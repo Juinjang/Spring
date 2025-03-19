@@ -19,5 +19,5 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 public class ChecklistControllerV2 {
-
+    int test;
 }

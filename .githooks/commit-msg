@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# 커밋 메시지 파일
+commit_msg_file=$1
+
+# 커밋 메시지 읽기
+commit_msg=$(cat "$commit_msg_file")
+
+# 정규식 패턴 (feat|fix|docs|refactor|test|chore 등의 prefix 필수)
+pattern="^(feat|fix|docs|refactor|test|chore): .+"
+
+# 메시지 검증 (형식이 맞지 않으면 커밋 차단)
+if ! [[ $commit_msg =~ $pattern ]]; then
+  echo "❌ [ERROR] 커밋 메시지가 잘못되었습니다!"
+  echo "✅ 올바른 형식: feat: 기능 추가, fix: 버그 수정, docs: 문서 추가 등"
+  exit 1
+fi
+
+# 커밋 메시지 패턴에 따라 깃이모지 추가
+case "$commit_msg" in
+  feat:*) new_msg="✨ $commit_msg" ;;
+  fix:*) new_msg="🐛 $commit_msg" ;;
+  docs:*) new_msg="📚 $commit_msg" ;;
+  refactor:*) new_msg="♻️ $commit_msg" ;;
+  test:*) new_msg="🧪 $commit_msg" ;;
+  chore:*) new_msg="🛠️ $commit_msg" ;;
+  *) new_msg="$commit_msg" ;;  # 기본적으로 변경하지 않음
+esac
+
+# 수정된 메시지를 커밋 메시지 파일에 덮어쓰기
+echo "$new_msg" > "$commit_msg_file"
+
+exit 0
