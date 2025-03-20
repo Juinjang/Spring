@@ -13,11 +13,13 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import umc.th.juinjang.config.TestConfig;
-import umc.th.juinjang.model.entity.Limjang;
-import umc.th.juinjang.model.entity.Member;
-import umc.th.juinjang.model.entity.enums.LimjangPriceType;
-import umc.th.juinjang.model.entity.enums.LimjangPropertyType;
-import umc.th.juinjang.model.entity.enums.LimjangPurpose;
+import umc.th.juinjang.domain.limjang.model.Limjang;
+import umc.th.juinjang.domain.limjang.repository.LimjangRepository;
+import umc.th.juinjang.domain.member.model.Member;
+import umc.th.juinjang.domain.limjang.model.LimjangPriceType;
+import umc.th.juinjang.domain.limjang.model.LimjangPropertyType;
+import umc.th.juinjang.domain.limjang.model.LimjangPurpose;
+import umc.th.juinjang.domain.member.repository.MemberRepository;
 
 @DataJpaTest
 @ActiveProfiles("test")

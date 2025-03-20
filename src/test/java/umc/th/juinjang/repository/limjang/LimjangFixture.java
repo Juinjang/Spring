@@ -1,8 +1,8 @@
 package umc.th.juinjang.repository.limjang;
 
 import java.time.LocalDateTime;
-import umc.th.juinjang.model.entity.Member;
-import umc.th.juinjang.model.entity.enums.MemberProvider;
+import umc.th.juinjang.domain.member.model.Member;
+import umc.th.juinjang.domain.member.model.MemberProvider;
 
 public class LimjangFixture {
 

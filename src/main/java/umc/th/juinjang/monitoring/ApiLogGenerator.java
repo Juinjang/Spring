@@ -1,6 +1,6 @@
 package umc.th.juinjang.monitoring;
 
-import static umc.th.juinjang.utils.LoggerProvider.getLogger;
+import static umc.th.juinjang.common.LoggerProvider.getLogger;
 
 import org.slf4j.Logger;
 import org.slf4j.MDC;
