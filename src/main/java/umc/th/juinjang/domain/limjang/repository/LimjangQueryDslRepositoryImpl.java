@@ -1,11 +1,10 @@
 package umc.th.juinjang.domain.limjang.repository;
 
 import static com.querydsl.core.types.Order.DESC;
-import static umc.th.juinjang.model.entity.QImage.image;
-import static umc.th.juinjang.model.entity.QLimjang.limjang;
-import static umc.th.juinjang.model.entity.QLimjangPrice.limjangPrice;
-import static umc.th.juinjang.model.entity.QReport.report;
-import static com.querydsl.core.group.GroupBy.list;
+import static umc.th.juinjang.domain.image.model.QImage.image;
+import static umc.th.juinjang.domain.limjang.model.QLimjang.limjang;
+import static umc.th.juinjang.domain.limjang.model.QLimjangPrice.limjangPrice;
+import static umc.th.juinjang.domain.report.model.QReport.report;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
