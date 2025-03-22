@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import umc.th.juinjang.event.SignUpEvent;
-import umc.th.juinjang.external.discord.DiscordAlertProvider;
+import umc.th.juinjang.external.openfeign.discord.DiscordAlertProvider;
 
 @Component
 @RequiredArgsConstructor
