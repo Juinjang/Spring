@@ -1,6 +1,7 @@
 package umc.th.juinjang.domain.note.liked.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -22,11 +23,11 @@ public class LikedNote {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long likedNoteId;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id", nullable = false)
 	private Member member;
 
-	@OneToOne
-	@JoinColumn(name = "shared_note_id", nullable = false, unique = true)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "shared_note_id", nullable = false)
 	private SharedNote sharedNote;
 }

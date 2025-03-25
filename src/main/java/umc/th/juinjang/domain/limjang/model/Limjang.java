@@ -99,11 +99,9 @@ public class Limjang extends BaseEntity {
 	@BatchSize(size = 100)
 	private List<Image> imageList = new ArrayList<>();
 
-	@OneToOne(mappedBy = "limjangId", cascade = CascadeType.ALL, orphanRemoval = true)
-	private SharedNote sharedNote;
-
-	@OneToOne(mappedBy = "limjangId", cascade = CascadeType.ALL, orphanRemoval = true)
-	private LikedNote likedNote;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "address_id")
+	private Address addressEntity;
 
 	@Column(name = "record_count")
 	@ColumnDefault("0") //default 0

@@ -1,5 +1,6 @@
 package umc.th.juinjang.domain.pencilaccount.model;
 
+import jakarta.persistence.FetchType;
 import org.hibernate.annotations.Comment;
 
 import jakarta.persistence.Entity;
@@ -23,8 +24,7 @@ public class PencilAccount extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long pencilAccountId;
 
-	@OneToOne
-	@JoinColumn(name = "member_id", nullable = false, unique = true)
+	@OneToOne(mappedBy = "member")
 	private Member member;
 
 	private Long acquiredBalance;

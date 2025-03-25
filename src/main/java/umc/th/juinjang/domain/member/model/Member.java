@@ -1,5 +1,6 @@
 package umc.th.juinjang.domain.member.model;
 
+import jakarta.persistence.JoinColumn;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -77,7 +78,8 @@ public class Member extends BaseEntity implements UserDetails {
 
 	private String status; // TODO : 추후에 ENUM 으로 변경 필요
 
-	@OneToOne(mappedBy = "memberId")
+	@OneToOne
+	@JoinColumn(name = "memberId")
 	private PencilAccount pencilAccount;
 
 	@OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
