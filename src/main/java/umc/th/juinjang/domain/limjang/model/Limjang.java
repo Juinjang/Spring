@@ -1,5 +1,11 @@
 package umc.th.juinjang.domain.limjang.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.ColumnDefault;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,21 +19,19 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.ColumnDefault;
 import umc.th.juinjang.domain.checklist.model.ChecklistAnswer;
+import umc.th.juinjang.domain.common.BaseEntity;
 import umc.th.juinjang.domain.image.model.Image;
 import umc.th.juinjang.domain.member.model.Member;
+import umc.th.juinjang.domain.note.liked.model.LikedNote;
+import umc.th.juinjang.domain.note.shared.model.SharedNote;
 import umc.th.juinjang.domain.record.model.Record;
 import umc.th.juinjang.domain.report.model.Report;
-import umc.th.juinjang.domain.common.BaseEntity;
 
 @Entity
 @Getter
@@ -37,90 +41,97 @@ import umc.th.juinjang.domain.common.BaseEntity;
 //@Where(clause = "deleted = false")
 public class Limjang extends BaseEntity {
 
-  @Id
-  @Column(name="limjang_id")
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long limjangId;
+	@Id
+	@Column(name = "limjang_id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long limjangId;
 
-  // 회원 ID
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "member_id")
-  private Member memberId;
+	// 회원 ID
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "member_id")
+	private Member memberId;
 
-  // 가격 ID
-  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-  @JoinColumn(name = "price_id", referencedColumnName = "price_id")
-  private LimjangPrice limjangPrice;
+	// 가격 ID
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "price_id", referencedColumnName = "price_id")
+	private LimjangPrice limjangPrice;
 
-  // 거래 목적
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private LimjangPurpose purpose;
+	// 거래 목적
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private LimjangPurpose purpose;
 
-  // 매물 유형
-  @Enumerated(EnumType.STRING)
-  private LimjangPropertyType propertyType;
+	// 매물 유형
+	@Enumerated(EnumType.STRING)
+	private LimjangPropertyType propertyType;
 
-  // 가격 유형
-  @Enumerated(EnumType.STRING)
-  private LimjangPriceType priceType;
+	// 가격 유형
+	@Enumerated(EnumType.STRING)
+	private LimjangPriceType priceType;
 
-  // 도로명 주소
-  @Column(nullable = false)
-  private String address;
+	// 도로명 주소
+	@Column(nullable = false)
+	private String address;
 
-  private String addressDetail;
+	private String addressDetail;
 
-  // 집 별명
-  @Column(nullable = false)
-  private String nickname;
+	// 보상 연필
+	private int rewardPencil;
 
-  @Column(columnDefinition = "text")
-  private String memo;
+	// 집 별명
+	@Column(nullable = false)
+	private String nickname;
 
-  // 양방향 매핑
-  @OneToMany(mappedBy = "limjangId", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<ChecklistAnswer> answerList = new ArrayList<>();
+	@Column(columnDefinition = "text")
+	private String memo;
 
-  @OneToOne(mappedBy = "limjangId", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Report report;
+	// 양방향 매핑
+	@OneToMany(mappedBy = "limjangId", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ChecklistAnswer> answerList = new ArrayList<>();
 
-  @OneToMany(mappedBy = "limjangId", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<Record> recordList = new ArrayList<>();
+	@OneToOne(mappedBy = "limjangId", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Report report;
 
-  @OneToMany(mappedBy = "limjangId", cascade = CascadeType.ALL, orphanRemoval = true)
-  @BatchSize(size = 100)
-  private List<Image> imageList = new ArrayList<>();
+	@OneToMany(mappedBy = "limjangId", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Record> recordList = new ArrayList<>();
 
-  @Column(name = "record_count")
-  @ColumnDefault("0") //default 0
-  private int recordCount;
+	@OneToMany(mappedBy = "limjangId", cascade = CascadeType.ALL, orphanRemoval = true)
+	@BatchSize(size = 100)
+	private List<Image> imageList = new ArrayList<>();
 
-  @Column(nullable = false, name = "deleted")
-  private boolean deleted = Boolean.FALSE;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "address_id")
+	private Address addressEntity;
 
-  public void saveMemberAndPrice(Member member, LimjangPrice limjangPrice){
-    this.limjangPrice = limjangPrice;
-    this.memberId = member;
-  }
+	@Column(name = "record_count")
+	@ColumnDefault("0") //default 0
+	private int recordCount;
 
-  public void updateLimjang(String address, String addressDetail, String nickname, LimjangPriceType priceType){
-    this.address = address;
-    this.addressDetail = addressDetail;
-    this.nickname = nickname;
-    this.priceType = priceType;
-  }
+	@Column(nullable = false, name = "deleted")
+	private boolean deleted = Boolean.FALSE;
 
-  public void updateMemo(String memo){
-    this.memo = memo;
-  }
-  public void saveImages(Image image){
-    this.imageList.add(image);
-  }
+	public void saveMemberAndPrice(Member member, LimjangPrice limjangPrice) {
+		this.limjangPrice = limjangPrice;
+		this.memberId = member;
+	}
 
-  public String getDefaultImage() {
-    return this.imageList.isEmpty() ? null :this.imageList.get(0).getImageUrl();
-  }
+	public void updateLimjang(String address, String addressDetail, String nickname, LimjangPriceType priceType) {
+		this.address = address;
+		this.addressDetail = addressDetail;
+		this.nickname = nickname;
+		this.priceType = priceType;
+	}
 
+	public void updateMemo(String memo) {
+		this.memo = memo;
+	}
+
+	public void saveImages(Image image) {
+		this.imageList.add(image);
+	}
+
+	public String getDefaultImage() {
+		return this.imageList.isEmpty() ? null : this.imageList.get(0).getImageUrl();
+	}
 
 }

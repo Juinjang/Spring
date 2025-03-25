@@ -1,19 +1,37 @@
 package umc.th.juinjang.domain.member.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.JoinColumn;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import umc.th.juinjang.domain.limjang.model.Limjang;
 import umc.th.juinjang.domain.common.BaseEntity;
+import umc.th.juinjang.domain.limjang.model.Limjang;
+import umc.th.juinjang.domain.note.liked.model.LikedNote;
+import umc.th.juinjang.domain.note.shared.model.SharedNote;
+import umc.th.juinjang.domain.pencil.purchased.model.PurchasedPencil;
+import umc.th.juinjang.domain.pencil.used.model.UsedPencil;
+import umc.th.juinjang.domain.pencilaccount.model.PencilAccount;
 
 @Entity
 @Getter
@@ -22,97 +40,119 @@ import umc.th.juinjang.domain.common.BaseEntity;
 @AllArgsConstructor
 public class Member extends BaseEntity implements UserDetails {
 
-  @Id
-  @Column(name="member_id")
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long memberId;
+	@Id
+	@Column(name = "member_id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long memberId;
 
-  @Column(nullable = false)
-  private String email;
+	@Column(nullable = false)
+	private String email;
 
-  private String nickname;
+	private String nickname;
 
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private MemberProvider provider;
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private MemberProvider provider;
 
-  @Column(name = "agree_version")
-  private String agreeVersion;
+	@Column(name = "agree_version")
+	private String agreeVersion;
 
-  // apple client id값을 의미
-  @Column(name = "apple_sub", unique = true)
-  private String appleSub;
+	// apple client id값을 의미
+	@Column(name = "apple_sub", unique = true)
+	private String appleSub;
 
-  // kakao target id값 의미 (카카오의 유저 식별값. 탈퇴할 때 필요)
-  @Column(name="target_id", unique = true)
-  private Long kakaoTargetId;
+	// kakao target id값 의미 (카카오의 유저 식별값. 탈퇴할 때 필요)
+	@Column(name = "target_id", unique = true)
+	private Long kakaoTargetId;
 
-  @Lob
-  private String imageUrl;
+	@Lob
+	private String imageUrl;
 
-  @Column(nullable = false)
-  private String refreshToken;
+	@Column(nullable = false)
+	private String refreshToken;
 
-  @Column(nullable = false)
-  private LocalDateTime refreshTokenExpiresAt;
+	@Column(nullable = false)
+	private LocalDateTime refreshTokenExpiresAt;
 
-  @OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<Limjang> limjangList = new ArrayList<>();
+	private String introduction;
 
-  // refreshToken 재발급
-  public void updateRefreshToken(String refreshToken) {
-    this.refreshToken = refreshToken;
-    this.refreshTokenExpiresAt = LocalDateTime.now().plusDays(7);
-  }
+	private String status; // TODO : 추후에 ENUM 으로 변경 필요
 
-  // 로그아웃 시 토큰 만료
-  public void refreshTokenExpires() {
-    this.refreshToken = "";
-    this.refreshTokenExpiresAt = LocalDateTime.now();
-  }
+	@OneToOne
+	@JoinColumn(name = "memberId")
+	private PencilAccount pencilAccount;
 
-  @Override
-  public Collection<? extends GrantedAuthority> getAuthorities() {
-    return null;
-  }
+	@OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Limjang> limjangList = new ArrayList<>();
 
-  @Override
-  public String getPassword() {
-    return null;
-  }
+	@OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL)
+	private List<PurchasedPencil> purchasedPencils = new ArrayList<>();
 
-  @Override
-  public String getUsername() {
-    return this.email;
-  }
+	@OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL)
+	private List<UsedPencil> usedPencils = new ArrayList<>();
 
-  @Override
-  public boolean isAccountNonExpired() {
-    return false;
-  }
+	@OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL)
+	private List<SharedNote> sharedNotes = new ArrayList<>();
 
-  @Override
-  public boolean isAccountNonLocked() {
-    return false;
-  }
+	@OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL)
+	private List<LikedNote> likedNotes = new ArrayList<>();
 
-  @Override
-  public boolean isCredentialsNonExpired() {
-    return true;
-  }
+	// refreshToken 재발급
+	public void updateRefreshToken(String refreshToken) {
+		this.refreshToken = refreshToken;
+		this.refreshTokenExpiresAt = LocalDateTime.now().plusDays(7);
+	}
 
-  @Override
-  public boolean isEnabled() {
-    return true;
-  }
+	// 로그아웃 시 토큰 만료
+	public void refreshTokenExpires() {
+		this.refreshToken = "";
+		this.refreshTokenExpiresAt = LocalDateTime.now();
+	}
 
-  public void updateNickname(String nickname) {
-    this.nickname = nickname;
-  }
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return null;
+	}
 
-  public void updateImage(String imageUrl) {
-    this.imageUrl = imageUrl;
-  }
+	@Override
+	public String getPassword() {
+		return null;
+	}
 
-  public void updateAgreeVersion(final String agreeVersion) { this.agreeVersion = agreeVersion; }
+	@Override
+	public String getUsername() {
+		return this.email;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return false;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return false;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return true;
+	}
+
+	public void updateNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
+	public void updateImage(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
+	public void updateAgreeVersion(final String agreeVersion) {
+		this.agreeVersion = agreeVersion;
+	}
 }
