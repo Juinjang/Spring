@@ -6,7 +6,7 @@ import umc.th.juinjang.domain.limjang.model.LimjangPrice;
 import umc.th.juinjang.domain.limjang.model.LimjangPriceType;
 import umc.th.juinjang.domain.limjang.model.LimjangPurpose;
 
-public class LimjangPriceFactory {
+public class NotePriceFactory {
 	public static LimjangPrice create(LimjangPurpose purpose, LimjangPriceType priceType, String price,
 		String monthlyRent) {
 		checkValidPriceTypeAndPrice(priceType, monthlyRent);

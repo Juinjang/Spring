@@ -8,7 +8,7 @@ import umc.th.juinjang.api.address.service.AddressUpdater;
 import umc.th.juinjang.domain.limjang.model.Address;
 import umc.th.juinjang.domain.limjang.model.Limjang;
 import umc.th.juinjang.domain.limjang.model.LimjangPrice;
-import umc.th.juinjang.domain.limjang.repository.LimjangPriceFactory;
+import umc.th.juinjang.domain.limjang.repository.NotePriceFactory;
 import umc.th.juinjang.domain.member.model.Member;
 
 @Service
@@ -20,7 +20,7 @@ public class NoteCommandServiceV2 {
 	private final NotePriceUpdater notePriceUpdater;
 
 	public void createNote(NotePostRequest request, Member member) {
-		LimjangPrice limjangPrice = createLimjangPrice(request);
+		LimjangPrice limjangPrice = createNotePrice(request);
 		notePriceUpdater.save(limjangPrice);
 
 		Address address = createAddress(request);
@@ -33,8 +33,8 @@ public class NoteCommandServiceV2 {
 		noteUpdater.save(limjang);
 	}
 
-	private LimjangPrice createLimjangPrice(NotePostRequest request) {
-		return LimjangPriceFactory.create(request.purposeType(), request.priceType(),
+	private LimjangPrice createNotePrice(NotePostRequest request) {
+		return NotePriceFactory.create(request.purposeType(), request.priceType(),
 			request.price(), request.monthlyRent());
 	}
 
