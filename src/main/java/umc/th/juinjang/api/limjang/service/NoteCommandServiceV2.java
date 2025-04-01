@@ -28,7 +28,7 @@ public class NoteCommandServiceV2 {
 
 		int rewardPencil = 3; // 추후 바뀜
 		Limjang limjang = Limjang.create(member, limjangPrice, request.purposeType(), request.propertyType(),
-			request.priceType(), rewardPencil, request.nickname(), address);
+			request.priceType(), rewardPencil, request.nickname(), address, request.pyong(), request.floor());
 
 		noteUpdater.save(limjang);
 	}

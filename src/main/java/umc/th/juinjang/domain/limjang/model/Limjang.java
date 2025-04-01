@@ -74,7 +74,11 @@ public class Limjang extends BaseEntity {
 	private String addressDetail;
 
 	// 보상 연필
-	private int rewardPencil;
+	private Integer rewardPencil;
+
+	private Integer pyong;
+
+	private String floor;
 
 	// 집 별명
 	@Column(nullable = false)
@@ -135,7 +139,7 @@ public class Limjang extends BaseEntity {
 	@Builder
 	private Limjang(Member member, LimjangPrice limjangPrice, LimjangPurpose purpose,
 		LimjangPropertyType propertyType, LimjangPriceType priceType,
-		int rewardPencil, String nickname, Address addressEntity) {
+		int rewardPencil, String nickname, Address addressEntity, int pyong, String floor) {
 		this.memberId = member;
 		this.limjangPrice = limjangPrice;
 		this.purpose = purpose;
@@ -144,11 +148,13 @@ public class Limjang extends BaseEntity {
 		this.rewardPencil = rewardPencil;
 		this.nickname = nickname;
 		this.addressEntity = addressEntity;
+		this.pyong = pyong;
+		this.floor = floor;
 	}
 
 	public static Limjang create(Member member, LimjangPrice price, LimjangPurpose purpose,
 		LimjangPropertyType propertyType, LimjangPriceType priceType,
-		int rewardPencil, String nickname, Address addressEntity) {
+		int rewardPencil, String nickname, Address addressEntity, int pyong, String floor) {
 		return Limjang.builder()
 			.memberId(member)
 			.limjangPrice(price)
@@ -158,6 +164,8 @@ public class Limjang extends BaseEntity {
 			.rewardPencil(rewardPencil)
 			.nickname(nickname)
 			.addressEntity(addressEntity)
+			.pyong(pyong)
+			.floor(floor)
 			.build();
 	}
 }
