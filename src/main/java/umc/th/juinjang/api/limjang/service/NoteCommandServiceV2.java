@@ -26,9 +26,8 @@ public class NoteCommandServiceV2 {
 		Address address = createAddress(request);
 		addressUpdater.save(address);
 
-		int rewardPencil = 3; // 추후 바뀜
 		Limjang limjang = Limjang.create(member, limjangPrice, request.purposeType(), request.propertyType(),
-			request.priceType(), rewardPencil, request.nickname(), address, request.pyong(), request.floor());
+			request.priceType(), request.nickname(), address, request.pyong(), request.floor());
 
 		noteUpdater.save(limjang);
 	}
