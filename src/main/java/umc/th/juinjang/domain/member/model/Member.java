@@ -1,5 +1,7 @@
 package umc.th.juinjang.domain.member.model;
 
+import jakarta.persistence.JoinColumn;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -72,20 +74,23 @@ public class Member extends BaseEntity implements UserDetails {
 
 	private String status; // TODO : 추후에 ENUM 으로 변경 필요
 
-	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "member")
 	private List<PencilAccount> pencilAccounts = new ArrayList<>();
 
 	@OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = false)
 	private List<Limjang> limjangList = new ArrayList<>();
 
-	// @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-	// private List<PurchasedPencil> purchasedPencils = new ArrayList<>();
-	//
-	// @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-	// private List<SharedNote> sharedNotes = new ArrayList<>();
-	//
-	// @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-	// private List<LikedNote> likedNotes = new ArrayList<>();
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	private List<PurchasedPencil> purchasedPencils = new ArrayList<>();
+
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	private List<UsedPencil> usedPencils = new ArrayList<>();
+
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	private List<SharedNote> sharedNotes = new ArrayList<>();
+
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	private List<LikedNote> likedNotes = new ArrayList<>();
 
 	// refreshToken 재발급
 	public void updateRefreshToken(String refreshToken) {

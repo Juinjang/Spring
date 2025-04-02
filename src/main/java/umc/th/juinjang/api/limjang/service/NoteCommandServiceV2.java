@@ -1,0 +1,45 @@
+package umc.th.juinjang.api.limjang.service;
+
+import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
+import umc.th.juinjang.api.limjang.controller.request.NotePostRequest;
+import umc.th.juinjang.api.address.service.AddressUpdater;
+import umc.th.juinjang.domain.limjang.model.Address;
+import umc.th.juinjang.domain.limjang.model.Limjang;
+import umc.th.juinjang.domain.limjang.model.LimjangPrice;
+import umc.th.juinjang.domain.limjang.repository.NotePriceFactory;
+import umc.th.juinjang.domain.member.model.Member;
+
+@Service
+@RequiredArgsConstructor
+public class NoteCommandServiceV2 {
+
+	private final AddressUpdater addressUpdater;
+	private final NoteUpdater noteUpdater;
+	private final NotePriceUpdater notePriceUpdater;
+
+	public void createNote(NotePostRequest request, Member member) {
+		LimjangPrice limjangPrice = createNotePrice(request);
+		notePriceUpdater.save(limjangPrice);
+
+		Address address = createAddress(request);
+		addressUpdater.save(address);
+
+		Limjang limjang = Limjang.create(member, limjangPrice, request.purposeType(), request.propertyType(),
+			request.priceType(), request.nickname(), address, request.pyong(), request.floor());
+
+		noteUpdater.save(limjang);
+	}
+
+	private LimjangPrice createNotePrice(NotePostRequest request) {
+		return NotePriceFactory.create(request.purposeType(), request.priceType(),
+			request.price(), request.monthlyRent());
+	}
+
+	private Address createAddress(NotePostRequest request) {
+		return Address.create(request.roadAddress(), request.addressDetail(), request.bcode(),
+			request.sido(), request.sigungu(),
+			request.bname1(), request.bname2());
+	}
+}

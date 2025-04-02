@@ -28,8 +28,6 @@ import umc.th.juinjang.domain.checklist.model.ChecklistAnswer;
 import umc.th.juinjang.domain.common.BaseEntity;
 import umc.th.juinjang.domain.image.model.Image;
 import umc.th.juinjang.domain.member.model.Member;
-import umc.th.juinjang.domain.note.liked.model.LikedNote;
-import umc.th.juinjang.domain.note.shared.model.SharedNote;
 import umc.th.juinjang.domain.record.model.Record;
 import umc.th.juinjang.domain.report.model.Report;
 
@@ -70,13 +68,17 @@ public class Limjang extends BaseEntity {
 	private LimjangPriceType priceType;
 
 	// 도로명 주소
-	@Column(nullable = false)
+	// @Column(nullable = false)
 	private String address;
 
 	private String addressDetail;
 
 	// 보상 연필
-	private int rewardPencil;
+	private Integer rewardPencil;
+
+	private Integer pyong;
+
+	private String floor;
 
 	// 집 별명
 	@Column(nullable = false)
@@ -134,4 +136,34 @@ public class Limjang extends BaseEntity {
 		return this.imageList.isEmpty() ? null : this.imageList.get(0).getImageUrl();
 	}
 
+	@Builder
+	private Limjang(Member member, LimjangPrice limjangPrice, LimjangPurpose purpose,
+		LimjangPropertyType propertyType, LimjangPriceType priceType,
+		String nickname, Address addressEntity, int pyong, String floor) {
+		this.memberId = member;
+		this.limjangPrice = limjangPrice;
+		this.purpose = purpose;
+		this.propertyType = propertyType;
+		this.priceType = priceType;
+		this.nickname = nickname;
+		this.addressEntity = addressEntity;
+		this.pyong = pyong;
+		this.floor = floor;
+	}
+
+	public static Limjang create(Member member, LimjangPrice price, LimjangPurpose purpose,
+		LimjangPropertyType propertyType, LimjangPriceType priceType, String nickname, Address addressEntity, int pyong,
+		String floor) {
+		return Limjang.builder()
+			.memberId(member)
+			.limjangPrice(price)
+			.purpose(purpose)
+			.propertyType(propertyType)
+			.priceType(priceType)
+			.nickname(nickname)
+			.addressEntity(addressEntity)
+			.pyong(pyong)
+			.floor(floor)
+			.build();
+	}
 }
