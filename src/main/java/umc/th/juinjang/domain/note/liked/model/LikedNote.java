@@ -30,4 +30,5 @@ public class LikedNote {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "shared_note_id", nullable = false)
 	private SharedNote sharedNote;
+	
 }
