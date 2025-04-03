@@ -20,7 +20,7 @@ public class NoteFinder {
 	}
 
 	protected Limjang getNoteByIdWithAddressAndNotePriceWhereDeletedIsFalse(long id) {
-		return limjangRepository.findNoteByIdWithAddressAndNotePriceWhereDeletedIsFalse(id)
+		return limjangRepository.findByIdWithAddressAndNotePriceWhereDeletedIsFalse(id)
 			.orElseThrow(() -> new LimjangHandler(ErrorStatus.LIMJANG_NOTFOUND_ERROR));
 	}
 }
