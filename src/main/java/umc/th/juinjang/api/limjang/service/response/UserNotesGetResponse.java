@@ -23,7 +23,7 @@ public record UserNotesGetResponse(
 		String rate,
 		String price,
 		String monthlyRent,
-		int pyong,
+		Integer pyong,
 		String floor,
 		String address,
 		String shortAddress
