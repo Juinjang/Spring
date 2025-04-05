@@ -149,15 +149,21 @@ public class OAuthService {
 			throw new MemberHandler(FAILED_TO_LOGIN);
 		} else if (!getMember.isPresent()
 			&& !getTargetId.isPresent()) {   // 두 값 모두 존재하지 않을 때 실행될 코드, 아직 회원가입 하지 않은 회원인 경우
-			member = memberRepository.save(
-				Member.builder()
-					.email(email)
-					.provider(MemberProvider.KAKAO)
-					.kakaoTargetId(targetId)
-					.nickname(kakaoSignUpReqDto.getNickname())
-					.refreshToken("")
-					.refreshTokenExpiresAt(LocalDateTime.now())
-					.build()
+			// member = memberRepository.save(
+			// 	Member.builder()
+			// 		.email(email)
+			// 		.provider(MemberProvider.KAKAO)
+			// 		.kakaoTargetId(targetId)
+			// 		.nickname(kakaoSignUpReqDto.getNickname())
+			// 		.refreshToken("")
+			// 		.refreshTokenExpiresAt(LocalDateTime.now())
+			// 		.build()
+			// );
+			member = Member.createKakaoMember(
+				email,
+				targetId,
+				kakaoSignUpReqDto.getNickname(),
+				null
 			);
 		}
 
@@ -589,16 +595,22 @@ public class OAuthService {
 			.equals(MemberProvider.KAKAO)) {
 			throw new MemberHandler(MEMBER_NOT_FOUND_IN_APPLE);
 		} else if (!findSub.isPresent() && !findEmail.isPresent()) {
-			member = memberRepository.save(
-				Member.builder()
-					.email(email)
-					.nickname(appleSignUpRequestDto.getNickname())
-					.provider(MemberProvider.APPLE)
-					.appleSub(sub)
-					.refreshToken("")
-					.refreshTokenExpiresAt(LocalDateTime.now())
-					.agreeVersion(appleSignUpRequestDto.getAgreeVersion())
-					.build()
+			// member = memberRepository.save(
+			// 	Member.builder()
+			// 		.email(email)
+			// 		.nickname(appleSignUpRequestDto.getNickname())
+			// 		.provider(MemberProvider.APPLE)
+			// 		.appleSub(sub)
+			// 		.refreshToken("")
+			// 		.refreshTokenExpiresAt(LocalDateTime.now())
+			// 		.agreeVersion(appleSignUpRequestDto.getAgreeVersion())
+			// 		.build()
+			// );
+			member = Member.createAppleMember(
+				email,
+				sub,
+				appleSignUpRequestDto.getNickname(),
+				appleSignUpRequestDto.getAgreeVersion()
 			);
 		}
 
