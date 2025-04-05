@@ -63,4 +63,14 @@ public class Address extends BaseEntity {
 			.bname2(bname2)
 			.build();
 	}
+
+	public void update(Address newAddress) {
+		this.roadAddress = newAddress.roadAddress;
+		this.addressDetail = newAddress.addressDetail;
+		this.bcode = newAddress.bcode;
+		this.sido = newAddress.sido;
+		this.sigungo = newAddress.sigungo;
+		this.bname1 = newAddress.bname1;
+		this.bname2 = newAddress.bname2;
+	}
 }
