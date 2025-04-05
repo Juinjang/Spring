@@ -1,7 +1,5 @@
 package umc.th.juinjang.domain.member.model;
 
-import jakarta.persistence.JoinColumn;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,6 +25,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import umc.th.juinjang.domain.common.BaseEntity;
 import umc.th.juinjang.domain.limjang.model.Limjang;
+import umc.th.juinjang.domain.note.liked.model.LikedNote;
+import umc.th.juinjang.domain.note.shared.model.SharedNote;
+import umc.th.juinjang.domain.pencil.purchased.model.PurchasedPencil;
+import umc.th.juinjang.domain.pencil.used.model.UsedPencil;
 import umc.th.juinjang.domain.pencilaccount.model.PencilAccount;
 
 @Entity
