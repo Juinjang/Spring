@@ -33,6 +33,7 @@ public class PencilAccount extends BaseEntity {
 
 	private Long purchasedBalance;
 
+	@Comment("총 계좌 잔액 = 얻은 잔액 + 구매 잔액")
 	private Long totalBalance;
 
 	private Long totalPurchaseAmount;
