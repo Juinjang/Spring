@@ -76,7 +76,7 @@ public class Member extends BaseEntity implements UserDetails {
 
 	private String status; // TODO : 추후에 ENUM 으로 변경 필요
 
-	@OneToMany(mappedBy = "member")
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 	private List<PencilAccount> pencilAccounts = new ArrayList<>();
 
 	@OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = false)
