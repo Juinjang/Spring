@@ -7,23 +7,24 @@ import lombok.NoArgsConstructor;
 
 public class MemberResponseDto {
 
-    @Builder
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class nicknameDto {
-        private String nickname;
-    }
+	@Builder
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class nicknameDto {
+		private String nickname;
+	}
 
-    @Builder
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class profileDto {
-        private String nickname;
-        private String email;
-        private String provider;
-        private String image;
-    }
+	@Builder
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class profileDto {
+		private String nickname;
+		private String email;
+		private String provider;
+		private String image;
+		private String introduction;
+	}
 
 }

@@ -1,7 +1,5 @@
 package umc.th.juinjang.domain.member.model;
 
-import jakarta.persistence.JoinColumn;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,7 +18,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -79,10 +76,10 @@ public class Member extends BaseEntity implements UserDetails {
 
 	private String status; // TODO : 추후에 ENUM 으로 변경 필요
 
-	@OneToMany(mappedBy = "member")
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 	private List<PencilAccount> pencilAccounts = new ArrayList<>();
 
-	@OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = false)
 	private List<Limjang> limjangList = new ArrayList<>();
 
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
@@ -154,5 +151,55 @@ public class Member extends BaseEntity implements UserDetails {
 
 	public void updateAgreeVersion(final String agreeVersion) {
 		this.agreeVersion = agreeVersion;
+	}
+
+	public static Member createKakaoMember(String email, Long targetId, String nickname, String agreeVersion) {
+		Member member = Member.builder()
+			.email(email)
+			.provider(MemberProvider.KAKAO)
+			.kakaoTargetId(targetId)
+			.nickname(nickname)
+			.refreshToken("")
+			.refreshTokenExpiresAt(LocalDateTime.now())
+			.agreeVersion(agreeVersion)
+			.build();
+
+		PencilAccount createAccount = PencilAccount.createPencilAccount(member);
+		member.addPencilAccount(createAccount);
+
+		return member;
+	}
+
+	// 애플 회원 생성 팩토리 메서드
+	public static Member createAppleMember(String email, String sub, String nickname, String agreeVersion) {
+		Member member = Member.builder()
+			.email(email)
+			.nickname(nickname)
+			.provider(MemberProvider.APPLE)
+			.appleSub(sub)
+			.refreshToken("")
+			.refreshTokenExpiresAt(LocalDateTime.now())
+			.agreeVersion(agreeVersion)
+			.build();
+
+		PencilAccount createAccount = PencilAccount.createPencilAccount(member);
+		member.addPencilAccount(createAccount);
+
+		return member;
+	}
+
+	public PencilAccount getAccount() {
+		if (this.pencilAccounts == null || this.pencilAccounts.isEmpty()) {
+			return null;
+		}
+
+		return this.pencilAccounts.get(0);
+	}
+
+	public void addPencilAccount(PencilAccount pencilAccount) {
+		if (this.pencilAccounts == null) {
+			this.pencilAccounts = new ArrayList<>();
+		}
+		this.pencilAccounts.add(pencilAccount);
 	}
 }
