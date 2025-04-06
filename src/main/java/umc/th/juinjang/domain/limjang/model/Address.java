@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import umc.th.juinjang.domain.common.BaseEntity;
@@ -37,4 +38,39 @@ public class Address extends BaseEntity {
 
 	@Comment("동")
 	private String bname2;
+
+	@Builder
+	private Address(String roadAddress, String addressDetail, String bcode, String sido, String sigungo,
+		String bname1, String bname2) {
+		this.roadAddress = roadAddress;
+		this.addressDetail = addressDetail;
+		this.bcode = bcode;
+		this.sido = sido;
+		this.sigungo = sigungo;
+		this.bname1 = bname1;
+		this.bname2 = bname2;
+	}
+
+	public static Address create(String roadAddress, String addressDetail, String bcode, String sido, String sigungo,
+		String bname1, String bname2) {
+		return Address.builder()
+			.roadAddress(roadAddress)
+			.addressDetail(addressDetail)
+			.bcode(bcode)
+			.sido(sido)
+			.sigungo(sigungo)
+			.bname1(bname1)
+			.bname2(bname2)
+			.build();
+	}
+
+	public void update(Address newAddress) {
+		this.roadAddress = newAddress.roadAddress;
+		this.addressDetail = newAddress.addressDetail;
+		this.bcode = newAddress.bcode;
+		this.sido = newAddress.sido;
+		this.sigungo = newAddress.sigungo;
+		this.bname1 = newAddress.bname1;
+		this.bname2 = newAddress.bname2;
+	}
 }

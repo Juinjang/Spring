@@ -1,6 +1,7 @@
 package umc.th.juinjang.domain.note.shared.model;
 
 import jakarta.persistence.FetchType;
+
 import java.sql.Timestamp;
 
 import org.hibernate.annotations.Comment;
@@ -56,6 +57,6 @@ public class SharedNote extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id", nullable = false)
-	private Member memberId;
+	private Member member;
 }
 

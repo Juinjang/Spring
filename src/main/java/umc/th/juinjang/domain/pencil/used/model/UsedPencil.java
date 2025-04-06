@@ -23,7 +23,7 @@ public class UsedPencil extends BaseEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "member_id", nullable = false)
-	private Member memberId;
+	private Member member;
 
 	private Long usedQuantity;
 
