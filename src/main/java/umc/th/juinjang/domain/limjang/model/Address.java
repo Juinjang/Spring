@@ -1,5 +1,9 @@
 package umc.th.juinjang.domain.limjang.model;
 
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.hibernate.annotations.Comment;
 
 import jakarta.persistence.Entity;
@@ -62,6 +66,12 @@ public class Address extends BaseEntity {
 			.bname1(bname1)
 			.bname2(bname2)
 			.build();
+	}
+
+	public String getShortAddress() {
+		return Stream.of(sigungo, bname1, bname2)
+			.filter(Objects::nonNull)
+			.collect(Collectors.joining(" "));
 	}
 
 	public void update(Address newAddress) {
