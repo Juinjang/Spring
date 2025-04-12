@@ -1,6 +1,7 @@
 package umc.th.juinjang.auth.config;
 
-import lombok.RequiredArgsConstructor;
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -16,85 +17,106 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import lombok.RequiredArgsConstructor;
 import umc.th.juinjang.auth.jwt.JwtAuthenticationFilter;
 import umc.th.juinjang.auth.jwt.JwtExceptionFilter;
 import umc.th.juinjang.auth.jwt.JwtService;
-
-import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final AuthenticationConfiguration authenticationConfiguration;
+	private final AuthenticationConfiguration authenticationConfiguration;
 
-    private final JwtService jwtService;
+	private final JwtService jwtService;
 
-    private final JwtExceptionFilter jwtExceptionFilter;
+	private final JwtExceptionFilter jwtExceptionFilter;
 
-    private final Environment environment;
-    @Bean
-    @Order(0)
-    public WebSecurityCustomizer webSecurityCustomizer(){
-        String[] activeProfiles = environment.getActiveProfiles();
-        boolean isProd = Arrays.asList(activeProfiles).contains("prod");
+	private final Environment environment;
 
-        //prod아닐때
-        if (!isProd) {
-            return web -> web.ignoring()
-                    .requestMatchers("/swagger-ui/**", "/swagger/**", "/swagger-resources/**", "/swagger-ui.html", "/test",
-                            "/configuration/ui",  "/v3/api-docs/**", "/h2-console/**", "/api/auth/regenerate-token",
-                            "/api/auth/kakao/**", "/api/auth/apple/**", "/actuator/prometheus",
-                            "/api/auth/v2/apple/**", "/api/auth/v2/kakao/**");
-        }
-        else {
-          return web -> web.ignoring()
-                    .requestMatchers("/h2-console/**", "/api/auth/regenerate-token",
-                            "/api/auth/kakao/**", "/api/auth/apple/**", "/actuator/prometheus",
-                            "/api/auth/v2/apple/**", "/api/auth/v2/kakao/**");
-        }
+	// 공통적으로 허용되는 URL 패턴
+	private static final String[] COMMON_WHITELIST_URLS = {
+		"/h2-console/**",
+		"/api/auth/regenerate-token",
+		"/api/auth/kakao/**",
+		"/api/auth/apple/**",
+		"/actuator/prometheus",
+		"/api/auth/v2/apple/**",
+		"/api/auth/v2/kakao/**",
+		"/api/members/nickname/exists"
+	};
 
-    }
+	// 개발 환경에서만 추가로 허용되는 URL 패턴
+	private static final String[] DEV_WHITELIST_URLS = {
+		"/swagger-ui/**",
+		"/swagger/**",
+		"/swagger-resources/**",
+		"/swagger-ui.html",
+		"/test",
+		"/configuration/ui",
+		"/v3/api-docs/**"
+	};
 
-    //선언 방식이 3.x에서 바뀜
-    @Bean AuthenticationManager authenticationManager(AuthenticationConfiguration authConfiguration) throws Exception
-    { return authConfiguration.getAuthenticationManager(); }
+	@Bean
+	@Order(0)
+	public WebSecurityCustomizer webSecurityCustomizer() {
+		String[] activeProfiles = environment.getActiveProfiles();
+		boolean isProd = Arrays.asList(activeProfiles).contains("prod");
 
-    @Bean
-    protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		//prod아닐때
+		if (!isProd) {
+			return web -> web.ignoring()
+				.requestMatchers(COMMON_WHITELIST_URLS)
+				.requestMatchers(DEV_WHITELIST_URLS);
+		} else {
+			return web -> web.ignoring()
+				.requestMatchers(COMMON_WHITELIST_URLS);
+		}
 
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .formLogin(Customizer.withDefaults())
-                .sessionManagement((sessionManagement) ->
-                                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                        세션을 사용하지 않는다고 설정함
-                )
-                .addFilter(new JwtAuthenticationFilter(authenticationManager(authenticationConfiguration),jwtService))
-//                 JwtAuthenticationFilter를 필터에 넣음
-                .authorizeHttpRequests((authorizeRequests) ->
-                        authorizeRequests
-                                .requestMatchers(
-                                        AntPathRequestMatcher.antMatcher("/api/auth/**")
-                                ).authenticated()
-                                .requestMatchers(
-                                    AntPathRequestMatcher.antMatcher("/h2-console/**")
-                                ).permitAll()
+	}
 
-                                .anyRequest().authenticated()
+	//선언 방식이 3.x에서 바뀜
+	@Bean
+	AuthenticationManager authenticationManager(AuthenticationConfiguration authConfiguration) throws Exception {
+		return authConfiguration.getAuthenticationManager();
+	}
 
-                )
-                .headers(
-                        headersConfigurer ->
-                                headersConfigurer
-                                        .frameOptions(
-                                                HeadersConfigurer.FrameOptionsConfig::sameOrigin
-                                        )
-                )
-                .addFilterBefore(jwtExceptionFilter, JwtAuthenticationFilter.class);
+	@Bean
+	protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        return http.build();
-    }
+		http
+			.csrf(AbstractHttpConfigurer::disable)
+			.formLogin(Customizer.withDefaults())
+			.sessionManagement((sessionManagement) ->
+					sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+				//                        세션을 사용하지 않는다고 설정함
+			)
+			.addFilter(new JwtAuthenticationFilter(authenticationManager(authenticationConfiguration), jwtService))
+			//                 JwtAuthenticationFilter를 필터에 넣음
+			.authorizeHttpRequests((authorizeRequests) ->
+				authorizeRequests
+					.requestMatchers(
+						AntPathRequestMatcher.antMatcher("/api/members/nickname/exists"),
+						AntPathRequestMatcher.antMatcher("/h2-console/**")
+					).permitAll()
+					.requestMatchers(
+						AntPathRequestMatcher.antMatcher("/api/auth/**")
+					).authenticated()
+					.anyRequest().authenticated()
+
+			)
+			.headers(
+				headersConfigurer ->
+					headersConfigurer
+						.frameOptions(
+							HeadersConfigurer.FrameOptionsConfig::sameOrigin
+						)
+			)
+			.addFilterBefore(jwtExceptionFilter, JwtAuthenticationFilter.class);
+
+		return http.build();
+	}
 
 }
 

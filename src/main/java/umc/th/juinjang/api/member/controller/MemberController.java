@@ -2,6 +2,8 @@ package umc.th.juinjang.api.member.controller;
 
 import static umc.th.juinjang.common.code.status.ErrorStatus.*;
 
+import java.util.Map;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -79,6 +82,12 @@ public class MemberController {
 		@RequestBody @Valid MemberAgreeVersionPostRequest memberAgreeVersionPostRequest) {
 		memberService.createMemberAgreeVersion(member, memberAgreeVersionPostRequest);
 		return ApiResponse.onSuccess(null);
+	}
+
+	@Operation(summary = "닉네임 중복 여부")
+	@GetMapping("/members/nickname/exists")
+	public ApiResponse<Map<String, Boolean>> isNicknameExists(@RequestParam String nickname) {
+		return ApiResponse.onSuccess(Map.of("exists", memberService.isNicknameExists(nickname)));
 	}
 
 }

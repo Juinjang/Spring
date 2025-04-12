@@ -103,6 +103,10 @@ public class MemberService {
 		getMember(member).updateAgreeVersion(memberAgreeVersionPostRequest.agreeVersion());
 	}
 
+	public boolean isNicknameExists(String nickname) {
+		return memberRepository.existsByNickname(nickname);
+	}
+
 	private Member getMember(Member member) {
 		return memberRepository.findById(member.getMemberId()).orElseThrow(() -> new MemberHandler(MEMBER_NOT_FOUND));
 	}
