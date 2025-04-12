@@ -1,0 +1,21 @@
+package umc.th.juinjang.api.pencil.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+
+import lombok.RequiredArgsConstructor;
+import umc.th.juinjang.domain.member.model.Member;
+import umc.th.juinjang.domain.pencil.acquired.model.AcquiredPencil;
+import umc.th.juinjang.domain.pencil.acquired.repository.AcquiredPencilRepository;
+
+@Component
+@RequiredArgsConstructor
+public class AcquiredPencilFinder {
+
+	private final AcquiredPencilRepository acquiredPencilRepository;
+
+	public List<AcquiredPencil> findAllByMember(Member member) {
+		return acquiredPencilRepository.findAllByMember(member);
+	}
+}

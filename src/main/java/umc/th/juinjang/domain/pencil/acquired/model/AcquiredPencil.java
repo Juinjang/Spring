@@ -1,6 +1,8 @@
 package umc.th.juinjang.domain.pencil.acquired.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,11 +28,12 @@ public class AcquiredPencil {
 
 	private String content;
 
-	private String sharedNoteId;
+	private Long sharedNoteId;
 
 	private int acquiredQuantity;
 
 	private boolean isRead;
 
-	private String type; // Note, Add, Sold
+	@Enumerated(EnumType.STRING)
+	private AcquiredType type; // Note, Add, Sold
 }
