@@ -31,4 +31,10 @@ public class NoteFinder {
 		return limjangRepository.findByIdWithAddressAndNotePriceWhereDeletedIsFalse(id)
 			.orElseThrow(() -> new LimjangHandler(ErrorStatus.LIMJANG_NOTFOUND_ERROR));
 	}
+
+	protected List<Limjang> getAllByMemberWithAddressAndNotePriceWhereRewardPencilIsNotNullAndDeletedIsFalse(
+		Member member) {
+		return limjangRepository.findAllByMemberWithAddressAndNotePriceWhereRewardPencilIsNotNullAndDeletedIsFalse(
+			member);
+	}
 }
