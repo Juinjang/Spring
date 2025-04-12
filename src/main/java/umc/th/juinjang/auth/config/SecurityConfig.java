@@ -35,6 +35,29 @@ public class SecurityConfig {
 
 	private final Environment environment;
 
+	// 공통적으로 허용되는 URL 패턴
+	private static final String[] COMMON_WHITELIST_URLS = {
+		"/h2-console/**",
+		"/api/auth/regenerate-token",
+		"/api/auth/kakao/**",
+		"/api/auth/apple/**",
+		"/actuator/prometheus",
+		"/api/auth/v2/apple/**",
+		"/api/auth/v2/kakao/**",
+		"/api/members/nickname/exists"
+	};
+
+	// 개발 환경에서만 추가로 허용되는 URL 패턴
+	private static final String[] DEV_WHITELIST_URLS = {
+		"/swagger-ui/**",
+		"/swagger/**",
+		"/swagger-resources/**",
+		"/swagger-ui.html",
+		"/test",
+		"/configuration/ui",
+		"/v3/api-docs/**"
+	};
+
 	@Bean
 	@Order(0)
 	public WebSecurityCustomizer webSecurityCustomizer() {
@@ -44,15 +67,11 @@ public class SecurityConfig {
 		//prod아닐때
 		if (!isProd) {
 			return web -> web.ignoring()
-				.requestMatchers("/swagger-ui/**", "/swagger/**", "/swagger-resources/**", "/swagger-ui.html", "/test",
-					"/configuration/ui", "/v3/api-docs/**", "/h2-console/**", "/api/auth/regenerate-token",
-					"/api/auth/kakao/**", "/api/auth/apple/**", "/actuator/prometheus",
-					"/api/auth/v2/apple/**", "/api/auth/v2/kakao/**", "/api/members/nickname/exists");
+				.requestMatchers(COMMON_WHITELIST_URLS)
+				.requestMatchers(DEV_WHITELIST_URLS);
 		} else {
 			return web -> web.ignoring()
-				.requestMatchers("/h2-console/**", "/api/auth/regenerate-token",
-					"/api/auth/kakao/**", "/api/auth/apple/**", "/actuator/prometheus",
-					"/api/auth/v2/apple/**", "/api/auth/v2/kakao/**", "/api/members/nickname/exists");
+				.requestMatchers(COMMON_WHITELIST_URLS);
 		}
 
 	}
