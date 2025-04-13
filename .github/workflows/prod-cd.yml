@@ -73,7 +73,7 @@ jobs:
             docker image prune -f
 
   create-release:
-    needs: CD
+    needs: build
     runs-on: ubuntu-22.04
 
     steps:
