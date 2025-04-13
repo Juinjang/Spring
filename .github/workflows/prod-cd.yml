@@ -71,4 +71,26 @@ jobs:
             chmod 777 ./deploy.sh
             ./deploy.sh
             docker image prune -f
-          
+
+  create-release:
+    needs: CD
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 버전 정보 추출
+        id: extract_version_name
+        run: |
+          VERSION=$(echo '${{ github.event.head_commit.message }}' | grep -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+')
+          echo "VERSION=$VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Release 생성
+        if: steps.extract_version_name.outputs.version != ''
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_SECRET }}
+        with:
+          tag_name: ${{ steps.extract_version_name.outputs.version }}
+          release_name: ${{ steps.extract_version_name.outputs.version }}
