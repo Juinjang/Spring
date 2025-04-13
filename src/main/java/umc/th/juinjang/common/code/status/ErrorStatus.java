@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import umc.th.juinjang.api.sharednote.service.SharedNoteFinder;
 import umc.th.juinjang.common.code.BaseErrorCode;
 import umc.th.juinjang.common.code.ErrorReasonDTO;
 
@@ -102,7 +103,11 @@ public enum ErrorStatus implements BaseErrorCode {
 	DISCORD_ALERT_ERROR(HttpStatus.NOT_FOUND, "DISCORD400", "discord 알림 수신 중 오류가 발생했습니다."),
 
 	// PencilAccount alert
-	PENCIL_ACCOUNT_NOT_FOUND(HttpStatus.BAD_REQUEST, "ACCOUNT4000", "멤버에 해당하는 계좌가 존재하지 않습니다.");
+	PENCIL_ACCOUNT_NOT_FOUND(HttpStatus.BAD_REQUEST, "ACCOUNT4000", "멤버에 해당하는 계좌가 존재하지 않습니다."),
+
+	SHAREDNOTE_NOT_FOUND(HttpStatus.BAD_REQUEST, "SHAREDNOTE4000", "해당하는 공유노트가 존재하지 않습니다."),
+	SHAREDNOTE_ALREADY_PURCHASE(HttpStatus.BAD_REQUEST, "SHAREDNOTE4001", "보유한 연필 수가 부족합니다."),
+	SHAREDNOTE_CONFLICT(HttpStatus.CONFLICT, "SHAREDNOTE4002", "이미 구매한 노트입니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;
