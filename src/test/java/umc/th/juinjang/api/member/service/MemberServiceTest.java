@@ -3,9 +3,12 @@ package umc.th.juinjang.api.member.service;
 import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,6 +18,7 @@ import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.member.model.MemberProvider;
 import umc.th.juinjang.domain.member.repository.MemberRepository;
 import umc.th.juinjang.domain.pencilaccount.repository.PencilAccountRepository;
+import umc.th.juinjang.testutil.fixture.MemberFixture;
 
 public class MemberServiceTest extends IntegrationTestSupport {
 
@@ -29,8 +33,8 @@ public class MemberServiceTest extends IntegrationTestSupport {
 
 	@AfterEach
 	void tearDown() {
-		memberRepository.deleteAllInBatch();
 		pencilAccountRepository.deleteAllInBatch();
+		memberRepository.deleteAllInBatch();
 	}
 
 	private final String DEFAULT_EMAIL = "test@naver.com";
@@ -68,6 +72,59 @@ public class MemberServiceTest extends IntegrationTestSupport {
 
 		// then
 		assertThat(updatedMember.getIntroduction()).isEqualTo(changedIntroduction);
+	}
+
+	@Nested
+	@DisplayName("닉네임 중복 검사")
+	class NicknameExistsTest {
+
+		// static 필드로 선언
+		private static String existingNickname;
+
+		@BeforeEach
+		void setUp() {
+			// given - 여러 멤버 데이터 한 번만 설정
+			existingNickname = "테스트1";
+			String nickname2 = "테스트2";
+			String nickname3 = "테스트3";
+
+			Member member1 = MemberFixture.createMemberWithParams(
+				"custom1@example.com", 11111111L, existingNickname,
+				"안녕하세요", "https://custom.image.url");
+
+			Member member2 = MemberFixture.createMemberWithParams(
+				"custom2@example.com", 2222222L, nickname2,
+				"안녕하세요", "https://custom.image.url");
+
+			Member member3 = MemberFixture.createMemberWithParams(
+				"custom3@example.com", 3333333L, nickname3,
+				"안녕하세요", "https://custom.image.url");
+
+			memberRepository.saveAll(List.of(member1, member2, member3));
+		}
+
+		@DisplayName("닉네임이 중복되었을 때, 중복 여부를 True 로 반환한다")
+		@Test
+		void returnsTrueWhenNicknameExists() {
+			// when
+			boolean result = memberService.isNicknameExists(existingNickname);
+
+			// then
+			assertThat(result).isTrue();
+		}
+
+		@DisplayName("닉네임이 중복되지 않았을 때, 중복 여부를 False 로 반환한다")
+		@Test
+		void returnsFalseWhenNicknameDoesNotExist() {
+			// given
+			String nonExistingNickname = "존재하지않는닉네임";
+
+			// when
+			boolean result = memberService.isNicknameExists(nonExistingNickname);
+
+			// then
+			assertThat(result).isFalse();
+		}
 	}
 
 	private Member createDefaultMember() {
