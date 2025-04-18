@@ -15,6 +15,7 @@ public class SharedNoteFinder {
 	private final SharedNoteRepository sharedNoteRepository;
 
 	SharedNote findById(Long id) {
-		sharedNoteRepository.findById(id).orElseThrow(new SharedNoteHandler(ErrorStatus.));
+		return sharedNoteRepository.findById(id)
+			.orElseThrow(() -> new SharedNoteHandler(ErrorStatus.SHAREDNOTE_NOT_FOUND));
 	}
 }
