@@ -22,18 +22,10 @@ public class ChecklistAnswerFinder {
 	private final LimjangRepository limjangRepository;
 
 	public List<ChecklistAnswerResponseDTO.AnswerDto> findByLimjangId(Long limjangId) {
-		Limjang limjang = limjangRepository.findById(limjangId)
+		Limjang limjang = limjangRepository.findByLimjangIdAndDeletedIsFalse(limjangId)
 			.orElseThrow(() -> new LimjangHandler(ErrorStatus.LIMJANG_NOTFOUND_ERROR));
 
 		List<ChecklistAnswer> answerList = checklistAnswerRepository.findChecklistAnswerByLimjangId(limjang);
-		return answerList.stream()
-			.map(entity -> ChecklistAnswerResponseDTO.AnswerDto.builder()
-				.answerId(entity.getAnswerId())
-				.questionId(entity.getQuestionId().getQuestionId())
-				.limjangId(entity.getLimjangId().getLimjangId())
-				.answer(entity.getAnswer())
-				.answerType(entity.getQuestionId().getAnswerType())
-				.build())
-			.collect(Collectors.toList());
+		return ChecklistAnswerResponseDTO.AnswerDto.fromEntityList(answerList);
 	}
 }
