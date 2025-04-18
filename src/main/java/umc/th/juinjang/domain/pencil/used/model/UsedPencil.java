@@ -40,7 +40,7 @@ public class UsedPencil extends BaseEntity {
 	@Column(name = "shared_note_id")
 	private Long sharedNoteId;
 
-	private int usedQuantity;
+	private Long usedQuantity;
 
 	// TODO: 우선 OWNED(소장) 하나만 추가
 	@Enumerated(EnumType.STRING)
@@ -50,7 +50,7 @@ public class UsedPencil extends BaseEntity {
 
 	private Long remainQuantity;
 
-	public static UsedPencil create(Member member, Long sharedNoteId, int usedQuantity, Usedtype type,
+	public static UsedPencil create(Member member, Long sharedNoteId, Long usedQuantity, Usedtype type,
 		String buildingName, Long remainQuantity) {
 		return new UsedPencil(
 			member,
@@ -63,7 +63,7 @@ public class UsedPencil extends BaseEntity {
 	}
 
 	@Builder
-	private UsedPencil(Member member, Long sharedNoteId, int usedQuantity, Usedtype type,
+	private UsedPencil(Member member, Long sharedNoteId, Long usedQuantity, Usedtype type,
 		String buildingName, Long remainQuantity) {
 		this.member = member;
 		this.sharedNoteId = sharedNoteId;
