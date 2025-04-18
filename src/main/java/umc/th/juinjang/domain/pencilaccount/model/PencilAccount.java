@@ -56,4 +56,23 @@ public class PencilAccount extends BaseEntity {
 			.member(member).build();
 
 	}
+
+	public void updatePurchasedBalance(long price) {
+		this.purchasedBalance -= price;
+		this.totalBalance = this.purchasedBalance + this.acquiredBalance;
+	}
+
+	public void recalculateTotalBalance() {
+		this.totalBalance = this.acquiredBalance + this.purchasedBalance;
+	}
+
+	public void increaseAcquiredBalance(long price) {
+		this.acquiredBalance += price;
+		this.totalBalance = this.purchasedBalance + this.acquiredBalance;
+	}
+
+	public void decreaseAcquiredBalance(long price) {
+		this.acquiredBalance -= price;
+		this.totalBalance = this.purchasedBalance + this.acquiredBalance;
+	}
 }
