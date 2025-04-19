@@ -1,5 +1,6 @@
 package umc.th.juinjang.domain.note.shared.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.FetchType;
 
 import java.sql.Timestamp;
@@ -38,9 +39,11 @@ public class SharedNote extends BaseEntity {
 	private boolean isImageShared;
 
 	@Comment("임장시기 연도")
+	@Column(name = "note_year")
 	private int year;
 
 	@Comment("임장시기 월")
+	@Column(name = "note_month")
 	private int month;
 
 	// TODO : 임장시기 - 시기 추후에, ENUM 으로 변경 필요
@@ -49,7 +52,7 @@ public class SharedNote extends BaseEntity {
 	private String review;
 
 	@Comment("임장 가격")
-	private int price;
+	private Long price;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "limjang_id", nullable = false, unique = true)

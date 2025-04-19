@@ -27,7 +27,7 @@ import umc.th.juinjang.common.code.status.ErrorStatus;
 @RestControllerAdvice(annotations = {RestController.class})
 public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 
-	@org.springframework.web.bind.annotation.ExceptionHandler
+	@ExceptionHandler
 	public ResponseEntity<Object> validation(ConstraintViolationException e, WebRequest request) {
 		String errorMessage = e.getConstraintViolations().stream()
 			.map(constraintViolation -> constraintViolation.getMessage())
@@ -37,7 +37,7 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 		return handleExceptionInternalConstraint(e, ErrorStatus.valueOf(errorMessage), HttpHeaders.EMPTY, request);
 	}
 
-	@org.springframework.web.bind.annotation.ExceptionHandler
+	@ExceptionHandler
 	public ResponseEntity<Object> exception(Exception e, WebRequest request) {
 		e.printStackTrace();
 
