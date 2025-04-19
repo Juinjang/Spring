@@ -67,7 +67,7 @@ public class SharedNoteCommandService {
 			if (buyerAccount.getPurchasedBalance() < unpaidPencil) {
 				throw new SharedNoteHandler(ErrorStatus.SHAREDNOTE_NOT_ENOUGH_PENCIL);
 			}
-			buyerAccount.updatePurchasedBalance(unpaidPencil);
+			buyerAccount.decreasePurchasedBalance(unpaidPencil);
 		}
 
 		sellerAccount.increaseAcquiredBalance(price);
