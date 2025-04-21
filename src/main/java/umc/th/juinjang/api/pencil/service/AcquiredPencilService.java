@@ -19,7 +19,7 @@ public class AcquiredPencilService {
 	private final PencilAccountService pencilAccountService;
 
 	public List<AcquiredPencilResponse> getAcquiredPencils(Member member) {
-		List<AcquiredPencil> acquiredPencils = acquiredPencilFinder.findAllByMember(member);
+		List<AcquiredPencil> acquiredPencils = acquiredPencilFinder.findAllByMemberOrderByCreatedAtDesc(member);
 		return acquiredPencils.stream()
 			.map(AcquiredPencilResponse::from)
 			.toList();

@@ -15,8 +15,8 @@ public class AcquiredPencilFinder {
 
 	private final AcquiredPencilRepository acquiredPencilRepository;
 
-	public List<AcquiredPencil> findAllByMember(Member member) {
-		return acquiredPencilRepository.findAllByMember(member);
+	public List<AcquiredPencil> findAllByMemberOrderByCreatedAtDesc(Member member) {
+		return acquiredPencilRepository.findAllByMemberOrderByCreatedAtDesc(member);
 	}
 
 	public AcquiredPencil findById(Long id) {
