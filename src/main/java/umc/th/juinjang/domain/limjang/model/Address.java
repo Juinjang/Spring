@@ -83,4 +83,8 @@ public class Address extends BaseEntity {
 		this.bname1 = newAddress.bname1;
 		this.bname2 = newAddress.bname2;
 	}
+
+	public String getFullAddress() {
+		return this.roadAddress + " " + this.getAddressDetail();
+	}
 }
