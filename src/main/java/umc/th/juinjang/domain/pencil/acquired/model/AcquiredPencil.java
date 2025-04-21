@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import umc.th.juinjang.domain.member.model.Member;
@@ -30,10 +31,34 @@ public class AcquiredPencil {
 
 	private Long sharedNoteId;
 
-	private int acquiredQuantity;
+	private Long acquiredQuantity;
 
 	private boolean isRead;
 
 	@Enumerated(EnumType.STRING)
 	private AcquiredType type; // Note, Add, Sold
+
+	@Builder
+	private AcquiredPencil(Member member, String content, Long sharedNoteId, Long acquiredQuantity, boolean isRead,
+		AcquiredType type) {
+		this.member = member;
+		this.content = content;
+		this.sharedNoteId = sharedNoteId;
+		this.acquiredQuantity = acquiredQuantity;
+		this.isRead = isRead;
+		this.type = type;
+	}
+
+	public static AcquiredPencil create(Member member, String content, Long sharedNoteId, Long acquiredQuantity,
+		boolean isRead,
+		AcquiredType type) {
+		return AcquiredPencil.builder()
+			.member(member)
+			.content(content)
+			.sharedNoteId(sharedNoteId)
+			.acquiredQuantity(acquiredQuantity)
+			.isRead(isRead)
+			.type(type)
+			.build();
+	}
 }

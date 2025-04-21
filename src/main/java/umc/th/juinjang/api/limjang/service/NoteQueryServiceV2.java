@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import umc.th.juinjang.api.image.service.ImageFinder;
 import umc.th.juinjang.api.limjang.controller.parameter.LimjangSortOptions;
+import umc.th.juinjang.api.limjang.service.response.UserNoteGetResponse;
 import umc.th.juinjang.api.limjang.service.response.UserNotesShareableGetResponse;
 import umc.th.juinjang.api.limjang.service.response.UserNotesGetResponse;
 import umc.th.juinjang.api.scrap.service.ScarpFinder;
@@ -64,5 +65,10 @@ public class NoteQueryServiceV2 {
 				image -> image.getLimjangId().getLimjangId(),
 				image -> image.getImageUrl()
 			));
+	}
+
+	@Transactional(readOnly = true)
+	public UserNoteGetResponse findNote(Long noteId) {
+		return UserNoteGetResponse.of(noteFinder.getNoteByIdWithAddressAndNotePriceWhereDeletedIsFalse(noteId));
 	}
 }
