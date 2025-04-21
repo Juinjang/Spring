@@ -18,4 +18,8 @@ public class AcquiredPencilFinder {
 	public List<AcquiredPencil> findAllByMember(Member member) {
 		return acquiredPencilRepository.findAllByMember(member);
 	}
+
+	public AcquiredPencil findById(Long id) {
+		return acquiredPencilRepository.findById(id).orElse(null);
+	}
 }

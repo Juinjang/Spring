@@ -10,12 +10,12 @@ public class AcquiredPencilResponse {
 	private Long acquiredPencilId;
 	private String content;
 	private Long sharedNoteId;
-	private int acquiredQuantity;
+	private Long acquiredQuantity;
 	private boolean isRead;
 	private String type;
 
 	@Builder
-	public AcquiredPencilResponse(Long acquiredPencilId, String content, Long sharedNoteId, int acquiredQuantity,
+	public AcquiredPencilResponse(Long acquiredPencilId, String content, Long sharedNoteId, Long acquiredQuantity,
 		boolean isRead, String type) {
 		this.acquiredPencilId = acquiredPencilId;
 		this.content = content;
