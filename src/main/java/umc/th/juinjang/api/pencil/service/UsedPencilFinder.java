@@ -16,4 +16,8 @@ public class UsedPencilFinder {
 		return usedPencilRepository.existsByMemberAndSharedNoteId(member, sharedNoteId);
 	}
 
+	public int countBySharedNoteId(long sharedNoteId) {
+		return usedPencilRepository.countBySharedNoteId(sharedNoteId);
+	}
+
 }
