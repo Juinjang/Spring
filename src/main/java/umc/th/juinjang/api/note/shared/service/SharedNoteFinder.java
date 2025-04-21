@@ -1,4 +1,4 @@
-package umc.th.juinjang.api.sharednote.service;
+package umc.th.juinjang.api.note.shared.service;
 
 import org.springframework.stereotype.Component;
 
