@@ -20,8 +20,7 @@ public class ViewCountSyncScheduler {
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final SharedNoteUpdater sharedNoteUpdater;
 
-	// @Scheduled(cron = "0 0 */6 * * *") // 6시간마다 실행
-	@Scheduled(cron = "*/30 * * * * *")
+	@Scheduled(cron = "0 0 */6 * * *") // 6시간마다 실행
 	@Transactional
 	public void syncRedisViewCountsToRDB() {
 		Set<String> keys = redisTemplate.keys(VIEW_COUNT + "*");
