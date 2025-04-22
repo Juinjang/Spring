@@ -1,5 +1,7 @@
 package umc.th.juinjang.api.note.shared.service;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
@@ -14,8 +16,17 @@ public class SharedNoteFinder {
 
 	private final SharedNoteRepository sharedNoteRepository;
 
-	SharedNote findById(Long id) {
+	SharedNote getById(Long id) {
 		return sharedNoteRepository.findById(id)
 			.orElseThrow(() -> new SharedNoteHandler(ErrorStatus.SHAREDNOTE_NOT_FOUND));
+	}
+
+	SharedNote findByIdWithNoteAndAddress(Long id) {
+		return sharedNoteRepository.findByIdWithNoteAndAddress(id)
+			.orElseThrow(() -> new SharedNoteHandler(ErrorStatus.SHAREDNOTE_NOT_FOUND));
+	}
+
+	Optional<SharedNote> findById(Long id) {
+		return sharedNoteRepository.findById(id);
 	}
 }
