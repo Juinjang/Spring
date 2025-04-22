@@ -33,14 +33,14 @@ public record SharedNoteGetResponse(
 	int likedCount,
 	String period,
 	String updatedAt,
-	int viewCount,
+	Long viewCount,
 	String floor,
 	int pyong,
 	String ownerProfileUrl,
 	String ownerNickname,
 	String ownerProfileBio
 ) {
-	public static SharedNoteGetResponse ofPurchased(
+	public static SharedNoteGetResponse ofNotPurchased(
 		boolean isBuyer,
 		Limjang limjang,
 		Address address,
@@ -48,7 +48,7 @@ public record SharedNoteGetResponse(
 		Member member,
 		Integer buyerCount,
 		boolean isLiked,
-		int viewCount) {
+		Long viewCount) {
 		return new SharedNoteGetResponse(
 			isBuyer,
 			sharedNote.isImageShared(),
@@ -81,7 +81,7 @@ public record SharedNoteGetResponse(
 		);
 	}
 
-	public static SharedNoteGetResponse ofNotPurchased(
+	public static SharedNoteGetResponse ofPurchased(
 		boolean isBuyer,
 		Limjang limjang,
 		Address address,
@@ -89,7 +89,7 @@ public record SharedNoteGetResponse(
 		Member member,
 		Integer buyerCount,
 		boolean isLiked,
-		int viewCount) {
+		Long viewCount) {
 		return new SharedNoteGetResponse(
 			isBuyer,
 			sharedNote.isImageShared(),
