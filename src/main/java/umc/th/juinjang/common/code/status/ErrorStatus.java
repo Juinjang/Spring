@@ -4,7 +4,6 @@ import org.springframework.http.HttpStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import umc.th.juinjang.api.sharednote.service.SharedNoteFinder;
 import umc.th.juinjang.common.code.BaseErrorCode;
 import umc.th.juinjang.common.code.ErrorReasonDTO;
 
