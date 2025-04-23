@@ -13,7 +13,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -54,9 +53,11 @@ public class SharedNote extends BaseEntity {
 	@Comment("임장 가격")
 	private Long price;
 
+	private int likeCount;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "limjang_id", nullable = false, unique = true)
-	private Limjang limjangId;
+	private Limjang limjang;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id", nullable = false)

@@ -89,6 +89,7 @@ public class Limjang extends BaseEntity {
 
 	// 양방향 매핑
 	@OneToMany(mappedBy = "limjangId", cascade = CascadeType.ALL, orphanRemoval = true)
+	@BatchSize(size = 100)
 	private List<ChecklistAnswer> answerList = new ArrayList<>();
 
 	@OneToOne(mappedBy = "limjangId", cascade = CascadeType.ALL, orphanRemoval = true)
