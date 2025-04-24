@@ -30,7 +30,7 @@ public record SharedNoteGetResponse(
 	String price,
 	String monthlyRent,
 	boolean isLiked,
-	int likedCount,
+	Long likedCount,
 	String period,
 	String updatedAt,
 	Long viewCount,

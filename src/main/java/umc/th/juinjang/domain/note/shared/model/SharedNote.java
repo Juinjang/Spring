@@ -53,7 +53,7 @@ public class SharedNote extends BaseEntity {
 	@Comment("임장 가격")
 	private Long price;
 
-	private int likeCount;
+	private Long likeCount;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "limjang_id", nullable = false, unique = true)
@@ -62,5 +62,9 @@ public class SharedNote extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id", nullable = false)
 	private Member member;
+
+	public Long increaseLikedCount() {
+		return this.likeCount = (likeCount == null ? 1L : likeCount + 1);
+	}
 }
 
