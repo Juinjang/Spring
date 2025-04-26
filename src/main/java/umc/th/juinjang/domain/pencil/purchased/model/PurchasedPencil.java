@@ -16,12 +16,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import umc.th.juinjang.domain.common.BaseEntity;
 import umc.th.juinjang.domain.member.model.Member;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class PurchasedPencil {
+public class PurchasedPencil extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,8 +48,6 @@ public class PurchasedPencil {
 	@Convert(converter = DeliveryStatusConverter.class)
 	private DeliveryStatus deliveryStatus;
 
-	private LocalDateTime createdAt;
-
 	@Builder
 	public PurchasedPencil(Member member, String title, Long purchaseQuantity,
 		Long remainQuantity,
@@ -62,7 +61,7 @@ public class PurchasedPencil {
 		this.transactionId = transactionId;
 		this.appAccountToken = appAccountToken;
 		this.deliveryStatus = deliveryStatus;
-		this.createdAt = createdAt;
+		setCreatedAt(createdAt);
 	}
 
 	public static PurchasedPencil createSuccessPurchase(Member member, String title,

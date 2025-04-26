@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import lombok.extern.slf4j.Slf4j;
 import umc.th.juinjang.api.IntegrationTestSupport;
 import umc.th.juinjang.api.pencil.service.response.AcquiredPencilResponse;
 import umc.th.juinjang.api.pencil.service.response.PurchasedPencilsResponse;
@@ -25,6 +26,7 @@ import umc.th.juinjang.domain.pencil.purchased.model.PurchasedPencil;
 import umc.th.juinjang.domain.pencil.purchased.repository.PurchasedPencilRepository;
 import umc.th.juinjang.testutil.fixture.MemberFixture;
 
+@Slf4j
 class PencilServiceTest extends IntegrationTestSupport {
 
 	@Autowired
@@ -92,6 +94,10 @@ class PencilServiceTest extends IntegrationTestSupport {
 		// when
 		List<AcquiredPencilResponse> foundPencils = pencilService.getAcquiredPencils(member);
 
+		foundPencils.forEach(pencil ->
+			log.info("[ACQUIRED PENCILS]: {}", pencil.getCreatedAt())
+		);
+
 		// then
 		assertThat(foundPencils).hasSize(5)
 			.extracting("content", "sharedNoteId", "acquiredQuantity")
@@ -153,6 +159,10 @@ class PencilServiceTest extends IntegrationTestSupport {
 		// when
 		List<PurchasedPencilsResponse> purchasedPencils = pencilService.getPurchasedPencils(member);
 
+		purchasedPencils.forEach(pencil -> {
+				log.info("[PENCILS]: CREATED_AT : {} ", pencil.getCreatedAt());
+			}
+		);
 		// then
 		assertThat(purchasedPencils).hasSize(5)
 			.extracting("title", "purchaseQuantity", "price")
@@ -178,7 +188,6 @@ class PencilServiceTest extends IntegrationTestSupport {
 		PurchasedPencil pencil = createServerErrorPurchase(member, "10개 연필팩", 10L, 1000L, "transaction1", uuid,
 			time);
 
-		System.out.println("DELIVERY STATUS : " + pencil.getDeliveryStatus());
 		purchasedPencilRepository.saveAll(List.of(pencil));
 
 		// when

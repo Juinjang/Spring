@@ -31,7 +31,9 @@ public abstract class BaseEntity {
 	}
 
 	protected void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
+		if (createdAt != null) {
+			this.createdAt = createdAt;
+		}
 	}
 
 }

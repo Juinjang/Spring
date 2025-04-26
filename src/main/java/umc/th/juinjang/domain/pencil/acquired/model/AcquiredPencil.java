@@ -14,12 +14,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import umc.th.juinjang.domain.common.BaseEntity;
 import umc.th.juinjang.domain.member.model.Member;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class AcquiredPencil {
+public class AcquiredPencil extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,8 +41,6 @@ public class AcquiredPencil {
 	@Enumerated(EnumType.STRING)
 	private AcquiredType type; // Note, Add, Sold
 
-	private LocalDateTime createdAt;
-
 	@Builder
 	private AcquiredPencil(Member member, String content, Long sharedNoteId, Long acquiredQuantity, boolean isRead,
 		AcquiredType type, LocalDateTime createdAt) {
@@ -51,7 +50,7 @@ public class AcquiredPencil {
 		this.acquiredQuantity = acquiredQuantity;
 		this.isRead = isRead;
 		this.type = type;
-		this.createdAt = createdAt;
+		setCreatedAt(createdAt);
 	}
 
 	public static AcquiredPencil create(Member member, String content, Long sharedNoteId, Long acquiredQuantity,
@@ -63,7 +62,6 @@ public class AcquiredPencil {
 			.acquiredQuantity(acquiredQuantity)
 			.isRead(isRead)
 			.type(type)
-			.createdAt(LocalDateTime.now())
 			.build();
 	}
 
