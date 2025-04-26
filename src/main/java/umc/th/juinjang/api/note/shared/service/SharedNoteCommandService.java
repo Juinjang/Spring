@@ -1,4 +1,4 @@
-package umc.th.juinjang.api.sharednote.service;
+package umc.th.juinjang.api.note.shared.service;
 
 import org.hibernate.exception.LockAcquisitionException;
 import org.springframework.dao.CannotAcquireLockException;
@@ -35,7 +35,7 @@ public class SharedNoteCommandService {
 	public void createSharedNotePurchase(Member buyer, Long sharedNoteId) {
 		checkAlreadyPurchase(buyer, sharedNoteId);
 
-		SharedNote sharedNote = sharedNoteFinder.findById(sharedNoteId);
+		SharedNote sharedNote = sharedNoteFinder.getById(sharedNoteId);
 		Member seller = sharedNote.getMember();
 		Long price = sharedNote.getPrice();
 
