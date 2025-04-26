@@ -12,7 +12,8 @@ import lombok.RequiredArgsConstructor;
 import umc.th.juinjang.api.dto.ApiResponse;
 import umc.th.juinjang.api.pencil.service.PencilService;
 import umc.th.juinjang.api.pencil.service.response.AcquiredPencilResponse;
-import umc.th.juinjang.api.pencil.service.response.PurchasedPencilsResponse;
+import umc.th.juinjang.api.pencil.service.response.PurchasedPencilResponse;
+import umc.th.juinjang.api.pencil.service.response.UsedPencilResponse;
 import umc.th.juinjang.domain.member.model.Member;
 
 @RestController
@@ -30,8 +31,15 @@ public class PencilController {
 
 	@Operation(summary = "구매한 연필 목록을 불러온다")
 	@GetMapping("/purchased")
-	public ApiResponse<List<PurchasedPencilsResponse>> getPurchasedPencilHistory(
+	public ApiResponse<List<PurchasedPencilResponse>> getPurchasedPencilHistory(
 		@AuthenticationPrincipal Member member) {
 		return ApiResponse.onSuccess(pencilService.getPurchasedPencils(member));
+	}
+
+	@Operation(summary = "사용한 연필 목록을 불러온다")
+	@GetMapping("/used")
+	public ApiResponse<List<UsedPencilResponse>> getUsedPencilHistory(
+		@AuthenticationPrincipal Member member) {
+		return ApiResponse.onSuccess(pencilService.getUsedPencils(member));
 	}
 }

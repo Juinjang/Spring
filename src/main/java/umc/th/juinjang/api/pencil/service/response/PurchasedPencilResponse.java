@@ -7,7 +7,7 @@ import lombok.Getter;
 import umc.th.juinjang.domain.pencil.purchased.model.PurchasedPencil;
 
 @Getter
-public class PurchasedPencilsResponse {
+public class PurchasedPencilResponse {
 	private Long purchasePencilId;
 	private Long purchaseQuantity;
 	private Long remainQuantity;
@@ -16,7 +16,7 @@ public class PurchasedPencilsResponse {
 	private LocalDateTime createdAt;
 
 	@Builder
-	public PurchasedPencilsResponse(Long purchasePencilId, Long purchaseQuantity, Long remainQuantity,
+	public PurchasedPencilResponse(Long purchasePencilId, Long purchaseQuantity, Long remainQuantity,
 		String title, Long price, LocalDateTime createdAt) {
 		this.purchasePencilId = purchasePencilId;
 		this.purchaseQuantity = purchaseQuantity;
@@ -26,8 +26,8 @@ public class PurchasedPencilsResponse {
 		this.createdAt = createdAt;
 	}
 
-	public static PurchasedPencilsResponse from(PurchasedPencil purchasedPencil) {
-		return PurchasedPencilsResponse.builder()
+	public static PurchasedPencilResponse from(PurchasedPencil purchasedPencil) {
+		return PurchasedPencilResponse.builder()
 			.purchasePencilId(purchasedPencil.getPurchasedPencilId())
 			.purchaseQuantity(purchasedPencil.getPurchaseQuantity())
 			.remainQuantity(purchasedPencil.getRemainQuantity())

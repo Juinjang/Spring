@@ -16,7 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import lombok.extern.slf4j.Slf4j;
 import umc.th.juinjang.api.IntegrationTestSupport;
 import umc.th.juinjang.api.pencil.service.response.AcquiredPencilResponse;
-import umc.th.juinjang.api.pencil.service.response.PurchasedPencilsResponse;
+import umc.th.juinjang.api.pencil.service.response.PurchasedPencilResponse;
+import umc.th.juinjang.api.pencil.service.response.UsedPencilResponse;
 import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.member.repository.MemberRepository;
 import umc.th.juinjang.domain.pencil.acquired.model.AcquiredPencil;
@@ -24,6 +25,9 @@ import umc.th.juinjang.domain.pencil.acquired.model.AcquiredType;
 import umc.th.juinjang.domain.pencil.acquired.repository.AcquiredPencilRepository;
 import umc.th.juinjang.domain.pencil.purchased.model.PurchasedPencil;
 import umc.th.juinjang.domain.pencil.purchased.repository.PurchasedPencilRepository;
+import umc.th.juinjang.domain.pencil.used.model.UsedPencil;
+import umc.th.juinjang.domain.pencil.used.model.Usedtype;
+import umc.th.juinjang.domain.pencil.used.repository.UsedPencilRepository;
 import umc.th.juinjang.testutil.fixture.MemberFixture;
 
 @Slf4j
@@ -39,12 +43,16 @@ class PencilServiceTest extends IntegrationTestSupport {
 	private PurchasedPencilRepository purchasedPencilRepository;
 
 	@Autowired
+	private UsedPencilRepository usedPencilRepository;
+
+	@Autowired
 	private PencilService pencilService;
 
 	@AfterEach
 	void tearDown() {
 		purchasedPencilRepository.deleteAllInBatch();
 		acquiredPencilRepository.deleteAllInBatch();
+		usedPencilRepository.deleteAllInBatch();
 		memberRepository.deleteAllInBatch();
 	}
 
@@ -119,7 +127,7 @@ class PencilServiceTest extends IntegrationTestSupport {
 		memberRepository.save(member);
 
 		// when
-		List<PurchasedPencilsResponse> list = pencilService.getPurchasedPencils(member);
+		List<PurchasedPencilResponse> list = pencilService.getPurchasedPencils(member);
 
 		// then
 		assertThat(list).hasSize(0);
@@ -157,7 +165,7 @@ class PencilServiceTest extends IntegrationTestSupport {
 		purchasedPencilRepository.saveAll(List.of(pencil1, pencil2, pencil3, pencil4, pencil5));
 
 		// when
-		List<PurchasedPencilsResponse> purchasedPencils = pencilService.getPurchasedPencils(member);
+		List<PurchasedPencilResponse> purchasedPencils = pencilService.getPurchasedPencils(member);
 
 		purchasedPencils.forEach(pencil -> {
 				log.info("[PENCILS]: CREATED_AT : {} ", pencil.getCreatedAt());
@@ -191,9 +199,45 @@ class PencilServiceTest extends IntegrationTestSupport {
 		purchasedPencilRepository.saveAll(List.of(pencil));
 
 		// when
-		List<PurchasedPencilsResponse> purchasedPencils = pencilService.getPurchasedPencils(member);
+		List<PurchasedPencilResponse> purchasedPencils = pencilService.getPurchasedPencils(member);
 
 		assertThat(purchasedPencils).hasSize(0);
+	}
+
+	@DisplayName("구매한 연필 목록이 없는 경우에는 빈 배열이 반환된다.")
+	@Test
+	void getEmptyUsedPencilsList() {
+		// given
+		Member member = MemberFixture.createDefaultMember();
+		memberRepository.save(member);
+
+		// when
+		List<UsedPencilResponse> list = pencilService.getUsedPencils(member);
+
+		// then
+		assertThat(list).hasSize(0);
+	}
+
+	@DisplayName("사용한 연필 목록이 생성 시간(createdAt) 내림차순으로 정렬되어 반환된다.")
+	@Test
+	void getUsedPencilsOrderedByCreatedAtDesc() {
+		// given
+		Member member = MemberFixture.createDefaultMember();
+		memberRepository.save(member);
+
+		UsedPencil usedPencil = UsedPencil.create(member, 1L, 10L, Usedtype.OWNED, "빌딩", 10L);
+		usedPencilRepository.saveAll(List.of(usedPencil));
+
+		// when
+		List<UsedPencilResponse> usedPencils = pencilService.getUsedPencils(member);
+
+		// then
+		// TODO: 추후에, 시간이 OrderBy 가 정상적으로 되는 지 테스트가 필요
+		assertThat(usedPencils).hasSize(1)
+			.extracting("type", "buildingName", "sharedNoteId")
+			.containsExactly(
+				Tuple.tuple(Usedtype.OWNED, "빌딩", 1L)
+			);
 	}
 
 	private AcquiredPencil createAcquiredPencilWithTime(LocalDateTime createdAt, String content, Long sharedNoteId,
@@ -201,8 +245,4 @@ class PencilServiceTest extends IntegrationTestSupport {
 		return AcquiredPencil.createWithDate(member, content, sharedNoteId, acquiredQuantity, isRead, type, createdAt);
 	}
 
-	// private PurchasedPencil createPurchasedPencilWithTime(LocalDateTime createdAt, String content, Long sharedNoteId,
-	// 	Long acquiredQuantity, boolean isRead, AcquiredType type, Member member) {
-	// 	return PurchasedPencil.createWithDate(member, content, sharedNoteId, acquiredQuantity, isRead, type, createdAt);
-	// }
 }
