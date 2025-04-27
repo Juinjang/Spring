@@ -1,27 +1,27 @@
 package umc.th.juinjang.api.note.liked.service;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 import umc.th.juinjang.common.code.status.ErrorStatus;
 import umc.th.juinjang.common.exception.handler.LikedNoteHandler;
+import umc.th.juinjang.common.exception.handler.SharedNoteHandler;
 import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.note.liked.model.LikedNote;
 import umc.th.juinjang.domain.note.liked.model.repository.LikedNoteRepository;
-import umc.th.juinjang.domain.note.shared.model.SharedNote;
 
 @Component
 @RequiredArgsConstructor
-public class LikedNoteFinder {
+public class LikedNoteUpdater {
 
 	private final LikedNoteRepository likedNoteRepository;
 
-	public boolean existsByMemberAndSharedNote(Member member, SharedNote sharedNote) {
-		return likedNoteRepository.existsByMemberAndSharedNote(member, sharedNote);
-	}
-
-	public LikedNote getByMemberAndSharedNote(Member member, SharedNote sharedNote) {
-		return likedNoteRepository.findByMemberAndSharedNote(member, sharedNote)
-			.orElseThrow(() -> new LikedNoteHandler(ErrorStatus.LIKEDNOTE_NOT_FOUND));
+	public void save(LikedNote likedNote) {
+		try {
+			likedNoteRepository.save(likedNote);
+		} catch (DataIntegrityViolationException e) {
+			throw new LikedNoteHandler(ErrorStatus.LIKEDNOTE_CONFLICT);
+		}
 	}
 }
