@@ -21,8 +21,8 @@ public class ChecklistAnswerFinder {
 	private final ChecklistAnswerRepository checklistAnswerRepository;
 	private final LimjangRepository limjangRepository;
 
-	public List<ChecklistAnswerResponseDTO.AnswerDto> findByLimjangId(Long limjangId) {
-		Limjang limjang = limjangRepository.findByLimjangIdAndDeletedIsFalse(limjangId)
+	public List<ChecklistAnswerResponseDTO.AnswerDto> findByLimjangId(Long noteId) {
+		Limjang limjang = limjangRepository.findByLimjangIdAndDeletedIsFalse(noteId)
 			.orElseThrow(() -> new LimjangHandler(ErrorStatus.LIMJANG_NOTFOUND_ERROR));
 
 		List<ChecklistAnswer> answerList = checklistAnswerRepository.findChecklistAnswerByLimjangId(limjang);

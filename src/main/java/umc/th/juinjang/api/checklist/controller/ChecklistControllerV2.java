@@ -23,7 +23,7 @@ public class ChecklistControllerV2 {
 	@Operation(summary = "체크리스트 답변 조회")
 	@GetMapping("/checklist/{limjangId}")
 	public ApiResponse<List<ChecklistAnswerResponseDTO.AnswerDto>> getChecklistAnswer(
-		@PathVariable(name = "limjangId") Long limjangId) {
-		return ApiResponse.onSuccess(checklistQueryService.getChecklistAnswerListByLimjang(limjangId));
+		@PathVariable(name = "limjangId") Long noteId) {
+		return ApiResponse.onSuccess(checklistQueryService.getChecklistAnswerListByLimjang(noteId));
 	}
 }

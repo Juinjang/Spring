@@ -28,8 +28,8 @@ public class ChecklistQueryServiceV2 {
 
 	private final ChecklistAnswerFinder checklistAnswerFinder;
 
-	public List<ChecklistAnswerResponseDTO.AnswerDto> getChecklistAnswerListByLimjang(Long limjangId) {
-		return checklistAnswerFinder.findByLimjangId(limjangId);
+	public List<ChecklistAnswerResponseDTO.AnswerDto> getChecklistAnswerListByLimjang(Long noteId) {
+		return checklistAnswerFinder.findByLimjangId(noteId);
 	}
 
 }
