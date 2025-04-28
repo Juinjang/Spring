@@ -58,19 +58,4 @@ public class ChecklistAnswerAndReportConverter {
 		return new ReportResponseDTO(reportDTO, detailDto);
 	}
 
-	public static ReportResponseDTO.ReportV2DTO toReportV2Dto(Report report, Limjang limjang) {
-		ReportResponseDTO.ReportV2DTO reportDTO = ReportResponseDTO.ReportV2DTO.builder()
-			.reportId(report.getReportId())
-			.indoorKeyWord(report.getIndoorKeyword())
-			.publicSpaceKeyWord(report.getPublicSpaceKeyword())
-			.locationConditionsWord(report.getLocationConditionsKeyword())
-			.indoorRate(report.getIndoorRate())
-			.publicSpaceRate(report.getPublicSpaceRate())
-			.locationConditionsRate(report.getLocationConditionsRate())
-			.totalRate(report.getTotalRate())
-			.limjangId(limjang.getLimjangId())
-			.build();
-		return reportDTO;
-	}
-
 }

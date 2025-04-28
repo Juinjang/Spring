@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import umc.th.juinjang.api.checklist.service.converter.ChecklistAnswerAndReportConverter;
+import umc.th.juinjang.api.checklist.service.converter.ReportConverter;
 import umc.th.juinjang.api.checklist.service.response.ReportResponseDTO;
 import umc.th.juinjang.common.code.status.ErrorStatus;
 import umc.th.juinjang.common.exception.handler.ChecklistHandler;
@@ -28,6 +29,6 @@ public class ChecklistReportFinder {
 		Report report = reportRepository.findByLimjangId(limjang)
 			.orElseThrow(() -> new ChecklistHandler(ErrorStatus.REPORT_NOTFOUND_ERROR));
 
-		return ChecklistAnswerAndReportConverter.toReportV2Dto(report, limjang);
+		return ReportConverter.toReportV2Dto(report, limjang);
 	}
 }
