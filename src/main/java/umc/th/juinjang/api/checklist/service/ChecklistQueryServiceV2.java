@@ -27,9 +27,13 @@ import umc.th.juinjang.domain.report.repository.ReportRepository;
 public class ChecklistQueryServiceV2 {
 
 	private final ChecklistAnswerFinder checklistAnswerFinder;
+	private final ChecklistReportFinder checklistReportFinder;
 
 	public List<ChecklistAnswerResponseDTO.AnswerDto> getChecklistAnswerListByLimjang(Long noteId) {
 		return checklistAnswerFinder.findByLimjangId(noteId);
 	}
 
+	public ReportResponseDTO.ReportV2DTO getReportByNoteId(Long noteId) {
+		return checklistReportFinder.findReportByNoteId(noteId);
+	}
 }

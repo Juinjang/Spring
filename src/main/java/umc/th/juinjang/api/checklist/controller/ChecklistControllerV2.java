@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import umc.th.juinjang.api.checklist.service.ChecklistQueryServiceV2;
 import umc.th.juinjang.api.checklist.service.response.ChecklistAnswerResponseDTO;
+import umc.th.juinjang.api.checklist.service.response.ReportResponseDTO;
 import umc.th.juinjang.api.dto.ApiResponse;
 
 import org.springframework.validation.annotation.Validated;
@@ -25,5 +26,13 @@ public class ChecklistControllerV2 {
 	public ApiResponse<List<ChecklistAnswerResponseDTO.AnswerDto>> getChecklistAnswer(
 		@PathVariable(name = "limjangId") Long noteId) {
 		return ApiResponse.onSuccess(checklistQueryService.getChecklistAnswerListByLimjang(noteId));
+	}
+
+	@CrossOrigin
+	@Operation(summary = "리포트 조회 V2")
+	@GetMapping("/report/{noteId}")
+	public ApiResponse<ReportResponseDTO.ReportV2DTO> getReport(
+		@PathVariable(name = "noteId") Long noteId) {
+		return ApiResponse.onSuccess(checklistQueryService.getReportByNoteId(noteId));
 	}
 }
