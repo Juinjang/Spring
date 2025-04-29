@@ -5,6 +5,8 @@ import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.cloud.vision.v1.Likelihood;
+
 import jakarta.persistence.PessimisticLockException;
 import lombok.RequiredArgsConstructor;
 import umc.th.juinjang.api.limjang.service.NoteFinder;
@@ -23,6 +25,7 @@ import umc.th.juinjang.domain.pencil.acquired.model.AcquiredType;
 import umc.th.juinjang.domain.pencil.used.model.UsedPencil;
 import umc.th.juinjang.domain.pencil.used.model.Usedtype;
 import umc.th.juinjang.domain.pencilaccount.model.PencilAccount;
+import umc.th.juinjang.safeSearch.SafeSearchClient;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +38,7 @@ public class SharedNoteCommandService {
 	private final PencilAccountFinder pencilAccountFinder;
 	private final NoteFinder noteFinder;
 	private final SharedNoteUpdater sharedNoteUpdater;
+	private final SafeSearchClient safeSearchClient;
 
 	@Transactional
 	public void createSharedNotePurchase(Member buyer, Long sharedNoteId) {
@@ -90,12 +94,30 @@ public class SharedNoteCommandService {
 
 	@Transactional
 	public void createSharedNote(Member member, Long noteId, SharedNotePostRequest request) {
-
+		//이미 공유된 임장인지 확인
 		if (sharedNoteFinder.existsByLimjangId(noteId)) {
 			throw new SharedNoteHandler(ErrorStatus.SHAREDNOTE_ALREADY_EXISTS);
 		}
+
+		//Limjang 조회
 		Limjang limjang = noteFinder.getNoteByIdWhereDeletedIsFalse(noteId);
-		
+
+		//SafeSearch 검사 (유해 이미지가 하나라도 있으면 차단)
+		for (var image : limjang.getImageList()) {
+			boolean safe = safeSearchClient.isSafeImage(
+				image.getImageUrl(),
+				Likelihood.VERY_LIKELY,  // adult
+				Likelihood.VERY_LIKELY,  // spoof
+				Likelihood.VERY_LIKELY,  // medical
+				Likelihood.VERY_LIKELY,  // violence
+				Likelihood.VERY_LIKELY   // racy
+			);
+			if (!safe) {
+				throw new SharedNoteHandler(ErrorStatus.SHARED_NOT_ALLOWED);
+			}
+		}
+
+		//저장
 		SharedNote sharedNote = SharedNote.toSharedNote(member, limjang, request);
 		sharedNoteUpdater.save(sharedNote);
 	}

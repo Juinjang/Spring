@@ -109,6 +109,7 @@ public enum ErrorStatus implements BaseErrorCode {
 	SHAREDNOTE_CONFLICT(HttpStatus.CONFLICT, "SHAREDNOTE4002", "이미 구매한 노트입니다."),
 	SHAREDNOTE_DEADLOCK(HttpStatus.LOCKED, "SHAREDNOTE4003", "잠시 후 다시 시도해주세요. 현재 다른 요청이 처리 중입니다."),
 	SHAREDNOTE_ALREADY_EXISTS(HttpStatus.CONFLICT, "SHAREDNOTE4004", "이미 공유된 노트입니다."),
+	SHARED_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "SAHREDNOTE4005", "공유가 금지된 노트입니다."),
 
 	// LikedNote
 	LIKEDNOTE_CONFLICT(HttpStatus.CONFLICT, "LIKEDNOTE4000", "이미 좋아요한 노트입니다"),
