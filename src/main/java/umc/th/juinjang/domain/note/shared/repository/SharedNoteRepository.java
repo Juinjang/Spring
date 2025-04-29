@@ -28,4 +28,6 @@ public interface SharedNoteRepository extends JpaRepository<SharedNote, Long> {
 	@Modifying
 	@Query("UPDATE SharedNote sn SET sn.likeCount = sn.likeCount - 1 WHERE sn.sharedNoteId = :sharedNoteId")
 	void decrementLikedCountById(@Param("sharedNoteId") Long sharedNoteId);
+
+	boolean existsByLimjang_LimjangId(Long limjangId);
 }

@@ -4,12 +4,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import umc.th.juinjang.api.dto.ApiResponse;
+import umc.th.juinjang.api.note.shared.controller.request.SharedNotePostRequest;
 import umc.th.juinjang.api.note.shared.service.SharedNoteCommandService;
 import umc.th.juinjang.api.note.shared.service.SharedNoteQueryService;
 import umc.th.juinjang.api.note.shared.service.response.SharedNoteGetResponse;
@@ -38,4 +40,12 @@ public class SharedNoteController {
 		return ApiResponse.onSuccess(sharedNoteQueryService.findSharedNote(member, sharedNoteId));
 	}
 
+	@Operation(summary = "공유 노트 생성 API")
+	@PostMapping("/{noteId}")
+	public ApiResponse<Void> uploadSharedNote(@AuthenticationPrincipal Member member,
+		@PathVariable("noteId") Long noteId,
+		@RequestBody SharedNotePostRequest request) {
+		sharedNoteCommandService.createSharedNote(member, noteId, request);
+		return ApiResponse.onSuccess(null);
+	}
 }

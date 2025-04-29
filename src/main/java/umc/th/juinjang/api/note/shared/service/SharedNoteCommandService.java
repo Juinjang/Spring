@@ -7,12 +7,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.PessimisticLockException;
 import lombok.RequiredArgsConstructor;
+import umc.th.juinjang.api.limjang.service.NoteFinder;
+import umc.th.juinjang.api.note.shared.controller.request.SharedNotePostRequest;
 import umc.th.juinjang.api.pencil.service.AcquiredPencilUpdater;
 import umc.th.juinjang.api.pencil.service.UsedPencilFinder;
 import umc.th.juinjang.api.pencil.service.UsedPencilUpdater;
 import umc.th.juinjang.api.pencilAccount.service.PencilAccountFinder;
 import umc.th.juinjang.common.code.status.ErrorStatus;
 import umc.th.juinjang.common.exception.handler.SharedNoteHandler;
+import umc.th.juinjang.domain.limjang.model.Limjang;
 import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.note.shared.model.SharedNote;
 import umc.th.juinjang.domain.pencil.acquired.model.AcquiredPencil;
@@ -30,6 +33,8 @@ public class SharedNoteCommandService {
 	private final UsedPencilFinder usedPencilFinder;
 	private final AcquiredPencilUpdater acquiredPencilUpdater;
 	private final PencilAccountFinder pencilAccountFinder;
+	private final NoteFinder noteFinder;
+	private final SharedNoteUpdater sharedNoteUpdater;
 
 	@Transactional
 	public void createSharedNotePurchase(Member buyer, Long sharedNoteId) {
@@ -81,5 +86,17 @@ public class SharedNoteCommandService {
 		PencilAccount buyerAccount) {
 		return UsedPencil.create(member, sharedNoteId, sharedNote.getPrice(), Usedtype.OWNED,
 			sharedNote.getBuildingName(), buyerAccount.getTotalBalance());
+	}
+
+	@Transactional
+	public void createSharedNote(Member member, Long noteId, SharedNotePostRequest request) {
+
+		if (sharedNoteFinder.existsByLimjangId(noteId)) {
+			throw new SharedNoteHandler(ErrorStatus.SHAREDNOTE_ALREADY_EXISTS);
+		}
+		Limjang limjang = noteFinder.getNoteByIdWhereDeletedIsFalse(noteId);
+		
+		SharedNote sharedNote = SharedNote.toSharedNote(member, limjang, request);
+		sharedNoteUpdater.save(sharedNote);
 	}
 }
