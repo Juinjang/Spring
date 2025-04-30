@@ -59,7 +59,7 @@ record SharedNoteExploreResponse(
 			note.getPropertyType(),
 			note.getPriceType(),
 			sharedNote.getBuildingName(),
-			note.getDefaultImage(),
+			sharedNote.isImageShared() ? note.getDefaultImage() : null,
 			isPurchase,
 			isLiked,
 			note.getReport() == null ? null : note.getReport().getTotalRate().toString(),
