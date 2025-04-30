@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import umc.th.juinjang.api.note.shared.service.util.SharedNotesTimeAgoFormatter;
 import umc.th.juinjang.domain.limjang.model.Limjang;
 import umc.th.juinjang.domain.limjang.model.LimjangPriceType;
 import umc.th.juinjang.domain.limjang.model.LimjangPropertyType;
@@ -50,6 +51,7 @@ record SharedNoteExploreResponse(
 	String timeAge,
 	Long viewCount
 ) {
+
 	public static SharedNoteExploreResponse of(SharedNote sharedNote, Limjang note, boolean isPurchase, boolean isLiked,
 		Long viewCount, Member member) {
 		return new SharedNoteExploreResponse(
@@ -68,12 +70,8 @@ record SharedNoteExploreResponse(
 			note.getAddressEntity().getShortAddress(),
 			member.getImageUrl(),
 			member.getNickname(),
-			getTimeAge(),
+			SharedNotesTimeAgoFormatter.getTimeAge(sharedNote.getCreatedAt()),
 			viewCount
 		);
-	}
-
-	private static String getTimeAge() {
-		return "";
 	}
 }
