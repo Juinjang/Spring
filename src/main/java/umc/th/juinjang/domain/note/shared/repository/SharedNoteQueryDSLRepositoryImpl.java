@@ -6,6 +6,7 @@ import static umc.th.juinjang.domain.limjang.model.QLimjang.*;
 import static umc.th.juinjang.domain.limjang.model.QLimjangPrice.*;
 import static umc.th.juinjang.domain.member.model.QMember.*;
 import static umc.th.juinjang.domain.note.shared.model.QSharedNote.*;
+import static umc.th.juinjang.domain.pencil.used.model.QUsedPencil.*;
 import static umc.th.juinjang.domain.report.model.QReport.*;
 
 import java.util.List;
@@ -16,10 +17,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.support.PageableExecutionUtils;
 
+import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -29,6 +32,7 @@ import umc.th.juinjang.api.note.shared.controller.ExploreSortType;
 import umc.th.juinjang.domain.limjang.model.LimjangPriceType;
 import umc.th.juinjang.domain.limjang.model.LimjangPropertyType;
 import umc.th.juinjang.domain.note.shared.model.SharedNote;
+import umc.th.juinjang.domain.pencil.used.model.Usedtype;
 
 public class SharedNoteQueryDSLRepositoryImpl implements SharedNoteQueryDSLRepository {
 	private final JPAQueryFactory queryFactory;
@@ -127,22 +131,23 @@ public class SharedNoteQueryDSLRepositoryImpl implements SharedNoteQueryDSLRepos
 	}
 
 	private OrderSpecifier<?>[] getOrderBySortOptions(ExploreSortType sort) {
-		switch (sort) {
-			case LATEST -> {
-				return new OrderSpecifier<?>[] {
-					new OrderSpecifier<>(DESC, limjang.updatedAt)
-				};
-			}
-			case POPULAR -> {
-				return new OrderSpecifier<?>[] {
-					new OrderSpecifier<>(DESC, report.totalRate.coalesce(0f)).nullsLast(),
-					new OrderSpecifier<>(DESC, limjang.createdAt)
-				};
-			}
-			default -> {
-				return new OrderSpecifier<?>[0];
-			}
-		}
+		return switch (sort) {
+			case LATEST -> new OrderSpecifier<?>[] {
+				new OrderSpecifier<>(DESC, limjang.updatedAt)
+			};
+			case POPULAR -> new OrderSpecifier<?>[] {
+				new OrderSpecifier<>(
+					DESC,
+					JPAExpressions
+						.select(usedPencil.count())
+						.from(usedPencil)
+						.where(
+							usedPencil.sharedNoteId.eq(sharedNote.sharedNoteId),
+							usedPencil.type.eq(Usedtype.OWNED)
+						)
+				)
+			};
+			default -> new OrderSpecifier<?>[0];
+		};
 	}
-
 }
