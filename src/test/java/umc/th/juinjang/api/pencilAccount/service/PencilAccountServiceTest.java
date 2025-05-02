@@ -7,18 +7,15 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
+import umc.th.juinjang.api.IntegrationTestSupport;
 import umc.th.juinjang.common.code.status.ErrorStatus;
 import umc.th.juinjang.common.exception.handler.PencilAccountHandler;
 import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.member.model.MemberProvider;
 import umc.th.juinjang.domain.member.repository.MemberRepository;
 
-@ActiveProfiles("test")
-@SpringBootTest
-public class PencilAccountServiceTest {
+public class PencilAccountServiceTest extends IntegrationTestSupport {
 
 	private final String DEFAULT_EMAIL = "test@naver.com";
 	private final String DEFAULT_IMAGE_URL = "https://image.url.com";

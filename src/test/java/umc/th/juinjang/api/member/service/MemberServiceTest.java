@@ -11,9 +11,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
+import umc.th.juinjang.api.IntegrationTestSupport;
 import umc.th.juinjang.api.member.service.response.MemberResponseDto;
 import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.member.model.MemberProvider;
@@ -21,9 +20,7 @@ import umc.th.juinjang.domain.member.repository.MemberRepository;
 import umc.th.juinjang.domain.pencilaccount.repository.PencilAccountRepository;
 import umc.th.juinjang.testutil.fixture.MemberFixture;
 
-@ActiveProfiles("test")
-@SpringBootTest
-public class MemberServiceTest {
+public class MemberServiceTest extends IntegrationTestSupport {
 
 	@Autowired
 	private MemberRepository memberRepository;

@@ -1,9 +1,12 @@
 package umc.th.juinjang.api.pencil.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 import umc.th.juinjang.domain.member.model.Member;
+import umc.th.juinjang.domain.pencil.used.model.UsedPencil;
 import umc.th.juinjang.domain.pencil.used.repository.UsedPencilRepository;
 
 @Component
@@ -20,4 +23,7 @@ public class UsedPencilFinder {
 		return usedPencilRepository.countBySharedNoteId(sharedNoteId);
 	}
 
+	public List<UsedPencil> findAllByMemberOrderByCreatedAtDesc(Member member) {
+		return usedPencilRepository.findAllByMemberOrderByCreatedAtDesc(member);
+	}
 }

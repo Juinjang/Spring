@@ -1,5 +1,7 @@
 package umc.th.juinjang.domain.pencil.used.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,4 +14,5 @@ public interface UsedPencilRepository extends JpaRepository<UsedPencil, Long> {
 	boolean existsByMemberAndSharedNoteId(Member member, Long sharedNoteId);
 
 	int countBySharedNoteId(Long sharedNoteId);
+	List<UsedPencil> findAllByMemberOrderByCreatedAtDesc(Member member);
 }
