@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 public record SharedNotePostRequest(
 	@NotBlank String buildingName,
 	@NotBlank String review,
+	@NotNull Boolean isImageShared,
 	@NotNull Integer year,
 	@NotNull Integer month,
 	@NotBlank String period,

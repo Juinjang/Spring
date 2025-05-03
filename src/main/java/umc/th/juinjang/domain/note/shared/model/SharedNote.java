@@ -81,7 +81,7 @@ public class SharedNote extends BaseEntity {
 			.month(dto.month())
 			.period(dto.period())
 			.price(dto.price())
-			.isImageShared(!limjang.getImageList().isEmpty())
+			.isImageShared(dto.isImageShared())
 			.build();
 	}
 }

@@ -137,6 +137,10 @@ public class Limjang extends BaseEntity {
 		return this.imageList.isEmpty() ? null : this.imageList.get(0).getImageUrl();
 	}
 
+	public void updateRewardPencil(Integer rewardPencil) {
+		this.rewardPencil = rewardPencil;
+	}
+
 	@Builder
 	private Limjang(Member member, LimjangPrice limjangPrice, LimjangPurpose purpose,
 		LimjangPropertyType propertyType, LimjangPriceType priceType,

@@ -10,6 +10,7 @@ import com.google.cloud.vision.v1.Likelihood;
 import jakarta.persistence.PessimisticLockException;
 import lombok.RequiredArgsConstructor;
 import umc.th.juinjang.api.limjang.service.NoteFinder;
+import umc.th.juinjang.api.limjang.service.NoteUpdater;
 import umc.th.juinjang.api.note.shared.controller.request.SharedNotePostRequest;
 import umc.th.juinjang.api.pencil.service.AcquiredPencilUpdater;
 import umc.th.juinjang.api.pencil.service.UsedPencilFinder;
@@ -39,6 +40,7 @@ public class SharedNoteCommandService {
 	private final NoteFinder noteFinder;
 	private final SharedNoteUpdater sharedNoteUpdater;
 	private final SafeSearchClient safeSearchClient;
+	private final NoteUpdater noteUpdater;
 
 	@Transactional
 	public void createSharedNotePurchase(Member buyer, Long sharedNoteId) {
@@ -94,6 +96,7 @@ public class SharedNoteCommandService {
 
 	@Transactional
 	public void createSharedNote(Member member, Long noteId, SharedNotePostRequest request) {
+		Integer rewardPencilCount = 0;
 		//이미 공유된 임장인지 확인
 		if (sharedNoteFinder.existsByLimjangId(noteId)) {
 			throw new SharedNoteHandler(ErrorStatus.SHAREDNOTE_ALREADY_EXISTS);
@@ -102,23 +105,35 @@ public class SharedNoteCommandService {
 		//Limjang 조회
 		Limjang limjang = noteFinder.getNoteByIdWhereDeletedIsFalse(noteId);
 
-		//SafeSearch 검사 (유해 이미지가 하나라도 있으면 차단)
-		for (var image : limjang.getImageList()) {
-			boolean safe = safeSearchClient.isSafeImage(
-				image.getImageUrl(),
-				Likelihood.VERY_LIKELY,  // adult
-				Likelihood.VERY_LIKELY,  // spoof
-				Likelihood.VERY_LIKELY,  // medical
-				Likelihood.VERY_LIKELY,  // violence
-				Likelihood.VERY_LIKELY   // racy
-			);
-			if (!safe) {
-				throw new SharedNoteHandler(ErrorStatus.SHARED_NOT_ALLOWED);
+		//사진 공유 체크 + 임장노트에 사진이 있으면
+		if (request.isImageShared() == Boolean.TRUE && !limjang.getImageList().isEmpty()) {
+			//SafeSearch 검사 (유해 이미지가 하나라도 있으면 차단)
+			for (var image : limjang.getImageList()) {
+				boolean safe = safeSearchClient.isSafeImage(
+					image.getImageUrl(),
+					Likelihood.VERY_LIKELY,  // adult
+					Likelihood.VERY_LIKELY,  // spoof
+					Likelihood.VERY_LIKELY,  // medical
+					Likelihood.VERY_LIKELY,  // violence
+					Likelihood.VERY_LIKELY   // racy
+				);
+				if (!safe) {
+					throw new SharedNoteHandler(ErrorStatus.SHARED_NOT_ALLOWED);
+				}
 			}
+			rewardPencilCount = 7;
 		}
+		//사진 공유 안함 체크 or 임장노트에 사진이 없으면
+		else if (request.isImageShared() == Boolean.TRUE || limjang.getImageList().isEmpty()) {
+			rewardPencilCount = 2;
+		}
+		limjang.updateRewardPencil(rewardPencilCount);
+		noteUpdater.save(limjang);
 
 		//저장
 		SharedNote sharedNote = SharedNote.toSharedNote(member, limjang, request);
 		sharedNoteUpdater.save(sharedNote);
+
+		//사용자 지갑에 rewardPencil만큼 업데이트
 	}
 }
