@@ -1,25 +1,17 @@
 package umc.th.juinjang.api.checklist.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import umc.th.juinjang.api.checklist.service.converter.ChecklistAnswerAndReportConverter;
+import umc.th.juinjang.api.checklist.service.converter.ReportConverter;
 import umc.th.juinjang.api.checklist.service.response.ChecklistAnswerResponseDTO;
 import umc.th.juinjang.api.checklist.service.response.ReportResponseDTO;
-import umc.th.juinjang.common.code.status.ErrorStatus;
-import umc.th.juinjang.common.exception.handler.ChecklistHandler;
-import umc.th.juinjang.common.exception.handler.LimjangHandler;
-import umc.th.juinjang.domain.checklist.model.ChecklistAnswer;
-import umc.th.juinjang.domain.checklist.repository.ChecklistAnswerRepository;
-import umc.th.juinjang.domain.checklist.repository.ChecklistQuestionRepository;
+import umc.th.juinjang.api.limjang.service.NoteFinder;
 import umc.th.juinjang.domain.limjang.model.Limjang;
-import umc.th.juinjang.domain.limjang.repository.LimjangRepository;
 import umc.th.juinjang.domain.report.model.Report;
-import umc.th.juinjang.domain.report.repository.ReportRepository;
 
 @Slf4j
 @Service
@@ -27,9 +19,16 @@ import umc.th.juinjang.domain.report.repository.ReportRepository;
 public class ChecklistQueryServiceV2 {
 
 	private final ChecklistAnswerFinder checklistAnswerFinder;
+	private final ReportFinder reportFinder;
+	private final NoteFinder noteFinder;
 
-	public List<ChecklistAnswerResponseDTO.AnswerDto> getChecklistAnswerListByLimjang(Long limjangId) {
-		return checklistAnswerFinder.findByLimjangId(limjangId);
+	public List<ChecklistAnswerResponseDTO.AnswerDto> getChecklistAnswerListByLimjang(Long noteId) {
+		return checklistAnswerFinder.findByLimjangId(noteId);
 	}
 
+	public ReportResponseDTO.ReportV2DTO getReportByNoteId(Long noteId) {
+		Limjang limjang = noteFinder.getNoteByIdWhereDeletedIsFalse(noteId);
+		Report report = reportFinder.findReportByNote(limjang);
+		return ReportConverter.toReportV2Dto(report, limjang);
+	}
 }

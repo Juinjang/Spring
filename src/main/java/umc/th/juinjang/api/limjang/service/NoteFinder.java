@@ -22,7 +22,7 @@ public class NoteFinder {
 		return limjangRepository.findAllByMemberAndDeletedIsFalseOrderByParamV2(member, sortOptions);
 	}
 
-	protected Limjang getNoteByIdWhereDeletedIsFalse(long id) {
+	public Limjang getNoteByIdWhereDeletedIsFalse(long id) {
 		return limjangRepository.findByLimjangIdAndDeletedIsFalse(id)
 			.orElseThrow(() -> new LimjangHandler(ErrorStatus.LIMJANG_NOTFOUND_ERROR));
 	}
