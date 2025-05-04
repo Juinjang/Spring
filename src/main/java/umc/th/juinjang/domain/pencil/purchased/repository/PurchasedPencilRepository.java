@@ -10,6 +10,7 @@ import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.pencil.purchased.model.PurchasedPencil;
 
 public interface PurchasedPencilRepository extends JpaRepository<PurchasedPencil, Long> {
+
 	@Query("SELECT p FROM PurchasedPencil p WHERE p.member = :member AND p.deliveryStatus = 0 ORDER BY p.createdAt DESC")
 	List<PurchasedPencil> findAllByMemberWhereDeliverySuccessOrderByCreatedAtDesc(@Param("member") Member member);
 }

@@ -1,11 +1,12 @@
 package umc.th.juinjang.api.note.shared.service;
 
 import java.time.Duration;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -15,20 +16,27 @@ import org.springframework.data.redis.RedisSystemException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.xml.sax.ErrorHandler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import umc.th.juinjang.api.note.liked.service.LikedNoteFinder;
 import umc.th.juinjang.api.note.shared.controller.ExploreSortType;
+import umc.th.juinjang.api.note.shared.controller.NoteType;
 import umc.th.juinjang.api.note.shared.service.response.SharedNoteExploreGetResponse;
+import umc.th.juinjang.api.note.shared.service.response.UserSharedNotesGetResponse;
 import umc.th.juinjang.api.pencil.service.UsedPencilFinder;
 import umc.th.juinjang.api.note.shared.service.response.SharedNoteGetResponse;
+import umc.th.juinjang.common.code.status.ErrorStatus;
+import umc.th.juinjang.common.exception.handler.SharedNoteHandler;
 import umc.th.juinjang.common.redis.RedisKeyFactory;
 import umc.th.juinjang.domain.limjang.model.Limjang;
 import umc.th.juinjang.domain.limjang.model.LimjangPriceType;
 import umc.th.juinjang.domain.limjang.model.LimjangPropertyType;
 import umc.th.juinjang.domain.member.model.Member;
+import umc.th.juinjang.domain.note.liked.model.LikedNote;
 import umc.th.juinjang.domain.note.shared.model.SharedNote;
+import umc.th.juinjang.domain.pencil.used.model.UsedPencil;
 
 @Service
 @Slf4j
@@ -143,5 +151,51 @@ public class SharedNoteQueryService {
 			SharedNote::getSharedNoteId,
 			this::getTotalViewCount
 		));
+	}
+
+	public UserSharedNotesGetResponse findUserSharedNotes(Member member, NoteType noteType,
+		LimjangPropertyType propertyType, LimjangPriceType priceType, String keyword) {
+
+		switch (noteType) {
+			case LIKED -> {
+				return getUserLikedSharedNotes(member, propertyType, priceType, keyword);
+			}
+			case SHARED -> {
+				return getUserSharedNotes(member, noteType, propertyType, priceType, keyword);
+			}
+			case OWNED -> {
+				return getUserOwnedSharedNotes(member, );
+			}
+			default -> throw new SharedNoteHandler(ErrorStatus.SHAREDNOTE_TYPE_ERROR);
+		}
+	}
+
+	private UserSharedNotesGetResponse getUserOwnedSharedNotes(Member member) {
+
+		usedPencilFinder.findAllByMemberOrderByCreatedAtDesc()
+		Set<Long> likedNoteIds = new HashSet<>(likedNoteFinder.findLikedSharedNoteIds(member, sharedNotes));
+		return UserSharedNotesGetResponse.ofOwned(sharedNotes, likedNoteIds, viewcountMap);
+	}
+
+	private UserSharedNotesGetResponse getUserSharedNotes(Member member, NoteType noteType,
+		LimjangPropertyType propertyType, LimjangPriceType priceType, String keyword) {
+		List<SharedNote> sharedNotes = sharedNoteFinder.findUserSharedNotes(member, noteType, propertyType, priceType, keyword);
+		Map<Long, Long> viewcountMap = mapIdsAndViewcount(sharedNotes);
+
+		Set<Long> likedNoteIds = new HashSet<>(likedNoteFinder.findLikedSharedNoteIds(member, sharedNotes));
+		return UserSharedNotesGetResponse.ofShared(sharedNotes, likedNoteIds, viewcountMap);
+	}
+
+	private UserSharedNotesGetResponse getUserLikedSharedNotes(Member member, LimjangPropertyType propertyType,
+		LimjangPriceType priceType, String keyword) {
+
+		List<LikedNote> userLikedNotes = likedNoteFinder.findAllByMemberAndDynamic(member, propertyType,
+			priceType, keyword);
+		List<SharedNote> sharedNotes = userLikedNotes.stream().map(LikedNote::getSharedNote).toList();
+
+		Set<Long> purchasedIds = new HashSet<>(usedPencilFinder.findByMemberInSharedNoteIdsAndTypeIsOwned(member, userLikedNotes.stream().map(it -> it.getSharedNote().getSharedNoteId()).toList()));
+		Map<Long, Long> viewcountMap = mapIdsAndViewcount(sharedNotes);
+
+		return UserSharedNotesGetResponse.ofLiked(sharedNotes, purchasedIds, viewcountMap);
 	}
 }

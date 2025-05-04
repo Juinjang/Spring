@@ -11,28 +11,49 @@ import umc.th.juinjang.domain.limjang.model.LimjangPropertyType;
 import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.note.shared.model.SharedNote;
 
-public record SharedNoteExploreGetResponse(
-	long totalResults,
-	List<SharedNoteExploreResponse> notes
+public record UserSharedNotesGetResponse(
+	List<UsersSharedNoteResponse> notes
+
 ) {
 
-	public static SharedNoteExploreGetResponse of(long totalResults, List<SharedNote> sharedNotes,
-		Set<Long> isPurchaseMap, Set<Long> likedNotes, Map<Long, Long> viewCountMap
-	) {
-		return new SharedNoteExploreGetResponse(totalResults,
-			sharedNotes.stream()
-				.map(it -> SharedNoteExploreResponse.of(
-					it,
-					it.getLimjang(),
-					isPurchaseMap.contains(it.getSharedNoteId()),
-					likedNotes.contains(it.getSharedNoteId()),
-					viewCountMap.get(it.getSharedNoteId()),
-					it.getMember()))
-				.toList());
+	public static UserSharedNotesGetResponse ofLiked(List<SharedNote> sharedNotes, Set<Long> isPurchaseMap,
+		Map<Long, Long> viewCountMap) {
+		return new UserSharedNotesGetResponse(sharedNotes.stream().map(it -> UsersSharedNoteResponse.of(
+			it,
+			it.getLimjang(),
+			isPurchaseMap.contains(it.getSharedNoteId()),
+			true,
+			viewCountMap.get(it.getSharedNoteId()),
+			it.getMember()
+		)).toList());
+	}
+
+	public static UserSharedNotesGetResponse ofShared(List<SharedNote> sharedNotes,
+		Set<Long> likedNotes, Map<Long, Long> viewCountMap) {
+		return new UserSharedNotesGetResponse(sharedNotes.stream().map(it -> UsersSharedNoteResponse.of(
+			it,
+			it.getLimjang(),
+			false,
+			likedNotes.contains(it.getSharedNoteId()),
+			viewCountMap.get(it.getSharedNoteId()),
+			it.getMember()
+		)).toList());
+	}
+
+	public static UserSharedNotesGetResponse ofOwned(List<SharedNote> sharedNotes,
+		Set<Long> likedNotes, Map<Long, Long> viewCountMap) {
+		return new UserSharedNotesGetResponse(sharedNotes.stream().map(it -> UsersSharedNoteResponse.of(
+			it,
+			it.getLimjang(),
+			true,
+			likedNotes.contains(it.getSharedNoteId()),
+			viewCountMap.get(it.getSharedNoteId()),
+			it.getMember()
+		)).toList());
 	}
 }
 
-record SharedNoteExploreResponse(
+record UsersSharedNoteResponse(
 	Long sharedNoteId,
 	LimjangPropertyType propertyType,
 	LimjangPriceType priceType,
@@ -49,12 +70,11 @@ record SharedNoteExploreResponse(
 	String ownerImageUrl,
 	String ownerNickname,
 	String timeAge,
-	Long viewCount
-) {
+	Long viewCount) {
 
-	public static SharedNoteExploreResponse of(SharedNote sharedNote, Limjang note, boolean isPurchase, boolean isLiked,
+	static UsersSharedNoteResponse of(SharedNote sharedNote, Limjang note, boolean isPurchase, boolean isLiked,
 		Long viewCount, Member member) {
-		return new SharedNoteExploreResponse(
+		return new UsersSharedNoteResponse(
 			sharedNote.getSharedNoteId(),
 			note.getPropertyType(),
 			note.getPriceType(),
