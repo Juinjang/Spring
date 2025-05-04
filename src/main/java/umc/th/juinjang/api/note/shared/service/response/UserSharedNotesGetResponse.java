@@ -28,7 +28,7 @@ public record UserSharedNotesGetResponse(
 		)).toList());
 	}
 
-	public static UserSharedNotesGetResponse ofShared(List<SharedNote> sharedNotes,
+	public static UserSharedNotesGetResponse ofShared(Member member, List<SharedNote> sharedNotes,
 		Set<Long> likedNotes, Map<Long, Long> viewCountMap) {
 		return new UserSharedNotesGetResponse(sharedNotes.stream().map(it -> UsersSharedNoteResponse.of(
 			it,
@@ -36,7 +36,7 @@ public record UserSharedNotesGetResponse(
 			false,
 			likedNotes.contains(it.getSharedNoteId()),
 			viewCountMap.get(it.getSharedNoteId()),
-			it.getMember()
+			member
 		)).toList());
 	}
 

@@ -205,7 +205,7 @@ public class SharedNoteQueryService {
 		Map<Long, Long> viewcountMap = mapIdsAndViewcount(sharedNotes);
 
 		Set<Long> likedNoteIds = new HashSet<>(likedNoteFinder.findLikedSharedNoteIds(member, sharedNotes));
-		return UserSharedNotesGetResponse.ofShared(sharedNotes, likedNoteIds, viewcountMap);
+		return UserSharedNotesGetResponse.ofShared(member, sharedNotes, likedNoteIds, viewcountMap);
 	}
 
 	private UserSharedNotesGetResponse getUserLikedSharedNotes(Member member, LimjangPropertyType propertyType,
@@ -214,7 +214,7 @@ public class SharedNoteQueryService {
 		List<LikedNote> userLikedNotes = likedNoteFinder.findAllByMemberAndDynamic(member, propertyType,
 			priceType, keyword);
 		List<SharedNote> sharedNotes = userLikedNotes.stream().map(LikedNote::getSharedNote).toList();
-
+		
 		Set<Long> purchasedIds = new HashSet<>(usedPencilFinder.findByMemberInSharedNoteIdsAndTypeIsOwned(member,
 			sharedNotes.stream().map(SharedNote::getSharedNoteId).toList()));
 		Map<Long, Long> viewcountMap = mapIdsAndViewcount(sharedNotes);
