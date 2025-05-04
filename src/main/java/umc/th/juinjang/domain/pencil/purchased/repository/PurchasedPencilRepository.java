@@ -14,7 +14,8 @@ public interface PurchasedPencilRepository extends JpaRepository<PurchasedPencil
 	@Query("SELECT p FROM PurchasedPencil p WHERE p.member = :member AND p.deliveryStatus = 0 ORDER BY p.createdAt DESC")
 	List<PurchasedPencil> findAllByMemberWhereDeliverySuccessOrderByCreatedAtDesc(@Param("member") Member member);
 
-	@Query("select p from PurchasedPencil p where p.member = :member and p.remainQuantity > :remainQuantity order by p.createdAt asc")
-	List<PurchasedPencil> findByMemberAndRemainQuantityGreaterThanOrderByCreatedAtAsc(@Param("member") Member buyer,
+	@Query("select p from PurchasedPencil p where p.member = :member and p.remainQuantity > :remainQuantity AND p.deliveryStatus = 0 order by p.createdAt asc")
+	List<PurchasedPencil> findByMemberAndDeliverySuccessAndRemainQuantityGreaterThanOrderByCreatedAtAsc(
+		@Param("member") Member buyer,
 		@Param("remainQuantity") Long remainQuantity);
 }

@@ -15,9 +15,11 @@ public class PurchasedPencilUpdater {
 
 	private PurchasedPencilRepository purchasedPencilRepository;
 
-	public List<PurchasedPencil> findByMemberAndRemainQuantityGreaterThanOrderByCreatedAtAsc(Member buyer,
+	public List<PurchasedPencil> findByMemberAndDeliverySuccessRemainQuantityGreaterThanOrderByCreatedAtAsc(
+		Member buyer,
 		Long remainQuantity) {
-		return purchasedPencilRepository.findByMemberAndRemainQuantityGreaterThanOrderByCreatedAtAsc(buyer,
+		return purchasedPencilRepository.findByMemberAndDeliverySuccessAndRemainQuantityGreaterThanOrderByCreatedAtAsc(
+			buyer,
 			remainQuantity);
 	}
 }

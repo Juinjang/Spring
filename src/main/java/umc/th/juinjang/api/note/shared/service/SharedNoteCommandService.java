@@ -81,7 +81,7 @@ public class SharedNoteCommandService {
 	}
 
 	private void consumePurchasedPencils(Member buyer, long unpaidPencil) {
-		List<PurchasedPencil> purchasedPencils = purchasedPencilUpdater.findByMemberAndRemainQuantityGreaterThanOrderByCreatedAtAsc(
+		List<PurchasedPencil> purchasedPencils = purchasedPencilUpdater.findByMemberAndDeliverySuccessRemainQuantityGreaterThanOrderByCreatedAtAsc(
 			buyer, 0L);
 
 		long remainingToConsume = unpaidPencil;
