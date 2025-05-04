@@ -49,7 +49,7 @@ public class SharedNoteFinder {
 	}
 
 	public List<SharedNote> findUserSharedNotes(Member member, NoteType noteType, LimjangPropertyType propertyType,
-		LimjangPriceType priceType, String keyword) {
-		return sharedNoteRepository.findUserSharedNotes(member, noteType, propertyType, priceType, keyword);
+		LimjangPriceType priceType, String keyword, List<Long> filterIds) {
+		return sharedNoteRepository.findUserSharedNotes(member, noteType, propertyType, priceType, keyword, filterIds);
 	}
 }

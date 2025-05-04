@@ -1,6 +1,7 @@
 package umc.th.juinjang.api.note.shared.service;
 
 import java.time.Duration;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -164,22 +166,42 @@ public class SharedNoteQueryService {
 				return getUserSharedNotes(member, noteType, propertyType, priceType, keyword);
 			}
 			case OWNED -> {
-				return getUserOwnedSharedNotes(member, );
+				return getUserOwnedSharedNotes(member, noteType, propertyType, priceType, keyword);
 			}
 			default -> throw new SharedNoteHandler(ErrorStatus.SHAREDNOTE_TYPE_ERROR);
 		}
 	}
 
-	private UserSharedNotesGetResponse getUserOwnedSharedNotes(Member member) {
+	private UserSharedNotesGetResponse getUserOwnedSharedNotes(Member member, NoteType noteType,
+		LimjangPropertyType propertyType, LimjangPriceType priceType, String keyword) {
 
-		usedPencilFinder.findAllByMemberOrderByCreatedAtDesc()
+		List<UsedPencil> usedPencils = usedPencilFinder.findAllByMemberAndTypeIsOwnedOrderByCreatedAtDesc(member);
+		List<Long> sharedNoteIds = usedPencils.stream().map(UsedPencil::getSharedNoteId).toList();
+
+		List<SharedNote> sharedNotes = sharedNoteFinder.findUserSharedNotes(member, noteType, propertyType, priceType,
+			keyword, sharedNoteIds);
+		List<SharedNote> sortedSharedNotes = sortByUsedPencilCreatedAt(sharedNoteIds, sharedNotes);
+
+		Map<Long, Long> viewcountMap = mapIdsAndViewcount(sharedNotes);
 		Set<Long> likedNoteIds = new HashSet<>(likedNoteFinder.findLikedSharedNoteIds(member, sharedNotes));
-		return UserSharedNotesGetResponse.ofOwned(sharedNotes, likedNoteIds, viewcountMap);
+
+		return UserSharedNotesGetResponse.ofOwned(sortedSharedNotes, likedNoteIds, viewcountMap);
+	}
+
+	private List<SharedNote> sortByUsedPencilCreatedAt(List<Long> sharedNoteIds, List<SharedNote> sharedNotes) {
+		Map<Long, Integer> orderMap = IntStream.range(0, sharedNoteIds.size())
+			.boxed()
+			.collect(Collectors.toMap(sharedNoteIds::get, i -> i));
+
+		return sharedNotes.stream()
+			.sorted(Comparator.comparingInt(note -> orderMap.get(note.getSharedNoteId())))
+			.toList();
 	}
 
 	private UserSharedNotesGetResponse getUserSharedNotes(Member member, NoteType noteType,
 		LimjangPropertyType propertyType, LimjangPriceType priceType, String keyword) {
-		List<SharedNote> sharedNotes = sharedNoteFinder.findUserSharedNotes(member, noteType, propertyType, priceType, keyword);
+		List<SharedNote> sharedNotes = sharedNoteFinder.findUserSharedNotes(member, noteType, propertyType, priceType,
+			keyword, List.of());
 		Map<Long, Long> viewcountMap = mapIdsAndViewcount(sharedNotes);
 
 		Set<Long> likedNoteIds = new HashSet<>(likedNoteFinder.findLikedSharedNoteIds(member, sharedNotes));
@@ -193,7 +215,8 @@ public class SharedNoteQueryService {
 			priceType, keyword);
 		List<SharedNote> sharedNotes = userLikedNotes.stream().map(LikedNote::getSharedNote).toList();
 
-		Set<Long> purchasedIds = new HashSet<>(usedPencilFinder.findByMemberInSharedNoteIdsAndTypeIsOwned(member, userLikedNotes.stream().map(it -> it.getSharedNote().getSharedNoteId()).toList()));
+		Set<Long> purchasedIds = new HashSet<>(usedPencilFinder.findByMemberInSharedNoteIdsAndTypeIsOwned(member,
+			sharedNotes.stream().map(SharedNote::getSharedNoteId).toList()));
 		Map<Long, Long> viewcountMap = mapIdsAndViewcount(sharedNotes);
 
 		return UserSharedNotesGetResponse.ofLiked(sharedNotes, purchasedIds, viewcountMap);

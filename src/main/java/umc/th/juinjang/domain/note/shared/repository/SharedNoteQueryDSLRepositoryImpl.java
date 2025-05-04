@@ -79,42 +79,36 @@ public class SharedNoteQueryDSLRepositoryImpl implements SharedNoteQueryDSLRepos
 
 	@Override
 	public List<SharedNote> findUserSharedNotes(Member user, NoteType noteType, LimjangPropertyType propertyType,
-		LimjangPriceType priceType, String keyword) {
+		LimjangPriceType priceType, String keyword, List<Long> filterIds) {
 
-		JPAQuery<SharedNote> query = queryFactory.selectFrom(sharedNote)
+		return queryFactory.selectFrom(sharedNote)
 			.join(sharedNote.limjang, limjang).fetchJoin()
 			.join(sharedNote.member, member).fetchJoin()
 			.join(limjang.limjangPrice, limjangPrice).fetchJoin()
 			.join(limjang.addressEntity, address).fetchJoin()
-			.leftJoin(limjang.report, report).fetchJoin();
-
-		query = applyNoteTypeJoinAndConditions(user, noteType, query);
-
-		query = query.where(
-			getWhereByPropertyType(propertyType),
-			getWhereByPriceType(priceType),
-			keywordCondition(keyword)
-		);
-
-		return query.distinct().fetch();
+			.leftJoin(limjang.report, report).fetchJoin()
+			.where(
+				getWhereByNoteType(user, noteType, filterIds),
+				getWhereByPropertyType(propertyType),
+				getWhereByPriceType(priceType),
+				keywordCondition(keyword)
+			)
+			.orderBy(getOrderByNoteType(noteType))
+			.fetch();
 	}
 
-	private JPAQuery<SharedNote> applyNoteTypeJoinAndConditions(Member user, NoteType noteType,
-		JPAQuery<SharedNote> query) {
+	private OrderSpecifier<?>[] getOrderByNoteType(NoteType noteType) {
+		if (noteType == NoteType.SHARED) {
+			return new OrderSpecifier<?>[] {sharedNote.createdAt.desc()};
+		}
+		return new OrderSpecifier<?>[0];
+	}
+
+	private BooleanExpression getWhereByNoteType(Member user, NoteType noteType, List<Long> ids) {
 		return switch (noteType) {
-			case OWNED -> query
-				.join(usedPencil).on(usedPencil.sharedNoteId.eq(sharedNote.sharedNoteId))
-				.where(usedPencil.member.eq(user), usedPencil.type.eq(Usedtype.OWNED))
-				.orderBy(usedPencil.createdAt.desc());
-
-			case LIKED -> query
-				.join(likedNote).on(likedNote.sharedNote.eq(sharedNote))
-				.where(likedNote.member.eq(user))
-				.orderBy(likedNote.likedNoteId.desc());
-
-			case SHARED -> query
-				.where(sharedNote.member.eq(user))
-				.orderBy(sharedNote.createdAt.desc());
+			case OWNED -> sharedNote.sharedNoteId.in(ids);
+			case SHARED -> sharedNote.member.eq(user);
+			default -> null;
 		};
 	}
 

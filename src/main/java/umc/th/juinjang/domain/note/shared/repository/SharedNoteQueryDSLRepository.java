@@ -18,5 +18,5 @@ public interface SharedNoteQueryDSLRepository {
 		LimjangPropertyType propertyType, LimjangPriceType priceType, String keyword, Pageable pageable);
 
 	List<SharedNote> findUserSharedNotes(Member member, NoteType noteType, LimjangPropertyType propertyType,
-		LimjangPriceType priceType, String keyword);
+		LimjangPriceType priceType, String keyword, List<Long> filterIds);
 }
