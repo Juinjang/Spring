@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import umc.th.juinjang.domain.note.shared.model.SharedNote;
 
-public interface SharedNoteRepository extends JpaRepository<SharedNote, Long> {
+public interface SharedNoteRepository extends JpaRepository<SharedNote, Long>, SharedNoteQueryDSLRepository {
 
 	@Query("select s from SharedNote s join fetch s.limjang l join fetch l.addressEntity join fetch l.limjangPrice where s.sharedNoteId = :sharedNoteId")
 	Optional<SharedNote> findByIdWithNoteAndAddress(@Param("sharedNoteId") Long sharedNoteId);

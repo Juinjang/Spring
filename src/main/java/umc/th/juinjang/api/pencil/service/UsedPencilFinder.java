@@ -26,4 +26,9 @@ public class UsedPencilFinder {
 	public List<UsedPencil> findAllByMemberOrderByCreatedAtDesc(Member member) {
 		return usedPencilRepository.findAllByMemberOrderByCreatedAtDesc(member);
 	}
+
+	public List<Long> findByMemberInSharedNoteIdsAndTypeIsOwned(Member member, List<Long> sharedNoteIds) {
+		return usedPencilRepository.findByMemberInSharedNoteIdsAndTypeIsOwned(member, sharedNoteIds);
+	}
+
 }

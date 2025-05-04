@@ -1,5 +1,7 @@
 package umc.th.juinjang.api.note.liked.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
@@ -23,5 +25,9 @@ public class LikedNoteFinder {
 	public LikedNote getByMemberAndSharedNote(Member member, SharedNote sharedNote) {
 		return likedNoteRepository.findByMemberAndSharedNote(member, sharedNote)
 			.orElseThrow(() -> new LikedNoteHandler(ErrorStatus.LIKEDNOTE_NOT_FOUND));
+	}
+
+	public List<Long> findLikedSharedNoteIds(Member member, List<SharedNote> sharedNotes) {
+		return likedNoteRepository.findLikedSharedNoteIds(member, sharedNotes);
 	}
 }

@@ -1,7 +1,15 @@
 package umc.th.juinjang.api.note.shared.service;
 
 import java.time.Duration;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.RedisSystemException;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -11,10 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import umc.th.juinjang.api.note.liked.service.LikedNoteFinder;
+import umc.th.juinjang.api.note.shared.controller.ExploreSortType;
+import umc.th.juinjang.api.note.shared.service.response.SharedNoteExploreGetResponse;
 import umc.th.juinjang.api.pencil.service.UsedPencilFinder;
 import umc.th.juinjang.api.note.shared.service.response.SharedNoteGetResponse;
 import umc.th.juinjang.common.redis.RedisKeyFactory;
 import umc.th.juinjang.domain.limjang.model.Limjang;
+import umc.th.juinjang.domain.limjang.model.LimjangPriceType;
+import umc.th.juinjang.domain.limjang.model.LimjangPropertyType;
 import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.note.shared.model.SharedNote;
 
@@ -35,7 +47,7 @@ public class SharedNoteQueryService {
 
 		boolean isBuyer = usedPencilFinder.existsByMemberAndSharedNoteId(member, sharedNoteId);
 
-		long viewCount = sharedNote.getViewCount() + getViewCount(sharedNoteId);
+		long viewCount = getTotalViewCount(sharedNote);
 		if (!isDuplicate(member.getMemberId(), sharedNoteId)) {
 			increaseViewCount(sharedNoteId);
 			viewCount++;
@@ -52,6 +64,10 @@ public class SharedNoteQueryService {
 			return SharedNoteGetResponse.ofNotPurchased(isBuyer, limjang, limjang.getAddressEntity(), sharedNote,
 				sharedNote.getMember(), countBuyer, isLiked, viewCount);
 		}
+	}
+
+	private long getTotalViewCount(SharedNote sharedNote) {
+		return sharedNote.getViewCount() + getRedisViewCount(sharedNote.getSharedNoteId());
 	}
 
 	private void recordViewerHistory(long memberId, long sharedNoteId) {
@@ -80,7 +96,7 @@ public class SharedNoteQueryService {
 		}
 	}
 
-	private Long getViewCount(long sharedNoteId) {
+	private Long getRedisViewCount(long sharedNoteId) {
 		try {
 			Object value = redisTemplate.opsForValue().get(RedisKeyFactory.viewCountKey(sharedNoteId));
 			return value == null ? 0L : Long.parseLong(value.toString());
@@ -101,5 +117,31 @@ public class SharedNoteQueryService {
 			return 10;
 		}
 		return null;
+	}
+
+	@Transactional(readOnly = true)
+	public SharedNoteExploreGetResponse findExploreSharedNote(Member member, List<String> code,
+		ExploreSortType sort,
+		LimjangPropertyType propertyType, LimjangPriceType priceType, String keyword,
+		Pageable pageable) {
+
+		Page<SharedNote> pages = sharedNoteFinder.findSharedNoteInExployer(code, sort, propertyType, priceType, keyword,
+			pageable);
+		List<SharedNote> sharedNotes = pages.getContent();
+		List<Long> ids = sharedNotes.stream().map(SharedNote::getSharedNoteId).toList();
+
+		Set<Long> likedNoteIds = new HashSet<>(likedNoteFinder.findLikedSharedNoteIds(member, sharedNotes));
+		Set<Long> purchasedIds = new HashSet<>(usedPencilFinder.findByMemberInSharedNoteIdsAndTypeIsOwned(member, ids));
+
+		Map<Long, Long> viewcountMap = mapIdsAndViewcount(sharedNotes);
+		return SharedNoteExploreGetResponse.of(pages.getTotalElements(), sharedNotes, purchasedIds, likedNoteIds,
+			viewcountMap);
+	}
+
+	private Map<Long, Long> mapIdsAndViewcount(List<SharedNote> sharedNotes) {
+		return sharedNotes.stream().collect(Collectors.toMap(
+			SharedNote::getSharedNoteId,
+			this::getTotalViewCount
+		));
 	}
 }
