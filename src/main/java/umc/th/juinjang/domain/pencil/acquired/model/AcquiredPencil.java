@@ -77,4 +77,8 @@ public class AcquiredPencil extends BaseEntity {
 			.createdAt(createdAt)
 			.build();
 	}
+
+	public void updateIsReadAsTrue() {
+		this.isRead = true;
+	}
 }

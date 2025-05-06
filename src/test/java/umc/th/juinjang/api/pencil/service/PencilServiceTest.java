@@ -46,7 +46,7 @@ class PencilServiceTest extends IntegrationTestSupport {
 	private UsedPencilRepository usedPencilRepository;
 
 	@Autowired
-	private PencilService pencilService;
+	private PencilQueryService pencilService;
 
 	@AfterEach
 	void tearDown() {
