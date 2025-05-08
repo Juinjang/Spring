@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 import umc.th.juinjang.common.code.status.ErrorStatus;
 import umc.th.juinjang.common.exception.handler.LikedNoteHandler;
+import umc.th.juinjang.domain.limjang.model.LimjangPriceType;
+import umc.th.juinjang.domain.limjang.model.LimjangPropertyType;
 import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.note.liked.model.LikedNote;
 import umc.th.juinjang.domain.note.liked.model.repository.LikedNoteRepository;
@@ -29,5 +31,10 @@ public class LikedNoteFinder {
 
 	public List<Long> findLikedSharedNoteIds(Member member, List<SharedNote> sharedNotes) {
 		return likedNoteRepository.findLikedSharedNoteIds(member, sharedNotes);
+	}
+
+	public List<LikedNote> findAllByMemberAndDynamic(Member user, LimjangPropertyType propertyType,
+		LimjangPriceType priceType, String keyword) {
+		return likedNoteRepository.findAllByMemberAndDynamic(user, propertyType, priceType, keyword);
 	}
 }
