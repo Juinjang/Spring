@@ -9,6 +9,6 @@ import umc.th.juinjang.domain.note.liked.model.LikedNote;
 
 public interface LikedNoteQueryDSLRepository {
 
-	List<LikedNote> findAllByMemberAndDynamic(Member user, LimjangPropertyType propertyType,
+	List<LikedNote> findAllByMemberAndDynamicWhereDeletedAtIsNull(Member user, LimjangPropertyType propertyType,
 		LimjangPriceType priceType, String keyword);
 }

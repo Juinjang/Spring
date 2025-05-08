@@ -34,7 +34,7 @@ public class LikedNoteQueryDSLRepositoryImpl implements LikedNoteQueryDSLReposit
 	}
 
 	@Override
-	public List<LikedNote> findAllByMemberAndDynamic(Member user, LimjangPropertyType propertyType,
+	public List<LikedNote> findAllByMemberAndDynamicWhereDeletedAtIsNull(Member user, LimjangPropertyType propertyType,
 		LimjangPriceType priceType, String keyword) {
 		return queryFactory.selectFrom(likedNote)
 			.join(likedNote.sharedNote, sharedNote).fetchJoin()
@@ -47,7 +47,9 @@ public class LikedNoteQueryDSLRepositoryImpl implements LikedNoteQueryDSLReposit
 				likedNote.member.eq(user),
 				getWhereByPropertyType(propertyType),
 				getWhereByPriceType(priceType),
-				keywordCondition(keyword))
+				keywordCondition(keyword),
+				sharedNote.deletedAt.isNull()
+			)
 			.orderBy(likedNote.likedNoteId.desc())
 			.fetch();
 

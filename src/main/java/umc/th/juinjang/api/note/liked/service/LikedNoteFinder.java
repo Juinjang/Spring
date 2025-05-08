@@ -35,6 +35,7 @@ public class LikedNoteFinder {
 
 	public List<LikedNote> findAllByMemberAndDynamic(Member user, LimjangPropertyType propertyType,
 		LimjangPriceType priceType, String keyword) {
-		return likedNoteRepository.findAllByMemberAndDynamic(user, propertyType, priceType, keyword);
+		return likedNoteRepository.findAllByMemberAndDynamicWhereDeletedAtIsNull(user, propertyType, priceType,
+			keyword);
 	}
 }
