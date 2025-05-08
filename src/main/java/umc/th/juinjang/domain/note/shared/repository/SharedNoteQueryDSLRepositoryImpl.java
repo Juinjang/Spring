@@ -107,7 +107,7 @@ public class SharedNoteQueryDSLRepositoryImpl implements SharedNoteQueryDSLRepos
 	private BooleanExpression getWhereByNoteType(Member user, NoteType noteType, List<Long> ids) {
 		return switch (noteType) {
 			case OWNED -> sharedNote.sharedNoteId.in(ids);
-			case SHARED -> sharedNote.member.eq(user);
+			case SHARED -> sharedNote.member.eq(user).and(sharedNote.deletedAt.isNull());
 			default -> null;
 		};
 	}
