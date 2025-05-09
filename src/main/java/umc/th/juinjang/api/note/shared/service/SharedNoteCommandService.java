@@ -88,6 +88,10 @@ public class SharedNoteCommandService {
 		return AcquiredPencil.create(seller, "", sharedNoteId, price, false, AcquiredType.SOLD);
 	}
 
+	private AcquiredPencil createNoteSharedAcquiredPencil(Long sharedNoteId, Member member, Long price) {
+		return AcquiredPencil.create(member, "", sharedNoteId, price, false, AcquiredType.NOTE);
+	}
+
 	private UsedPencil createUsedPencil(Member member, Long sharedNoteId, SharedNote sharedNote,
 		PencilAccount buyerAccount) {
 		return UsedPencil.create(member, sharedNoteId, sharedNote.getPrice(), Usedtype.OWNED,
@@ -135,5 +139,9 @@ public class SharedNoteCommandService {
 		sharedNoteUpdater.save(sharedNote);
 
 		//사용자 지갑에 rewardPencil만큼 업데이트
+		PencilAccount pencilAccount = pencilAccountFinder.findByMemberWithLock(member);
+		pencilAccount.increaseAcquiredBalance(rewardPencilCount);
+		acquiredPencilUpdater.save(
+			createNoteSharedAcquiredPencil(sharedNote.getSharedNoteId(), member, rewardPencilCount.longValue()));
 	}
 }

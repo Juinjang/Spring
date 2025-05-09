@@ -43,11 +43,11 @@ public class SharedNote extends BaseEntity {
 
 	@Comment("임장시기 연도")
 	@Column(name = "note_year")
-	private int year;
+	private Integer year;
 
 	@Comment("임장시기 월")
 	@Column(name = "note_month")
-	private int month;
+	private Integer month;
 
 	// TODO : 임장시기 - 시기 추후에, ENUM 으로 변경 필요
 	private String period;
