@@ -5,6 +5,7 @@ import static umc.th.juinjang.domain.limjang.model.QAddress.*;
 import static umc.th.juinjang.domain.limjang.model.QLimjang.*;
 import static umc.th.juinjang.domain.limjang.model.QLimjangPrice.*;
 import static umc.th.juinjang.domain.member.model.QMember.*;
+import static umc.th.juinjang.domain.note.liked.model.QLikedNote.*;
 import static umc.th.juinjang.domain.note.shared.model.QSharedNote.*;
 import static umc.th.juinjang.domain.pencil.used.model.QUsedPencil.*;
 import static umc.th.juinjang.domain.report.model.QReport.*;
@@ -14,10 +15,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.support.PageableExecutionUtils;
 
-import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
@@ -29,8 +27,10 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
 import umc.th.juinjang.api.note.shared.controller.ExploreSortType;
+import umc.th.juinjang.api.note.shared.controller.NoteType;
 import umc.th.juinjang.domain.limjang.model.LimjangPriceType;
 import umc.th.juinjang.domain.limjang.model.LimjangPropertyType;
+import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.note.shared.model.SharedNote;
 import umc.th.juinjang.domain.pencil.used.model.Usedtype;
 
@@ -75,6 +75,41 @@ public class SharedNoteQueryDSLRepositoryImpl implements SharedNoteQueryDSLRepos
 			);
 		long totalCount = countQuery.fetchOne();
 		return new PageImpl<>(content, pageable, totalCount);
+	}
+
+	@Override
+	public List<SharedNote> findUserSharedNotes(Member user, NoteType noteType, LimjangPropertyType propertyType,
+		LimjangPriceType priceType, String keyword, List<Long> filterIds) {
+
+		return queryFactory.selectFrom(sharedNote)
+			.join(sharedNote.limjang, limjang).fetchJoin()
+			.join(sharedNote.member, member).fetchJoin()
+			.join(limjang.limjangPrice, limjangPrice).fetchJoin()
+			.join(limjang.addressEntity, address).fetchJoin()
+			.leftJoin(limjang.report, report).fetchJoin()
+			.where(
+				getWhereByNoteType(user, noteType, filterIds),
+				getWhereByPropertyType(propertyType),
+				getWhereByPriceType(priceType),
+				keywordCondition(keyword)
+			)
+			.orderBy(getOrderByNoteType(noteType))
+			.fetch();
+	}
+
+	private OrderSpecifier<?>[] getOrderByNoteType(NoteType noteType) {
+		if (noteType == NoteType.SHARED) {
+			return new OrderSpecifier<?>[] {sharedNote.createdAt.desc()};
+		}
+		return new OrderSpecifier<?>[0];
+	}
+
+	private BooleanExpression getWhereByNoteType(Member user, NoteType noteType, List<Long> ids) {
+		return switch (noteType) {
+			case OWNED -> sharedNote.sharedNoteId.in(ids);
+			case SHARED -> sharedNote.member.eq(user).and(sharedNote.deletedAt.isNull());
+			default -> null;
+		};
 	}
 
 	private BooleanExpression keywordCondition(String keyword) {

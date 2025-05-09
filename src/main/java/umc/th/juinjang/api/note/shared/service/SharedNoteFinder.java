@@ -9,10 +9,12 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 import umc.th.juinjang.api.note.shared.controller.ExploreSortType;
+import umc.th.juinjang.api.note.shared.controller.NoteType;
 import umc.th.juinjang.common.code.status.ErrorStatus;
 import umc.th.juinjang.common.exception.handler.SharedNoteHandler;
 import umc.th.juinjang.domain.limjang.model.LimjangPriceType;
 import umc.th.juinjang.domain.limjang.model.LimjangPropertyType;
+import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.note.shared.model.SharedNote;
 import umc.th.juinjang.domain.note.shared.repository.SharedNoteRepository;
 
@@ -44,5 +46,10 @@ public class SharedNoteFinder {
 		LimjangPropertyType propertyType, LimjangPriceType priceType, String keyword, Pageable pageable) {
 		return sharedNoteRepository.findSharedNoteInExployer(code, sort, propertyType, priceType,
 			keyword, pageable);
+	}
+
+	public List<SharedNote> findUserSharedNotes(Member member, NoteType noteType, LimjangPropertyType propertyType,
+		LimjangPriceType priceType, String keyword, List<Long> filterIds) {
+		return sharedNoteRepository.findUserSharedNotes(member, noteType, propertyType, priceType, keyword, filterIds);
 	}
 }

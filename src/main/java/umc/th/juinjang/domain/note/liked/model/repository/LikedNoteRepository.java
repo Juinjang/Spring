@@ -11,7 +11,7 @@ import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.note.liked.model.LikedNote;
 import umc.th.juinjang.domain.note.shared.model.SharedNote;
 
-public interface LikedNoteRepository extends JpaRepository<LikedNote, Long> {
+public interface LikedNoteRepository extends JpaRepository<LikedNote, Long>, LikedNoteQueryDSLRepository {
 
 	boolean existsByMemberAndSharedNote(Member member, SharedNote sharedNote);
 
@@ -20,4 +20,6 @@ public interface LikedNoteRepository extends JpaRepository<LikedNote, Long> {
 	@Query("SELECT l.sharedNote.sharedNoteId FROM LikedNote l WHERE l.member = :member AND l.sharedNote IN :sharedNotes")
 	List<Long> findLikedSharedNoteIds(@Param("member") Member member,
 		@Param("sharedNotes") List<SharedNote> sharedNotes);
+
+	List<LikedNote> findAllByMember(Member member);
 }

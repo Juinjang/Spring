@@ -22,4 +22,8 @@ public interface UsedPencilRepository extends JpaRepository<UsedPencil, Long> {
 	@Query("select u.sharedNoteId from UsedPencil u where u.member = :member and u.sharedNoteId in :sharedNoteIds and u.type = 'OWNED'")
 	List<Long> findByMemberInSharedNoteIdsAndTypeIsOwned(@Param("member") Member member,
 		@Param("sharedNoteIds") List<Long> sharedNoteIds);
+
+	@Query("select u from UsedPencil u where u.member = :member and u.type = 'OWNED' order by u.createdAt desc ")
+	List<UsedPencil> findAllByMemberAndTypeIsOwnedOrderByCreatedAtDesc(@Param("member") Member member);
+
 }
