@@ -6,6 +6,7 @@ import jakarta.persistence.FetchType;
 import java.sql.Timestamp;
 
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.DynamicUpdate;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,6 +24,7 @@ import umc.th.juinjang.domain.member.model.Member;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
+@DynamicUpdate
 public class SharedNote extends BaseEntity {
 
 	@Id

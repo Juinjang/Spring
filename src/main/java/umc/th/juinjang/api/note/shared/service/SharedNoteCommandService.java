@@ -86,6 +86,7 @@ public class SharedNoteCommandService {
 			sharedNote.getBuildingName(), buyerAccount.getTotalBalance());
 	}
 
+	@Transactional
 	public void deleteSharedNote(Member member, Long sharedNoteId, LocalDateTime deletedAt) {
 		SharedNote sharedNote = sharedNoteFinder.getBySharedNoteIdAndMember(sharedNoteId,member);
 		sharedNote.updateDeletedAt(Timestamp.valueOf(deletedAt));
