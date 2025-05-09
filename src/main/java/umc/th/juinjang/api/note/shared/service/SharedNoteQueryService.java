@@ -5,9 +5,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -18,17 +16,19 @@ import org.springframework.data.redis.RedisSystemException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.xml.sax.ErrorHandler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import umc.th.juinjang.api.checklist.service.ChecklistAnswerFinder;
+import umc.th.juinjang.api.checklist.service.response.ChecklistAnswerResponseDTO;
 import umc.th.juinjang.api.note.liked.service.LikedNoteFinder;
 import umc.th.juinjang.api.note.shared.controller.ExploreSortType;
 import umc.th.juinjang.api.note.shared.controller.NoteType;
+import umc.th.juinjang.api.note.shared.service.response.SharedNoteCheckListAndReviewResponse;
 import umc.th.juinjang.api.note.shared.service.response.SharedNoteExploreGetResponse;
+import umc.th.juinjang.api.note.shared.service.response.SharedNoteGetResponse;
 import umc.th.juinjang.api.note.shared.service.response.UserSharedNotesGetResponse;
 import umc.th.juinjang.api.pencil.service.UsedPencilFinder;
-import umc.th.juinjang.api.note.shared.service.response.SharedNoteGetResponse;
 import umc.th.juinjang.common.code.status.ErrorStatus;
 import umc.th.juinjang.common.exception.handler.SharedNoteHandler;
 import umc.th.juinjang.common.redis.RedisKeyFactory;
@@ -48,6 +48,7 @@ public class SharedNoteQueryService {
 	private final UsedPencilFinder usedPencilFinder;
 	private final SharedNoteFinder sharedNoteFinder;
 	private final LikedNoteFinder likedNoteFinder;
+	private final ChecklistAnswerFinder checklistAnswerFinder;
 	private final RedisTemplate<String, String> redisTemplate;
 
 	@Transactional(readOnly = true)
@@ -214,11 +215,23 @@ public class SharedNoteQueryService {
 		List<LikedNote> userLikedNotes = likedNoteFinder.findAllByMemberAndDynamic(member, propertyType,
 			priceType, keyword);
 		List<SharedNote> sharedNotes = userLikedNotes.stream().map(LikedNote::getSharedNote).toList();
-		
+
 		Set<Long> purchasedIds = new HashSet<>(usedPencilFinder.findByMemberInSharedNoteIdsAndTypeIsOwned(member,
 			sharedNotes.stream().map(SharedNote::getSharedNoteId).toList()));
 		Map<Long, Long> viewcountMap = mapIdsAndViewcount(sharedNotes);
 
 		return UserSharedNotesGetResponse.ofLiked(sharedNotes, purchasedIds, viewcountMap);
+	}
+
+	@Transactional(readOnly = true)
+	public SharedNoteCheckListAndReviewResponse findChecklistAndReview(Member member, Long sharedNoteId) {
+		SharedNote sharedNote = sharedNoteFinder.findByIdWithNoteAndAddress(sharedNoteId);
+		Limjang limjang = sharedNote.getLimjang();
+		List<ChecklistAnswerResponseDTO.AnswerDto> answers = checklistAnswerFinder.findByLimjangId(
+			limjang.getLimjangId());
+		boolean isOwned = usedPencilFinder.existsByMemberAndSharedNoteId(member, sharedNoteId);
+		// 구매했다면 review 포함, 아니면 null
+		String review = isOwned ? sharedNote.getReview() : null;
+		return new SharedNoteCheckListAndReviewResponse(review, answers);
 	}
 }
