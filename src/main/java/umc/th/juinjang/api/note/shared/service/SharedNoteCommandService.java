@@ -1,5 +1,8 @@
 package umc.th.juinjang.api.note.shared.service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
 import org.hibernate.exception.LockAcquisitionException;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.stereotype.Service;
@@ -81,5 +84,10 @@ public class SharedNoteCommandService {
 		PencilAccount buyerAccount) {
 		return UsedPencil.create(member, sharedNoteId, sharedNote.getPrice(), Usedtype.OWNED,
 			sharedNote.getBuildingName(), buyerAccount.getTotalBalance());
+	}
+
+	public void deleteSharedNote(Member member, Long sharedNoteId, LocalDateTime deletedAt) {
+		SharedNote sharedNote = sharedNoteFinder.getBySharedNoteIdAndMember(sharedNoteId,member);
+		sharedNote.updateDeletedAt(Timestamp.valueOf(deletedAt));
 	}
 }

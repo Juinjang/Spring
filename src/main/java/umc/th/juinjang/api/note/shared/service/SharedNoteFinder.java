@@ -29,6 +29,11 @@ public class SharedNoteFinder {
 			.orElseThrow(() -> new SharedNoteHandler(ErrorStatus.SHAREDNOTE_NOT_FOUND));
 	}
 
+	public SharedNote getBySharedNoteIdAndMember(Long sharedNoteId, Member member) {
+		return sharedNoteRepository.findBySharedNoteIdAndMember(sharedNoteId, member).orElseThrow(
+			() -> new SharedNoteHandler(ErrorStatus.SHAREDNOTE_NOT_FOUND));
+	}
+
 	SharedNote findByIdWithNoteAndAddress(Long id) {
 		return sharedNoteRepository.findByIdWithNoteAndAddress(id)
 			.orElseThrow(() -> new SharedNoteHandler(ErrorStatus.SHAREDNOTE_NOT_FOUND));

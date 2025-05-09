@@ -66,5 +66,9 @@ public class SharedNote extends BaseEntity {
 	public Long increaseLikedCount() {
 		return this.likeCount = (likeCount == null ? 1L : likeCount + 1);
 	}
+
+	public void updateDeletedAt(Timestamp deletedAt) {
+		this.deletedAt = deletedAt;
+	}
 }
 
