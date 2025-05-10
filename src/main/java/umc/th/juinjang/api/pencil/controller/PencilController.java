@@ -1,20 +1,25 @@
 package umc.th.juinjang.api.pencil.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import umc.th.juinjang.api.dto.ApiResponse;
+import umc.th.juinjang.api.pencil.controller.request.AppleIAPPurchaseRequest;
 import umc.th.juinjang.api.pencil.service.PencilCommandService;
 import umc.th.juinjang.api.pencil.service.PencilQueryService;
 import umc.th.juinjang.api.pencil.service.response.AcquiredPencilResponse;
+import umc.th.juinjang.api.pencil.service.response.AppleIAPPurchaseResponse;
 import umc.th.juinjang.api.pencil.service.response.PurchasedPencilResponse;
 import umc.th.juinjang.api.pencil.service.response.UsedPencilResponse;
 import umc.th.juinjang.domain.member.model.Member;
@@ -53,5 +58,14 @@ public class PencilController {
 	public ApiResponse<List<UsedPencilResponse>> getUsedPencilHistory(
 		@AuthenticationPrincipal Member member) {
 		return ApiResponse.onSuccess(pencilQueryService.getUsedPencils(member));
+	}
+
+	@Operation(summary = "애플 인앱 결제를 통해 연필을 구매한다")
+	@PostMapping("/purchase/apple")
+	public ApiResponse<AppleIAPPurchaseResponse> purchasePencil(
+		@AuthenticationPrincipal Member member,
+		@RequestBody AppleIAPPurchaseRequest request
+	) {
+		return ApiResponse.onSuccess(pencilCommandService.processAppleIAPPurchase(request , member, LocalDateTime.now()));
 	}
 }

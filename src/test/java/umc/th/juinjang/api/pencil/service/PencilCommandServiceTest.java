@@ -80,14 +80,17 @@ public class PencilCommandServiceTest extends IntegrationTestSupport {
 		payload.setAppAccountToken(appAccountToken);
 		payload.setBundleId(bundleId);
 		payload.setQuantity(20);
+		payload.setTransactionId(transactionId);
 
 		when(appleService.getTransactionInfo(transactionId)).thenReturn(payload);
 
 		// when
 		AppleIAPPurchaseResponse response = pencilService.processAppleIAPPurchase(request, member,now);
-		log.info("[RESPONSE - PENCIL_QUANTITY]: {}", response.getPencilQuantity());
 
 		// then
+		log.info("[RESPONSE - TRANSACTION_ID]: {}", response.getTransactionId());
+		log.info("[RESPONSE - PENCIL_QUANTITY]: {}", response.getPencilQuantity());
+
 		assertThat(response).isNotNull();
 		assertThat(response.getPencilQuantity()).isEqualTo(20L);
 		assertThat(response.getTransactionId()).isEqualTo(transactionId);
@@ -96,8 +99,8 @@ public class PencilCommandServiceTest extends IntegrationTestSupport {
 
 
 	private AppleIAPPurchaseRequest createValidRequest() {
-		return AppleIAPPurchaseRequest.of(
-			transactionId, appAccountToken, 20L, 3000L, productId);
+		return AppleIAPPurchaseRequest
+			.of(transactionId, appAccountToken, 20L, 3000L, productId);
 	}
 }
 
