@@ -15,7 +15,7 @@ import umc.th.juinjang.domain.pencil.used.model.UsedPencil;
 
 @Service
 @RequiredArgsConstructor
-public class PencilService {
+public class PencilQueryService {
 
 	private final AcquiredPencilFinder acquiredPencilFinder;
 	private final PurchasedPencilFinder purchasedPencilFinder;
