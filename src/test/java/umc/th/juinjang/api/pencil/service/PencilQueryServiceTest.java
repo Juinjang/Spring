@@ -31,7 +31,7 @@ import umc.th.juinjang.domain.pencil.used.repository.UsedPencilRepository;
 import umc.th.juinjang.testutil.fixture.MemberFixture;
 
 @Slf4j
-class PencilServiceTest extends IntegrationTestSupport {
+class PencilQueryServiceTest extends IntegrationTestSupport {
 
 	@Autowired
 	private MemberRepository memberRepository;
