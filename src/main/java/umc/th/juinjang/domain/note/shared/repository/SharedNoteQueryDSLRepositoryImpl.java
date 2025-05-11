@@ -55,7 +55,9 @@ public class SharedNoteQueryDSLRepositoryImpl implements SharedNoteQueryDSLRepos
 				getBcodesStartsWith(code),
 				getWhereByPropertyType(propertyType),
 				getWhereByPriceType(priceType),
-				keywordCondition(keyword))
+				keywordCondition(keyword),
+				sharedNote.deletedAt.isNull()
+			)
 			.orderBy(getOrderBySortOptions(sort))
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
