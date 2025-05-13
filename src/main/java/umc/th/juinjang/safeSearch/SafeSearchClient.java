@@ -17,7 +17,9 @@ import com.google.cloud.vision.v1.Likelihood;
 import com.google.cloud.vision.v1.SafeSearchAnnotation;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class SafeSearchClient {
@@ -47,6 +49,12 @@ public class SafeSearchClient {
 			}
 
 			SafeSearchAnnotation annotation = res.getSafeSearchAnnotation();
+			log.info("SafeSearch 분석 결과 for [{}]", imageUrl);
+			log.info(" - adult: {}", annotation.getAdult());
+			log.info(" - spoof: {}", annotation.getSpoof());
+			log.info(" - medical: {}", annotation.getMedical());
+			log.info(" - violence: {}", annotation.getViolence());
+			log.info(" - racy: {}", annotation.getRacy());
 			return isAnnotationSafe(annotation, adultThreshold, spoofThreshold, medicalThreshold, violenceThreshold,
 				racyThreshold);
 
