@@ -57,7 +57,7 @@ public class SharedNoteCommandService {
 			executePayment(buyerAccount, sellerAccount, price);
 
 			usedPencilUpdater.save(createUsedPencil(buyer, sharedNoteId, sharedNote, buyerAccount));
-			acquiredPencilUpdater.save(createAcquiredPencil(sharedNoteId, seller, price));
+			acquiredPencilUpdater.save(createAcquiredPencil(sharedNoteId, seller, price, AcquiredType.SOLD));
 		} catch (CannotAcquireLockException | PessimisticLockException | LockAcquisitionException e) {
 			throw new SharedNoteHandler(ErrorStatus.SHAREDNOTE_DEADLOCK);
 		}
@@ -84,12 +84,8 @@ public class SharedNoteCommandService {
 		sellerAccount.increaseAcquiredBalance(price);
 	}
 
-	private AcquiredPencil createAcquiredPencil(Long sharedNoteId, Member seller, Long price) {
-		return AcquiredPencil.create(seller, "", sharedNoteId, price, false, AcquiredType.SOLD);
-	}
-
-	private AcquiredPencil createNoteSharedAcquiredPencil(Long sharedNoteId, Member member, Long price) {
-		return AcquiredPencil.create(member, "", sharedNoteId, price, false, AcquiredType.NOTE);
+	private AcquiredPencil createAcquiredPencil(Long sharedNoteId, Member seller, Long price, AcquiredType type) {
+		return AcquiredPencil.create(seller, "", sharedNoteId, price, false, type);
 	}
 
 	private UsedPencil createUsedPencil(Member member, Long sharedNoteId, SharedNote sharedNote,
@@ -142,6 +138,7 @@ public class SharedNoteCommandService {
 		PencilAccount pencilAccount = pencilAccountFinder.findByMemberWithLock(member);
 		pencilAccount.increaseAcquiredBalance(rewardPencilCount);
 		acquiredPencilUpdater.save(
-			createNoteSharedAcquiredPencil(sharedNote.getSharedNoteId(), member, rewardPencilCount.longValue()));
+			createAcquiredPencil(sharedNote.getSharedNoteId(), member, rewardPencilCount.longValue(),
+				AcquiredType.NOTE));
 	}
 }
