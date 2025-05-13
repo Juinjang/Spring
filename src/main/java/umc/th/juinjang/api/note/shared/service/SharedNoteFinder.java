@@ -34,7 +34,7 @@ public class SharedNoteFinder {
 		return sharedNoteRepository.getLikeCountById(id);
 	}
 
-	public boolean existsByLimjangId(Long limjangId) {
-		return sharedNoteRepository.existsByLimjang_LimjangId(limjangId);
+	public Optional<SharedNote> findLatestByLimjangId(Long limjangId) {
+		return sharedNoteRepository.findLatestByLimjangId(limjangId);
 	}
 }

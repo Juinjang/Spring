@@ -1,5 +1,8 @@
 package umc.th.juinjang.api.note.shared.service;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import org.hibernate.exception.LockAcquisitionException;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.stereotype.Service;
@@ -97,9 +100,16 @@ public class SharedNoteCommandService {
 	@Transactional
 	public void createSharedNote(Member member, Long noteId, SharedNotePostRequest request) {
 		Integer rewardPencilCount = 0;
-		//이미 공유된 임장인지 확인
-		if (sharedNoteFinder.existsByLimjangId(noteId)) {
-			throw new SharedNoteHandler(ErrorStatus.SHAREDNOTE_ALREADY_EXISTS);
+
+		Optional<SharedNote> maybeNote = sharedNoteFinder.findLatestByLimjangId(noteId);
+		if (maybeNote.isPresent()) {
+			SharedNote note = maybeNote.get();
+			if (note.getDeletedAt() == null) {
+				throw new SharedNoteHandler(ErrorStatus.SHAREDNOTE_ALREADY_EXISTS);
+			}
+			if (note.getDeletedAt().toLocalDateTime().isAfter(LocalDateTime.now().minusMonths(6))) {
+				throw new SharedNoteHandler(ErrorStatus.SHAREDNOTE_DELETED_RECENTLY);
+			}
 		}
 
 		//Limjang 조회
