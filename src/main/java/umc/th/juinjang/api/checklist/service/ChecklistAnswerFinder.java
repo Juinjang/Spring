@@ -1,7 +1,6 @@
 package umc.th.juinjang.api.checklist.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
@@ -27,5 +26,12 @@ public class ChecklistAnswerFinder {
 
 		List<ChecklistAnswer> answerList = checklistAnswerRepository.findChecklistAnswerByLimjangId(limjang);
 		return ChecklistAnswerResponseDTO.AnswerDto.fromEntityList(answerList);
+	}
+
+	public List<ChecklistAnswer> findEntitiesByLimjangId(Long limjangId) {
+		Limjang limjang = limjangRepository.findByLimjangIdAndDeletedIsFalse(limjangId)
+			.orElseThrow(() -> new LimjangHandler(ErrorStatus.LIMJANG_NOTFOUND_ERROR));
+
+		return checklistAnswerRepository.findChecklistAnswerByLimjangId(limjang);
 	}
 }
