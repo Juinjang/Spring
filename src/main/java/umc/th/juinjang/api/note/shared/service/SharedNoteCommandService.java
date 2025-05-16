@@ -101,9 +101,9 @@ public class SharedNoteCommandService {
 	public void createSharedNote(Member member, Long noteId, SharedNotePostRequest request) {
 		Integer rewardPencilCount = 0;
 
-		Optional<SharedNote> maybeNote = sharedNoteFinder.findLatestByLimjangId(noteId);
-		if (maybeNote.isPresent()) {
-			SharedNote note = maybeNote.get();
+		Optional<SharedNote> latestSharedNote = sharedNoteFinder.findLatestByLimjangId(noteId);
+		if (latestSharedNote.isPresent()) {
+			SharedNote note = latestSharedNote.get();
 			if (note.getDeletedAt() == null) {
 				throw new SharedNoteHandler(ErrorStatus.SHAREDNOTE_ALREADY_EXISTS);
 			}
