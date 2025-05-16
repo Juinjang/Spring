@@ -24,7 +24,7 @@ public class DiscordEventListener {
 	@Async
 	public void handleSignUpEvent(SignUpEvent event) {
 		if (isProdEnv()) {
-			discordAlertProvider.sendAlertToDiscord(
+			discordAlertProvider.sendMemberCreateAlertToDiscord(
 				String.format(EventMessage.SIGN_UP_MESSAGE.getMessage(), event.memberProvider(), event.count(),
 					event.name()));
 		}
@@ -33,8 +33,7 @@ public class DiscordEventListener {
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	@Async
 	public void handleFlagSharedNoteEvent(FlagSharedNoteEvent event) {
-		System.out.println("??왜안됨");
-		discordAlertProvider.sendAlertToDiscord(String.format(
+		discordAlertProvider.sendReportSharedNoteAlertToDiscord(String.format(
 			EventMessage.FLAG_SHARED_NOTE_MESSAGE.getMessage(),
 			event.flaggedByMemberId(),
 			event.flagSharedNoteType().getDescription(),

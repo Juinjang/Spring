@@ -3,21 +3,52 @@ package umc.th.juinjang.external.openfeign.discord;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
+
 import umc.th.juinjang.external.openfeign.discord.dto.DiscordAlert;
 
-@RequiredArgsConstructor
 @Component
 @Slf4j
 public class DiscordAlertProvider {
+	private final WebClient webClient;
 
-  private final DiscordFeignClient discordFeignClient;
+	@Value("${discord.member-create}")
+	private String memberCreateWebhookUrl;
 
-  public void sendAlertToDiscord(String content) {
-    try {
-      discordFeignClient.sendAlert(DiscordAlert.createAlert(content));
-    } catch (FeignException e) {
-      log.info(StatusMessage.DISCORD_ALERT_ERROR.getMessage()+ " " +e.getMessage());
-    }
-  }
+	@Value("${discord.report-shared-note}")
+	private String reportSharedNoteWebhookUrl;
+
+	public DiscordAlertProvider(WebClient.Builder builder) {
+		this.webClient = builder.build();
+	}
+
+	private void sendWebClient(String url, String content) {
+		webClient.post()
+			.uri(url)
+			.contentType(MediaType.APPLICATION_JSON)
+			.bodyValue(DiscordAlert.createAlert(content))
+			.retrieve()
+			.bodyToMono(Void.class)
+			.block();
+	}
+
+	public void sendMemberCreateAlertToDiscord(String content) {
+		try {
+			sendWebClient(memberCreateWebhookUrl, content);
+		} catch (Exception e) {
+			log.info(StatusMessage.DISCORD_ALERT_ERROR.getMessage() + " " + e.getMessage());
+		}
+	}
+
+	public void sendReportSharedNoteAlertToDiscord(String content) {
+		try {
+			sendWebClient(reportSharedNoteWebhookUrl, content);
+		} catch (FeignException e) {
+			log.info(StatusMessage.DISCORD_ALERT_ERROR.getMessage() + " " + e.getMessage());
+		}
+	}
 }
