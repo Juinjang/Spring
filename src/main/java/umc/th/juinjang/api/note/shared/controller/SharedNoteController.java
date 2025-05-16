@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import umc.th.juinjang.api.dto.ApiResponse;
+import umc.th.juinjang.api.note.shared.controller.request.ExploreSortType;
+import umc.th.juinjang.api.note.shared.controller.request.NoteType;
 import umc.th.juinjang.api.note.shared.controller.request.SharedNotePostRequest;
 import umc.th.juinjang.api.note.shared.service.SharedNoteCommandService;
 import umc.th.juinjang.api.note.shared.service.SharedNoteQueryService;
