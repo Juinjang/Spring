@@ -53,7 +53,7 @@ public class SharedNoteCommandService {
 	public void createSharedNotePurchase(Member buyer, Long sharedNoteId) {
 		checkAlreadyPurchase(buyer, sharedNoteId);
 
-		SharedNote sharedNote = sharedNoteFinder.getById(sharedNoteId);
+		SharedNote sharedNote = sharedNoteFinder.getByIdWhereDeletedAtIsNull(sharedNoteId);
 		Member seller = sharedNote.getMember();
 		Long price = sharedNote.getPrice();
 
