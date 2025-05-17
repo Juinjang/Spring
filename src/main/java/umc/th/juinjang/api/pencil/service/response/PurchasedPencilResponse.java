@@ -13,17 +13,17 @@ public class PurchasedPencilResponse {
 	private Long remainQuantity;
 	private String title;
 	private Long price;
-	private LocalDateTime createdAt;
+	private LocalDateTime purchasedAt;
 
 	@Builder
 	public PurchasedPencilResponse(Long purchasePencilId, Long purchaseQuantity, Long remainQuantity,
-		String title, Long price, LocalDateTime createdAt) {
+		String title, Long price, LocalDateTime purchasedAt) {
 		this.purchasePencilId = purchasePencilId;
 		this.purchaseQuantity = purchaseQuantity;
 		this.remainQuantity = remainQuantity;
 		this.title = title;
 		this.price = price;
-		this.createdAt = createdAt;
+		this.purchasedAt = purchasedAt;
 	}
 
 	public static PurchasedPencilResponse from(PurchasedPencil purchasedPencil) {
@@ -33,7 +33,7 @@ public class PurchasedPencilResponse {
 			.remainQuantity(purchasedPencil.getRemainQuantity())
 			.title(purchasedPencil.getTitle())
 			.price(purchasedPencil.getPrice())
-			.createdAt(purchasedPencil.getCreatedAt())
+			.purchasedAt(purchasedPencil.getPurchasedAt())
 			.build();
 	}
 }

@@ -1,24 +1,26 @@
 package umc.th.juinjang.api.pencil.service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.apple.itunes.storekit.model.JWSTransactionDecodedPayload;
-
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import umc.th.juinjang.api.apple.service.AppleService;
+import umc.th.juinjang.api.apple.service.command.AppleTransactionVerifyCommand;
 import umc.th.juinjang.api.pencil.controller.request.AppleIAPPurchaseRequest;
 import umc.th.juinjang.api.pencil.service.response.AppleIAPPurchaseResponse;
+import umc.th.juinjang.api.pencil.service.response.VerificationResult;
 import umc.th.juinjang.api.pencilAccount.service.PencilAccountFinder;
 import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.pencil.acquired.model.AcquiredPencil;
 import umc.th.juinjang.domain.pencil.purchased.model.PurchasedPencil;
-import umc.th.juinjang.domain.pencilaccount.model.PencilAccount;
+import umc.th.juinjang.domain.pencil.purchased.model.TransactionStatus;
+import umc.th.juinjang.event.publisher.PaymentEventPublisher;
 
 @Slf4j
 @Service
@@ -28,11 +30,9 @@ public class PencilCommandService {
 	private final AppleService appleService;
 
 	private final PurchasedPencilUpdater purchasedPencilUpdater;
+	private final PurchasedPencilFinder purchasedPencilFinder;
 	private final AcquiredPencilFinder acquiredPencilFinder;
 	private final PencilAccountFinder pencilAccountFinder;
-
-	@Value("${apple.iap.bundle-id}")
-	String appleBundleId;
 
 	@Transactional
 	public Boolean markAcquiredPencilAsRead(Long acquiredPencilId) {
@@ -50,89 +50,98 @@ public class PencilCommandService {
 	public AppleIAPPurchaseResponse processAppleIAPPurchase(AppleIAPPurchaseRequest request, Member member,
 		LocalDateTime now) {
 		String transactionId = request.getTransactionId();
+
+		Optional<PurchasedPencil> existing = purchasedPencilFinder.findByTransactionIdAndMember(transactionId, member);
+
+		if (existing.isEmpty()) {
+			// 기존 트랜잭션이 없는 경우
+			log.info("기존 트랜잭션이 없습니다. {}", transactionId);
+			return validateAndCommitApplePurchase(request, member, now);
+		}
+
+		PurchasedPencil pencil = existing.get();
+		TransactionStatus status = pencil.getTransactionStatus();
+
+		if (status == TransactionStatus.SUCCESS) {
+			// 트랜잭션이 정상적으로 성공된 기록이 있는 경우
+			return AppleIAPPurchaseResponse.ofSuccess(transactionId);
+		}
+
+		PurchasedPencil newPencil = retryPurchasedPencil(pencil, member); // 실패 재시도 처리
+		return AppleIAPPurchaseResponse.of(transactionId, newPencil.getTransactionStatus());
+	}
+
+
+
+	@Transactional
+	public AppleIAPPurchaseResponse validateAndCommitApplePurchase(AppleIAPPurchaseRequest request, Member member, LocalDateTime now) {
+		String transactionId = request.getTransactionId();
+
+		VerificationResult verificationResult = appleService.verifyAppleTransaction(AppleTransactionVerifyCommand.fromRequest(request));
+
+		if (VerificationResult.isSuccess(verificationResult)){
+			// 성공 시, DB에 저장z
+			handleSuccessfulApplePurchase(request, member, now);
+
+			// TODO : 디스코드 알림 추가 필요
+			// paymentEventPublisher.publishPaymentEvent(member,request.getPrice(), pencilAmount,TransactionStatus.SUCCESS);
+			return AppleIAPPurchaseResponse.ofSuccess(transactionId);
+		}else{
+			// 실패 시, DB에 저장
+			handleFailureApplePurchase(request, member, now);
+
+			// TODO : 디스코드 알림 추가 필요
+			// paymentEventPublisher.publishPaymentEvent(member,request.getPrice(), pencilAmount,TransactionStatus.VALIDATION_FAILED);
+			return AppleIAPPurchaseResponse.ofValidationFailure(transactionId);
+		}
+	}
+
+	@Transactional
+	public void handleSuccessfulApplePurchase(AppleIAPPurchaseRequest request, Member member, LocalDateTime now) {
+		String transactionId = request.getTransactionId();
 		Long pencilAmount = request.getPencilQuantity();
 
-		// 트랜잭션이 중복되는 지 체크가 필요한 가?
-		try{
-			// 1. 애플 서버로부터 트랜잭션 정보 가져오기
-			JWSTransactionDecodedPayload decodedPayload = appleService.getTransactionInfo(transactionId);
+		String title = createTitle(pencilAmount);
+		purchasedPencilUpdater.save(PurchasedPencil.successOf(member, title, pencilAmount, request.getPrice(),
+			request.getPlayTime(), transactionId, request.getAppAccountToken(), now));
 
-			// 2. 서버와의 검증 수행
-			if (!validateTransaction(decodedPayload,request)){
-				// PurchasePencil에 결과 저장
-				return null;
-			}
-
-			PencilAccount pencilAccount = pencilAccountFinder.findByMemberWithLock(member);
-			pencilAccount.increasePurchasedBalance(pencilAmount);
-
-			String title = "연필 10개 구매";
-
-			PurchasedPencil purchasedPencil = PurchasedPencil.createSuccessPurchase(
-				member, title, 10L, pencilAmount, transactionId, request.getAppAccountToken(),now);
-
-			purchasedPencilUpdater.save(purchasedPencil);
-
-			log.info("Apple IAP Purchase Success. Transaction ID: {}, Total Balance Amount: {} , Total Purchase Amount: {}",
-				transactionId, pencilAccount.getTotalBalance(), pencilAccount.getTotalPurchaseAmount());
-			return AppleIAPPurchaseResponse.of(transactionId, pencilAccount.getTotalBalance());
-		}catch (Exception e){
-			return null;
-		}
+		pencilAccountFinder.findByMemberWithLock(member).increasePurchasedBalance(pencilAmount);
 	}
 
-	private boolean validateTransaction(JWSTransactionDecodedPayload decodedPayload, AppleIAPPurchaseRequest request) {
-		// 트랜잭션 아이디가 정상적으로 일치하는 지 여부
-		if (!decodedPayload.getTransactionId().equals(request.getTransactionId())) {
-			log.warn("트랜잭션 아이디 불일치. 애플 PAYLOAD : {}, REQUEST 요청 : {}",decodedPayload.getTransactionId(), request.getTransactionId());
-			return false;
-		}
+	@Transactional
+	public void handleFailureApplePurchase(AppleIAPPurchaseRequest request, Member member, LocalDateTime now) {
+		String transactionId = request.getTransactionId();
+		Long pencilAmount = request.getPencilQuantity();
 
-		// 1. 환불/취소 여부 확인
-		if (decodedPayload.getRevocationDate() != null || decodedPayload.getRevocationReason() != null) {
-			log.warn("트랜잭션이 취소되었습니다. 트랜잭션 ID: {}, 취소 이유: {}",
-				decodedPayload.getTransactionId(), decodedPayload.getRevocationReason());
-			return false;
-		}
-
-		// 2. 번들 ID가 앱의 번들 ID와 일치하는지 검증
-		if (!appleBundleId.equals(decodedPayload.getBundleId())) {
-			log.warn("번들 ID 불일치. 예상: {}, 실제: {}",
-				appleBundleId, decodedPayload.getBundleId());
-			return false;
-		}
-
-		// 3. 상품 ID가 요청한 상품과 일치하는지 검증
-		if (!request.getProductId().equals(decodedPayload.getProductId())) {
-			log.warn("상품 ID 불일치. 요청: {}, 응답: {}",
-				request.getProductId(), decodedPayload.getProductId());
-			return false;
-		}
-
-		// 4. 환경 확인 - 프로덕션에서는 프로덕션, 개발에서는 샌드박스인지 확인
-		// boolean isProduction = !"Sandbox".equalsIgnoreCase(decodedPayload.getEnvironment());
-		// if (isProduction) {
-		// 	log.warn("환경 불일치. 프로덕션 여부: {}, 프로덕션이어야 함: {}",
-		// 		isProduction, shouldBeProduction);
-		// 	return false;
-		// }
-
-		// 5. 수량 검증
-		if (decodedPayload.getQuantity() <= 0) {
-			log.warn("유효하지 않은 수량: {}", decodedPayload.getQuantity());
-			return false;
-		}
-
-		// 6. 앱 계정 토큰이 제공된 경우 일치하는지 확인
-		if (request.getAppAccountToken() != null && decodedPayload.getAppAccountToken() != null &&
-			!request.getAppAccountToken().equals(decodedPayload.getAppAccountToken())) {
-			log.warn("앱 계정 토큰 불일치. 요청: {}, 응답: {}",
-				request.getAppAccountToken(), decodedPayload.getAppAccountToken());
-			return false;
-		}
-
-		// 7. 모든 검증이 완료되었으므로 true 반환
-		log.info("Apple IAP Purchase Validation Success. Transaction ID: {}", decodedPayload.getTransactionId());
-		return true;
+		String title = createTitle(pencilAmount);
+		purchasedPencilUpdater.save(PurchasedPencil.failedDueToValidation(member, title, pencilAmount, request.getPrice(),
+			request.getPlayTime(), transactionId, request.getAppAccountToken(), now));
 	}
+
+	private PurchasedPencil retryPurchasedPencil(PurchasedPencil pencil, Member member) {
+		if ( pencil.getRetryCount() >= 3 ) { // 재시도 횟수가 3회 이상일 경우 실패로 처리
+			return pencil;
+		}
+
+		AppleIAPPurchaseRequest retryRequest = AppleIAPPurchaseRequest.ofRetry(pencil);
+		VerificationResult verificationResult = appleService.verifyAppleTransaction(
+			AppleTransactionVerifyCommand.fromRequest(retryRequest)
+		);
+
+		if (VerificationResult.isSuccess(verificationResult)) {
+			pencil.markAsSuccess();
+			pencil.updateRetryCount(pencil.getRetryCount() + 1);
+
+			pencilAccountFinder.findByMemberWithLock(member)
+				.increasePurchasedBalance(pencil.getPurchaseQuantity());
+		}
+
+		return pencil;
+	}
+
+
+	private String createTitle(Long pencilAmount) {
+		return String.format("연필 %d개 구매", pencilAmount);
+	}
+
 }

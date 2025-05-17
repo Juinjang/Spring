@@ -1,6 +1,7 @@
 package umc.th.juinjang.api.pencil.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
@@ -16,5 +17,9 @@ public class PurchasedPencilFinder {
 
 	public List<PurchasedPencil> findAllByMemberWhereDeliverySuccessOrderByCreatedAtDesc(Member member) {
 		return purchasedPencilRepository.findAllByMemberWhereDeliverySuccessOrderByCreatedAtDesc(member);
+	}
+
+	public Optional<PurchasedPencil> findByTransactionIdAndMember(String transactionId, Member member) {
+		return purchasedPencilRepository.findByTransactionIdAndMember(transactionId, member);
 	}
 }
