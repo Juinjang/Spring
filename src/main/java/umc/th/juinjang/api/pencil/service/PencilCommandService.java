@@ -3,7 +3,6 @@ package umc.th.juinjang.api.pencil.service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +19,6 @@ import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.pencil.acquired.model.AcquiredPencil;
 import umc.th.juinjang.domain.pencil.purchased.model.PurchasedPencil;
 import umc.th.juinjang.domain.pencil.purchased.model.TransactionStatus;
-import umc.th.juinjang.event.publisher.PaymentEventPublisher;
 
 @Slf4j
 @Service
