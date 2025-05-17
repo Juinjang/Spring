@@ -141,6 +141,9 @@ public class Limjang extends BaseEntity {
 		return this.imageList.isEmpty() ? null : this.imageList.get(0).getImageUrl();
 	}
 
+	public void updateRewardPencil(Integer rewardPencil) {
+		this.rewardPencil = rewardPencil;
+
 	public void updateSharable(boolean state) {
 		this.isSharable = state;
 	}

@@ -44,6 +44,11 @@ public class SharedNoteFinder {
 		return sharedNoteRepository.getLikeCountById(id);
 	}
 
+
+	public Optional<SharedNote> findLatestByLimjangId(Long limjangId) {
+		return sharedNoteRepository.findLatestByLimjangId(limjangId);
+  }
+  
 	Page<SharedNote> findSharedNoteInExployer(List<String> code, ExploreSortType sort,
 		LimjangPropertyType propertyType, LimjangPriceType priceType, String keyword, Pageable pageable) {
 		return sharedNoteRepository.findSharedNoteInExployer(code, sort, propertyType, priceType,
