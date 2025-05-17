@@ -1,5 +1,5 @@
 # .github/workflows/prod-cd.yml
-name: CD for Prod
+name: CD For Prod
 
 on:
   push:
