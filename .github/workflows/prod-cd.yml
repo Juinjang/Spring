@@ -60,7 +60,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO_PROD }}
 
-      - name: Deploy to Prod
+      - name: Deploy to Prod!
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.EC2_HOST_PROD }}
@@ -68,9 +68,9 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY_PROD }}
           script: |
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO_PROD }}
-            chmod 777 ./deploy.sh
+            sudo chmod 777 ./deploy.sh
             ./deploy.sh
-            docker image prune -f
+            sudo docker image prune -f
 
   create-release:
     needs: build
