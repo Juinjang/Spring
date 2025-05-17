@@ -7,22 +7,39 @@ import umc.th.juinjang.api.limjang.service.response.LimjangDetailResponseDTO;
 @Getter
 @Setter
 public class ReportResponseDTO {
-    private ReportDTO reportDTO;
-    private LimjangDetailResponseDTO.DetailDto limjangDto;
+	private ReportDTO reportDTO;
+	private LimjangDetailResponseDTO.DetailDto limjangDto;
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class ReportDTO {
-        private Long reportId;
-        private String indoorKeyWord;
-        private String publicSpaceKeyWord;
-        private String locationConditionsWord;
-        private Float indoorRate;
-        private Float publicSpaceRate;
-        private Float locationConditionsRate;
-        private Float totalRate;
-    }
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	public static class ReportDTO {
+		private Long reportId;
+		private String indoorKeyWord;
+		private String publicSpaceKeyWord;
+		private String locationConditionsWord;
+		private Float indoorRate;
+		private Float publicSpaceRate;
+		private Float locationConditionsRate;
+		private Float totalRate;
+	}
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	public static class ReportV2DTO {
+		private Long reportId;
+		private String indoorKeyWord;
+		private String publicSpaceKeyWord;
+		private String locationConditionsWord;
+		private Float indoorRate;
+		private Float publicSpaceRate;
+		private Float locationConditionsRate;
+		private Float totalRate;
+		private Long limjangId;
+	}
 }

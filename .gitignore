@@ -49,3 +49,4 @@ out/
 /src/main/resources/application-prod.yml
 /src/main/resources/*.json
 /src/main/generated/*
+/src/test/java/resources/application-*.yml

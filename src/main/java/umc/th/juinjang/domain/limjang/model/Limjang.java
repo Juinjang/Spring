@@ -113,6 +113,10 @@ public class Limjang extends BaseEntity {
 	@Column(nullable = false, name = "deleted")
 	private boolean deleted = Boolean.FALSE;
 
+	@Column(nullable = false)
+	@ColumnDefault("false")
+	private boolean isSharable = false;
+
 	public void saveMemberAndPrice(Member member, LimjangPrice limjangPrice) {
 		this.limjangPrice = limjangPrice;
 		this.memberId = member;
@@ -139,6 +143,9 @@ public class Limjang extends BaseEntity {
 
 	public void updateRewardPencil(Integer rewardPencil) {
 		this.rewardPencil = rewardPencil;
+
+	public void updateSharable(boolean state) {
+		this.isSharable = state;
 	}
 
 	@Builder
