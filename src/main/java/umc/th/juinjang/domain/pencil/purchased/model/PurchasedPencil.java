@@ -95,5 +95,9 @@ public class PurchasedPencil extends BaseEntity {
 			.createdAt(createdAt)
 			.build();
 	}
+	
+	public void decreaseRemainQuantity(long quantity) {
+		this.remainQuantity -= quantity;
+	}
 }
 

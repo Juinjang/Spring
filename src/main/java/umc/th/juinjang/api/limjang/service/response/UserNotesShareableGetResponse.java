@@ -24,8 +24,7 @@ public record UserNotesShareableGetResponse(
 		String monthlyRent,
 		Integer pyong,
 		String floor,
-		String shortAddress,
-		int rewardPencil
+		String shortAddress
 	) {
 
 		static UserNoteShareableResponse of(Limjang limjang, String imageUrl, boolean isScraped) {
@@ -40,8 +39,7 @@ public record UserNotesShareableGetResponse(
 					null,
 				limjang.getPyong(),
 				limjang.getFloor(),
-				limjang.getAddressEntity().getShortAddress(),
-				limjang.getRewardPencil()
+				limjang.getAddressEntity().getShortAddress()
 			);
 		}
 	}

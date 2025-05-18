@@ -1,7 +1,9 @@
 package umc.th.juinjang.api.note.shared.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,6 +44,11 @@ public class SharedNoteFinder {
 		return sharedNoteRepository.getLikeCountById(id);
 	}
 
+
+	public Optional<SharedNote> findLatestByLimjangId(Long limjangId) {
+		return sharedNoteRepository.findLatestByLimjangId(limjangId);
+  }
+  
 	Page<SharedNote> findSharedNoteInExployer(List<String> code, ExploreSortType sort,
 		LimjangPropertyType propertyType, LimjangPriceType priceType, String keyword, Pageable pageable) {
 		return sharedNoteRepository.findSharedNoteInExployer(code, sort, propertyType, priceType,
@@ -51,5 +58,17 @@ public class SharedNoteFinder {
 	public List<SharedNote> findUserSharedNotes(Member member, NoteType noteType, LimjangPropertyType propertyType,
 		LimjangPriceType priceType, String keyword, List<Long> filterIds) {
 		return sharedNoteRepository.findUserSharedNotes(member, noteType, propertyType, priceType, keyword, filterIds);
+	}
+
+	public Map<Long, Long> findAllIdAndViewCountById(List<Long> ids) {
+		return sharedNoteRepository.findAllViewCountById(ids).stream()
+			.collect(Collectors.toMap(
+				row -> (Long)row[0],
+				row -> (Long)row[1]
+			));
+	}
+
+	public Long findViewCountById(Long id) {
+		return sharedNoteRepository.findViewCountById(id);
 	}
 }

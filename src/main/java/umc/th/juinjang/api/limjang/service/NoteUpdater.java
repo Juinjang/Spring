@@ -12,7 +12,7 @@ public class NoteUpdater {
 
 	private final LimjangRepository limjangRepository;
 
-	protected void save(Limjang limjang) {
+	public void save(Limjang limjang) {
 		limjangRepository.save(limjang);
 	}
 }
