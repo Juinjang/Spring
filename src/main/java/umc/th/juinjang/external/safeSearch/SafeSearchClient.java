@@ -1,4 +1,4 @@
-package umc.th.juinjang.safeSearch;
+package umc.th.juinjang.external.safeSearch;
 
 import java.io.IOException;
 import java.util.Collections;
