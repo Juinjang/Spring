@@ -55,6 +55,7 @@ public class SharedNoteController {
 		@RequestBody SharedNotePostRequest request) {
 		sharedNoteCommandService.createSharedNote(member, noteId, request);
 		return ApiResponse.onSuccess(null);
+	}
 
 	@Operation(summary = "공유 노트 둘러보기 API")
 	@GetMapping("/explore")

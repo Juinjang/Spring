@@ -3,11 +3,14 @@ package umc.th.juinjang.api.note.shared.service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.List;
+
 import org.hibernate.exception.LockAcquisitionException;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.google.cloud.vision.v1.Likelihood;
+
 import jakarta.persistence.PessimisticLockException;
 import lombok.RequiredArgsConstructor;
 import umc.th.juinjang.api.limjang.service.NoteFinder;
@@ -29,7 +32,7 @@ import umc.th.juinjang.domain.pencil.purchased.model.PurchasedPencil;
 import umc.th.juinjang.domain.pencil.used.model.UsedPencil;
 import umc.th.juinjang.domain.pencil.used.model.Usedtype;
 import umc.th.juinjang.domain.pencilaccount.model.PencilAccount;
-import umc.th.juinjang.safeSearch.SafeSearchClient;
+import umc.th.juinjang.external.safeSearch.SafeSearchClient;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +48,6 @@ public class SharedNoteCommandService {
 	private final SafeSearchClient safeSearchClient;
 	private final NoteUpdater noteUpdater;
 	private final PurchasedPencilUpdater purchasedPencilUpdater;
-
 
 	@Transactional
 	public void createSharedNotePurchase(Member buyer, Long sharedNoteId) {
@@ -93,8 +95,8 @@ public class SharedNoteCommandService {
 
 	private AcquiredPencil createAcquiredPencil(Long sharedNoteId, Member seller, Long price, AcquiredType type) {
 		return AcquiredPencil.create(seller, "", sharedNoteId, price, false, type);
-  }
-  
+	}
+
 	private void consumePurchasedPencils(Member buyer, long unpaidPencil) {
 		List<PurchasedPencil> purchasedPencils = purchasedPencilUpdater.findByMemberAndDeliverySuccessRemainQuantityGreaterThanOrderByCreatedAtAsc(
 			buyer, 0L);
@@ -116,7 +118,6 @@ public class SharedNoteCommandService {
 			throw new SharedNoteHandler(ErrorStatus.SHAREDNOTE_NOT_ENOUGH_PENCIL);
 		}
 	}
-
 
 	private UsedPencil createUsedPencil(Member member, Long sharedNoteId, SharedNote sharedNote,
 		PencilAccount buyerAccount) {

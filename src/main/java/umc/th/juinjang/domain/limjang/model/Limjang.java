@@ -143,6 +143,7 @@ public class Limjang extends BaseEntity {
 
 	public void updateRewardPencil(Integer rewardPencil) {
 		this.rewardPencil = rewardPencil;
+	}
 
 	public void updateSharable(boolean state) {
 		this.isSharable = state;

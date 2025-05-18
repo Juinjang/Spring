@@ -53,6 +53,7 @@ public enum ErrorStatus implements BaseErrorCode {
 		"요청한 임장 게시글이 모두 삭제되지 않아 삭제가 취소되었습니다. 다시 시도하거나 백엔드 팀에 문의바랍니다."),
 	LIMJANG_UPDATE_PRICETYPE_ERROR(HttpStatus.BAD_REQUEST, "LIMJANG4007", "가격유형 입력값이 잘못되었습니다. 다시 확인해주세요."),
 	LIMJANG_REQUEST_SORT_ERROR(HttpStatus.BAD_REQUEST, "LIMJANG4008", "요청한 정렬 방식이 지정되지 않은 값입니다. 다시 확인해주세요."),
+	LIMJANG_UPDATE_FAILED(HttpStatus.BAD_REQUEST, "LIMJANG4009", "요청한 임장 업데이트가 정상적으로 진행되지 않았습니다. 백엔드 팀에 문의 바랍니다."),
 
 	// LimjangPrice Error
 	LIMJANGPRICE_NOTFOUND_ERROR(HttpStatus.BAD_REQUEST, "LIMJANGPRICE4000", "해당 임장가격 레코드가 존재하지 않습니다."),
@@ -110,8 +111,8 @@ public enum ErrorStatus implements BaseErrorCode {
 	SHAREDNOTE_DEADLOCK(HttpStatus.LOCKED, "SHAREDNOTE4003", "잠시 후 다시 시도해주세요. 현재 다른 요청이 처리 중입니다."),
 	SHAREDNOTE_TYPE_ERROR(HttpStatus.BAD_REQUEST, "SHAREDNOTE4004", "유효하지 않은 마이 노트 요청 타입입니다."),
 	SHARED_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "SAHREDNOTE4005", "공유가 금지된 노트입니다."),
-	SHAREDNOTE_DELETED_RECENTLY(HttpStatus.BAD_REQUEST, "SHAREDNOTE4006", "삭제한지 6개월이 지나지 않아 다시 공유할 수 없습니다."),	
-  SHAREDNOTE_ALREADY_EXISTS(HttpStatus.CONFLICT, "SHAREDNOTE4007", "이미 공유된 노트입니다."),
+	SHAREDNOTE_DELETED_RECENTLY(HttpStatus.BAD_REQUEST, "SHAREDNOTE4006", "삭제한지 6개월이 지나지 않아 다시 공유할 수 없습니다."),
+	SHAREDNOTE_ALREADY_EXISTS(HttpStatus.CONFLICT, "SHAREDNOTE4007", "이미 공유된 노트입니다."),
 
 	// LikedNote
 	LIKEDNOTE_CONFLICT(HttpStatus.CONFLICT, "LIKEDNOTE4000", "이미 좋아요한 노트입니다"),
