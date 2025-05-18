@@ -55,7 +55,7 @@ public class SharedNote extends BaseEntity {
 	private String review;
 
 	@Comment("임장 가격")
-	private Integer price;
+	private Long price;
 
 	private Long likeCount;
 
@@ -84,7 +84,7 @@ public class SharedNote extends BaseEntity {
 			.build();
 	}
 
-	public void updatePrice(int price) {
+	public void updatePrice(long price) {
 		this.price = price;
 	}
 }
