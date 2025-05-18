@@ -15,13 +15,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import umc.th.juinjang.api.checklist.service.ChecklistAnswerFinder;
+import umc.th.juinjang.api.checklist.service.response.ChecklistAnswerResponseDTO;
 import umc.th.juinjang.api.note.liked.service.LikedNoteFinder;
 import umc.th.juinjang.api.note.shared.controller.ExploreSortType;
 import umc.th.juinjang.api.note.shared.controller.NoteType;
+import umc.th.juinjang.api.note.shared.service.response.SharedNoteCheckListAndReviewResponse;
 import umc.th.juinjang.api.note.shared.service.response.SharedNoteExploreGetResponse;
+import umc.th.juinjang.api.note.shared.service.response.SharedNoteGetResponse;
 import umc.th.juinjang.api.note.shared.service.response.UserSharedNotesGetResponse;
 import umc.th.juinjang.api.pencil.service.UsedPencilFinder;
-import umc.th.juinjang.api.note.shared.service.response.SharedNoteGetResponse;
 import umc.th.juinjang.common.code.status.ErrorStatus;
 import umc.th.juinjang.common.exception.handler.SharedNoteHandler;
 import umc.th.juinjang.domain.limjang.model.Limjang;
@@ -41,6 +44,8 @@ public class SharedNoteQueryService {
 	private final UsedPencilFinder usedPencilFinder;
 	private final SharedNoteFinder sharedNoteFinder;
 	private final LikedNoteFinder likedNoteFinder;
+	private final ChecklistAnswerFinder checklistAnswerFinder;
+	private final RedisTemplate<String, String> redisTemplate;
 	private final ViewCountService viewCountService;
 	private final ApplicationRewardViewCountPublisherAdapter applicationRewardViewCountPublisherAdapter;
 
@@ -182,5 +187,17 @@ public class SharedNoteQueryService {
 		Map<Long, Long> viewcountMap = mapIdsAndViewcount(sharedNotes);
 
 		return UserSharedNotesGetResponse.ofLiked(sharedNotes, purchasedIds, viewcountMap);
+	}
+
+	@Transactional(readOnly = true)
+	public SharedNoteCheckListAndReviewResponse findChecklistAndReview(Member member, Long sharedNoteId) {
+		SharedNote sharedNote = sharedNoteFinder.findByIdWithNoteAndAddress(sharedNoteId);
+		Limjang limjang = sharedNote.getLimjang();
+		List<ChecklistAnswerResponseDTO.AnswerDto> answers = checklistAnswerFinder.findByLimjangId(
+			limjang.getLimjangId());
+		boolean isOwned = usedPencilFinder.existsByMemberAndSharedNoteId(member, sharedNoteId);
+		// 구매했다면 review 포함, 아니면 null
+		String review = isOwned ? sharedNote.getReview() : null;
+		return new SharedNoteCheckListAndReviewResponse(review, answers);
 	}
 }

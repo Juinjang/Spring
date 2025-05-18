@@ -18,6 +18,7 @@ import umc.th.juinjang.api.dto.ApiResponse;
 import umc.th.juinjang.api.note.shared.controller.request.SharedNotePostRequest;
 import umc.th.juinjang.api.note.shared.service.SharedNoteCommandService;
 import umc.th.juinjang.api.note.shared.service.SharedNoteQueryService;
+import umc.th.juinjang.api.note.shared.service.response.SharedNoteCheckListAndReviewResponse;
 import umc.th.juinjang.api.note.shared.service.response.SharedNoteExploreGetResponse;
 import umc.th.juinjang.api.note.shared.service.response.SharedNoteGetResponse;
 import umc.th.juinjang.api.note.shared.service.response.UserSharedNotesGetResponse;
@@ -82,5 +83,14 @@ public class SharedNoteController {
 	) {
 		return ApiResponse.onSuccess(
 			sharedNoteQueryService.findUserSharedNotes(member, noteType, propertyType, priceType, keyword));
+	}
+
+	@Operation(summary = "체크리스트 및 상세 후기 API")
+	@GetMapping("shared-note/{sharedNoteId}/checklist")
+	public ApiResponse<SharedNoteCheckListAndReviewResponse> findChecklistAndReview(
+		@AuthenticationPrincipal Member member,
+		@PathVariable("sharedNoteId") Long sharedNoteId) {
+		return ApiResponse.onSuccess(
+			sharedNoteQueryService.findChecklistAndReview(member, sharedNoteId));
 	}
 }
