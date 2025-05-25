@@ -90,8 +90,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     //Safe Search
-    // Apple
+    implementation 'com.google.cloud:google-cloud-vision:3.58.0'
 
+    // Apple
+    implementation 'com.apple.itunes.storekit:app-store-server-library:3.4.0'
 }
 
 tasks.named('test') {
