@@ -13,7 +13,7 @@ import umc.th.juinjang.domain.pencil.purchased.repository.PurchasedPencilReposit
 @RequiredArgsConstructor
 public class PurchasedPencilUpdater {
 
-	private PurchasedPencilRepository purchasedPencilRepository;
+	private final PurchasedPencilRepository purchasedPencilRepository;
 
 	public List<PurchasedPencil> findByMemberAndDeliverySuccessRemainQuantityGreaterThanOrderByCreatedAtAsc(
 		Member buyer,
@@ -21,5 +21,9 @@ public class PurchasedPencilUpdater {
 		return purchasedPencilRepository.findByMemberAndDeliverySuccessAndRemainQuantityGreaterThanOrderByCreatedAtAsc(
 			buyer,
 			remainQuantity);
+	}
+
+	public void save(PurchasedPencil successPurchase) {
+		purchasedPencilRepository.save(successPurchase);
 	}
 }

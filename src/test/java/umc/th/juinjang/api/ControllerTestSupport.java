@@ -8,7 +8,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import umc.th.juinjang.api.pencil.controller.PencilController;
-import umc.th.juinjang.api.pencil.service.AcquiredPencilService;
+import umc.th.juinjang.api.pencil.service.PencilCommandService;
+import umc.th.juinjang.api.pencil.service.PencilQueryService;
 import umc.th.juinjang.api.pencilAccount.controller.PencilAccountController;
 import umc.th.juinjang.api.pencilAccount.service.PencilAccountService;
 
@@ -28,5 +29,8 @@ public abstract class ControllerTestSupport {
 	protected PencilAccountService pencilAccountService;
 
 	@MockBean
-	protected AcquiredPencilService acquiredPencilService;
+	protected PencilQueryService pencilQueryService;
+
+	@MockBean
+	protected PencilCommandService pencilCommandService;
 }
