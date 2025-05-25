@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import umc.th.juinjang.api.limjang.controller.request.NotePatchRequest;
 import umc.th.juinjang.api.limjang.controller.request.NotePostRequest;
 import umc.th.juinjang.api.address.service.AddressUpdater;
+import umc.th.juinjang.api.limjang.service.response.NotePostResponse;
 import umc.th.juinjang.common.code.status.ErrorStatus;
 import umc.th.juinjang.common.exception.handler.LimjangHandler;
 import umc.th.juinjang.domain.limjang.model.Address;
@@ -26,14 +27,15 @@ public class NoteCommandServiceV2 {
 	private final NoteFinder noteFinder;
 
 	@Transactional
-	public void createNote(NotePostRequest request, Member member) {
+	public NotePostResponse createNote(NotePostRequest request, Member member) {
 		Limjang note = request.toEntity(member);
 
 		validatePriceType(request.purposeType(), request.priceType());
 
 		notePriceUpdater.save(note.getLimjangPrice());
 		addressUpdater.save(note.getAddressEntity());
-		noteUpdater.save(note);
+		Limjang savedNote = noteUpdater.save(note);
+		return NotePostResponse.of(savedNote.getLimjangId());
 	}
 
 	@Transactional
