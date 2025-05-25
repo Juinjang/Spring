@@ -39,7 +39,7 @@ jobs:
         shell: bash
 
       - name: Run tests
-        run: ./gradlew test --no-daemon --continue
+        run: ./gradlew test --no-daemon --continue --stacktrace --info
 
       - name: Build With Gradle
         run: ./gradlew build -x test
