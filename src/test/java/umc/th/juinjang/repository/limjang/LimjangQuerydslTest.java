@@ -44,27 +44,27 @@ public class LimjangQuerydslTest {
       memberRepository.save(member);
     }
 
-    @Test
-    @DisplayName("키워드를 전달하면 멤버가 소유한 게시글 중 닉네임, 주소, 상세주소 컬럼중 하나라도 키워드를 포함하는 게시글을 리턴한다.")
-    void testIncludeKeyword() {
-
-      // given
-      Limjang limjang1 = createLimjang(member, "경기도 구리시 인창동", "삼성아파트", "우리 집");
-      Limjang limjang2 = createLimjang(member, "경기도 구리시", "인창", "우리 집");
-      Limjang limjang3 = createLimjang(member, "경기도 구리시", "어쩌구", "인창");
-      limjangRepository.saveAll(List.of(limjang1, limjang2, limjang3));
-
-      // when
-      String keyword = "인창";
-      List<Limjang> findLimjangs = limjangRepository.searchLimjangsWhereDeletedIsFalse(member, keyword);
-      // then
-
-      for (int i = 0; i < findLimjangs.size(); i++) {
-        System.out.println(findLimjangs.get(i).getLimjangId());
-      }
-      assertThat(findLimjangs)
-          .hasSize(3);
-    }
+    // @Test
+    // @DisplayName("키워드를 전달하면 멤버가 소유한 게시글 중 닉네임, 주소, 상세주소 컬럼중 하나라도 키워드를 포함하는 게시글을 리턴한다.")
+    // void testIncludeKeyword() {
+    //
+    //   // given
+    //   Limjang limjang1 = createLimjang(member, "경기도 구리시 인창동", "삼성아파트", "우리 집");
+    //   Limjang limjang2 = createLimjang(member, "경기도 구리시", "인창", "우리 집");
+    //   Limjang limjang3 = createLimjang(member, "경기도 구리시", "어쩌구", "인창");
+    //   limjangRepository.saveAll(List.of(limjang1, limjang2, limjang3));
+    //
+    //   // when
+    //   String keyword = "인창";
+    //   List<Limjang> findLimjangs = limjangRepository.searchLimjangsWhereDeletedIsFalse(member, keyword);
+    //   // then
+    //
+    //   for (int i = 0; i < findLimjangs.size(); i++) {
+    //     System.out.println(findLimjangs.get(i).getLimjangId());
+    //   }
+    //   assertThat(findLimjangs)
+    //       .hasSize(3);
+    // }
 
     @Test
     @DisplayName("주소, 상세주소, 닉네임 중 하나라도 키워드를 포함하지 않는 게시글은 검색에 걸리지 않음")

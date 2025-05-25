@@ -96,7 +96,15 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+        showStandardStreams = false
+    }
 }
+
+
+
+
 
 def generated = 'src/main/generated'
 tasks.withType(JavaCompile).configureEach {
