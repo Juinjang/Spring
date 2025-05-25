@@ -1,27 +1,31 @@
 package umc.th.juinjang.domain.note.shared.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.FetchType;
-
 import java.sql.Timestamp;
 
 import org.hibernate.annotations.Comment;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import umc.th.juinjang.api.note.shared.controller.request.SharedNotePostRequest;
 import umc.th.juinjang.domain.common.BaseEntity;
 import umc.th.juinjang.domain.limjang.model.Limjang;
 import umc.th.juinjang.domain.member.model.Member;
 
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Entity
 public class SharedNote extends BaseEntity {
 
@@ -39,11 +43,11 @@ public class SharedNote extends BaseEntity {
 
 	@Comment("임장시기 연도")
 	@Column(name = "note_year")
-	private int year;
+	private Integer year;
 
 	@Comment("임장시기 월")
 	@Column(name = "note_month")
-	private int month;
+	private Integer month;
 
 	// TODO : 임장시기 - 시기 추후에, ENUM 으로 변경 필요
 	private String period;
@@ -65,6 +69,20 @@ public class SharedNote extends BaseEntity {
 
 	public Long increaseLikedCount() {
 		return this.likeCount = (likeCount == null ? 1L : likeCount + 1);
+	}
+
+	public static SharedNote toSharedNote(Member member, Limjang limjang, SharedNotePostRequest dto) {
+		return SharedNote.builder()
+			.member(member)
+			.limjang(limjang)
+			.buildingName(dto.buildingName())
+			.review(dto.review())
+			.year(dto.year())
+			.month(dto.month())
+			.period(dto.period())
+			.price(dto.price())
+			.isImageShared(dto.isImageShared())
+			.build();
 	}
 }
 

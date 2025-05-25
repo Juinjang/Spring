@@ -89,8 +89,8 @@ dependencies {
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    //Safe Search
     // Apple
-    implementation 'com.apple.itunes.storekit:app-store-server-library:3.4.0'
 
 }
 

@@ -34,7 +34,7 @@ public class NoteFinder {
 
 	protected List<Limjang> getAllByMemberWithAddressAndNotePriceWhereRewardPencilIsNotNullAndDeletedIsFalse(
 		Member member) {
-		return limjangRepository.findAllByMemberWithAddressAndNotePriceWhereRewardPencilIsNotNullAndDeletedIsFalse(
+		return limjangRepository.findAllByMemberWithAddressAndNotePriceWhereIsSharableIsTrueAndDeletedIsFalse(
 			member);
 	}
 }
