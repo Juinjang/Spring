@@ -20,6 +20,7 @@ import umc.th.juinjang.api.limjang.controller.request.NotePostRequest;
 import umc.th.juinjang.api.limjang.service.NoteCommandServiceV2;
 import umc.th.juinjang.api.limjang.service.NoteQueryServiceV2;
 import umc.th.juinjang.api.limjang.service.response.ChecklistConditionResponse;
+import umc.th.juinjang.api.limjang.service.response.NotePostResponse;
 import umc.th.juinjang.api.limjang.service.response.UserNoteGetResponse;
 import umc.th.juinjang.api.limjang.service.response.UserNotesGetResponse;
 import umc.th.juinjang.api.limjang.service.response.UserNotesShareableGetResponse;
@@ -36,10 +37,9 @@ public class NoteControllerV2 {
 
 	@Operation(summary = "임장 생성 API V2")
 	@PostMapping("/notes")
-	public ApiResponse<Void> createNote(@RequestBody @Valid NotePostRequest request,
+	public ApiResponse<NotePostResponse> createNote(@RequestBody @Valid NotePostRequest request,
 		@AuthenticationPrincipal Member member) {
-		noteCommandService.createNote(request, member);
-		return ApiResponse.of(SuccessStatus._CREATED, null);
+		return ApiResponse.of(SuccessStatus._CREATED, noteCommandService.createNote(request, member));
 	}
 
 	@Operation(summary = "마이 노트 조회 API V2")
