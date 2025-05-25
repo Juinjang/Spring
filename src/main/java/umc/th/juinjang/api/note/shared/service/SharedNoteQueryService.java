@@ -45,7 +45,6 @@ public class SharedNoteQueryService {
 	private final SharedNoteFinder sharedNoteFinder;
 	private final LikedNoteFinder likedNoteFinder;
 	private final ChecklistAnswerFinder checklistAnswerFinder;
-	private final RedisTemplate<String, String> redisTemplate;
 	private final ViewCountService viewCountService;
 	private final ApplicationRewardViewCountPublisherAdapter applicationRewardViewCountPublisherAdapter;
 
