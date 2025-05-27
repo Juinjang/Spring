@@ -22,4 +22,16 @@ public class PurchasedPencilFinder {
 	public Optional<PurchasedPencil> findByTransactionIdAndMember(String transactionId, Member member) {
 		return purchasedPencilRepository.findByTransactionIdAndMember(transactionId, member);
 	}
+
+	public Optional<PurchasedPencil> findByTransactionId(String transactionId) {
+		return purchasedPencilRepository.findByTransactionId(transactionId);
+	}
+
+	public Long getSumPriceWhereMemberAndSuccess(Member member) {
+		return purchasedPencilRepository.getSumPriceWhereMemberAndSuccess(member).orElse(0L);
+	}
+
+	public Long getSumPriceWhereMemberAndRefund(Member member) {
+		return purchasedPencilRepository.getSumPriceWhereMemberAndRefund(member).orElse(0L);
+	}
 }

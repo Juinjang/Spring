@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -13,8 +14,12 @@ import org.springframework.stereotype.Service;
 
 import com.apple.itunes.storekit.client.APIException;
 import com.apple.itunes.storekit.client.AppStoreServerAPIClient;
+import com.apple.itunes.storekit.model.Data;
 import com.apple.itunes.storekit.model.Environment;
 import com.apple.itunes.storekit.model.JWSTransactionDecodedPayload;
+import com.apple.itunes.storekit.model.NotificationTypeV2;
+import com.apple.itunes.storekit.model.ResponseBodyV2;
+import com.apple.itunes.storekit.model.ResponseBodyV2DecodedPayload;
 import com.apple.itunes.storekit.model.TransactionInfoResponse;
 import com.apple.itunes.storekit.verification.SignedDataVerifier;
 import com.apple.itunes.storekit.verification.VerificationException;
@@ -22,10 +27,12 @@ import com.apple.itunes.storekit.verification.VerificationException;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import umc.th.juinjang.api.apple.service.command.AppleTransactionVerifyCommand;
+import umc.th.juinjang.api.pencil.service.PencilQueryService;
 import umc.th.juinjang.api.pencil.service.response.VerificationResult;
 
 @Slf4j
 @Service
+@Profile("!local")
 public class AppleService {
 
 	@Value("${apple.iap.bundle-id}")
@@ -51,6 +58,7 @@ public class AppleService {
 
 	private SignedDataVerifier signedDataVerifier;
 	private AppStoreServerAPIClient appStoreServerAPIClient;
+	private PencilQueryService pencilQueryService;
 
 	@PostConstruct
 	public void init() {
@@ -109,6 +117,30 @@ public class AppleService {
 			log.warn("❌ Apple transaction verification error. transactionId: {}", command.getTransactionId(), e);
 			return VerificationResult.ofVerificationError();
 		}
+	}
+
+	public void handleNotification(ResponseBodyV2 responseBody) {
+		try{
+			ResponseBodyV2DecodedPayload notificationPayload = signedDataVerifier.verifyAndDecodeNotification(responseBody.getSignedPayload());
+			NotificationTypeV2 notificationType = notificationPayload.getNotificationType();
+
+			if (notificationType == NotificationTypeV2.CONSUMPTION_REQUEST) {
+				log.info("Apple IAP Consumption Request Notification Received.");
+				Data data = notificationPayload.getData();
+				JWSTransactionDecodedPayload transactionPayload = signedDataVerifier.verifyAndDecodeTransaction(data.getSignedTransactionInfo());
+				String transactionId = transactionPayload.getTransactionId();
+				appStoreServerAPIClient.sendConsumptionData(transactionId, pencilQueryService.getConsumptionRequest(transactionId));
+			}
+			// else if ( notificationType == NotificationTypeV2.REFUND){
+			//
+			// }else if ( notificationType == NotificationTypeV2.REFUND_DECLINED){
+			//
+			// }
+
+		}catch (VerificationException | APIException | IOException e){
+			throw new RuntimeException("Apple Notification Verification Error");
+		}
+
 	}
 
 

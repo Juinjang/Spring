@@ -116,7 +116,8 @@ public class PencilCommandService {
 			request.getPlayTime(), transactionId, request.getAppAccountToken(), now));
 	}
 
-	private PurchasedPencil retryPurchasedPencil(PurchasedPencil pencil, Member member) {
+	@Transactional
+	public PurchasedPencil retryPurchasedPencil(PurchasedPencil pencil, Member member) {
 		if ( pencil.getRetryCount() >= 3 ) { // 재시도 횟수가 3회 이상일 경우 실패로 처리
 			return pencil;
 		}

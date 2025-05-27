@@ -55,7 +55,7 @@ public class PurchasedPencil {
 	@Column(nullable = false)
 	private TransactionStatus transactionStatus;
 
-	private Long playTime;
+	private Integer playTime;
 
 	private Long retryCount = 0L;
 
@@ -66,7 +66,7 @@ public class PurchasedPencil {
 
 	@Builder
 	public PurchasedPencil(Member member, String title, Long purchaseQuantity,
-		Long remainQuantity, TransactionStatus transactionStatus, Long playTime,
+		Long remainQuantity, TransactionStatus transactionStatus, Integer playTime,
 		Long price, String transactionId, UUID appAccountToken, DeliveryStatus deliveryStatus,
 		LocalDateTime purchasedAt) {
 		this.member = member;
@@ -97,7 +97,7 @@ public class PurchasedPencil {
 
 	private static PurchasedPencilBuilder baseBuilder(
 		Member member, String title, Long quantity, Long price,
-		Long playTime, String transactionId, UUID token, LocalDateTime purchasedAt
+		Integer playTime, String transactionId, UUID token, LocalDateTime purchasedAt
 	) {
 		return PurchasedPencil.builder()
 			.member(member)
@@ -113,7 +113,7 @@ public class PurchasedPencil {
 
 	// ✅ 결제 성공
 	public static PurchasedPencil successOf(Member member, String title, Long quantity,
-		Long price, Long playTime, String transactionId,
+		Long price, Integer playTime, String transactionId,
 		UUID token, LocalDateTime purchasedAt) {
 		return baseBuilder(member, title, quantity, price, playTime, transactionId, token, purchasedAt)
 			.transactionStatus(TransactionStatus.SUCCESS)
@@ -123,7 +123,7 @@ public class PurchasedPencil {
 
 	// ✅ 서버 에러
 	public static PurchasedPencil failedDueToServerError(Member member, String title, Long quantity,
-		Long price, Long playTime, String transactionId, UUID token, LocalDateTime purchasedAt) {
+		Long price, Integer playTime, String transactionId, UUID token, LocalDateTime purchasedAt) {
 		return baseBuilder(member, title, quantity, price, playTime, transactionId, token, purchasedAt)
 			.transactionStatus(TransactionStatus.DB_FAILED)
 			.deliveryStatus(DeliveryStatus.SERVER_ERROR)
@@ -132,7 +132,7 @@ public class PurchasedPencil {
 
 	// ✅ 검증 실패
 	public static PurchasedPencil failedDueToValidation(Member member, String title, Long quantity,
-		Long price, Long playTime, String transactionId, UUID token, LocalDateTime purchasedAt) {
+		Long price, Integer playTime, String transactionId, UUID token, LocalDateTime purchasedAt) {
 		return baseBuilder(member, title, quantity, price, playTime, transactionId, token, purchasedAt)
 			.transactionStatus(TransactionStatus.VALIDATION_FAILED)
 			.deliveryStatus(DeliveryStatus.OTHER_REASONS)

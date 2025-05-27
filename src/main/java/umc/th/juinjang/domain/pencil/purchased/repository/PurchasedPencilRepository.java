@@ -22,4 +22,17 @@ public interface PurchasedPencilRepository extends JpaRepository<PurchasedPencil
 
 	Optional<PurchasedPencil> findByTransactionIdAndMember(String transactionId, Member member);
 
+	Optional<PurchasedPencil> findByTransactionId(String transactionId);
+
+	@Query("SELECT SUM(p.price) FROM PurchasedPencil p " +
+		"WHERE p.member = :member " +
+		"AND p.deliveryStatus = 0 " +
+		"AND p.transactionStatus = 'SUCCESS'")
+	Optional<Long> getSumPriceWhereMemberAndSuccess(Member member);
+
+	@Query("SELECT SUM(p.price) FROM PurchasedPencil p " +
+		"WHERE p.member = :member " +
+		"AND p.deliveryStatus = 0 " +
+		"AND p.transactionStatus = 'REFUNDED'")
+	Optional<Long> getSumPriceWhereMemberAndRefund(Member member);
 }

@@ -4,5 +4,6 @@ public enum TransactionStatus {
 	// PENDING,
 	SUCCESS,
 	VALIDATION_FAILED,
+	REFUNDED,
 	DB_FAILED;
 }
