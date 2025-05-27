@@ -33,7 +33,7 @@ public class DiscordAlertProvider {
 			.bodyValue(DiscordAlert.createAlert(content))
 			.retrieve()
 			.bodyToMono(Void.class)
-			.block();
+			.subscribe();
 	}
 
 	public void sendMemberCreateAlertToDiscord(String content) {
