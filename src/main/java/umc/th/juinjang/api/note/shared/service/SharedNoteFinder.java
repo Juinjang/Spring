@@ -10,8 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
-import umc.th.juinjang.api.note.shared.controller.ExploreSortType;
-import umc.th.juinjang.api.note.shared.controller.NoteType;
+import umc.th.juinjang.api.note.shared.controller.request.ExploreSortType;
+import umc.th.juinjang.api.note.shared.controller.request.NoteType;
 import umc.th.juinjang.common.code.status.ErrorStatus;
 import umc.th.juinjang.common.exception.handler.SharedNoteHandler;
 import umc.th.juinjang.domain.limjang.model.LimjangPriceType;
@@ -26,8 +26,8 @@ public class SharedNoteFinder {
 
 	private final SharedNoteRepository sharedNoteRepository;
 
-	public SharedNote getById(Long id) {
-		return sharedNoteRepository.findById(id)
+	public SharedNote getByIdWhereDeletedAtIsNull(Long id) {
+		return sharedNoteRepository.findBySharedNoteIdAndDeletedAtIsNull(id)
 			.orElseThrow(() -> new SharedNoteHandler(ErrorStatus.SHAREDNOTE_NOT_FOUND));
 	}
 

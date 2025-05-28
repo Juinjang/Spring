@@ -38,5 +38,6 @@ public interface SharedNoteRepository extends JpaRepository<SharedNote, Long>, S
 
 	@Query("SELECT s.viewCount FROM SharedNote s WHERE s.sharedNoteId = :id")
 	Long findViewCountById(@Param("id") Long id);
-
+	
+	Optional<SharedNote> findBySharedNoteIdAndDeletedAtIsNull(Long id);
 }
