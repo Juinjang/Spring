@@ -11,8 +11,8 @@ import umc.th.juinjang.domain.limjang.repository.LimjangRepository;
 public class NoteUpdater {
 
 	private final LimjangRepository limjangRepository;
-
-	protected void save(Limjang limjang) {
-		limjangRepository.save(limjang);
+	
+	public Limjang save(Limjang limjang) {
+		return limjangRepository.save(limjang);
 	}
 }

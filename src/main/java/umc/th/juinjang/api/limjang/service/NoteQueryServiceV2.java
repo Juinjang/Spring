@@ -1,5 +1,6 @@
 package umc.th.juinjang.api.limjang.service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -10,14 +11,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import umc.th.juinjang.api.checklist.service.ChecklistAnswerFinder;
 import umc.th.juinjang.api.image.service.ImageFinder;
 import umc.th.juinjang.api.limjang.controller.parameter.LimjangSortOptions;
+import umc.th.juinjang.api.limjang.service.response.ChecklistConditionResponse;
 import umc.th.juinjang.api.limjang.service.response.UserNoteGetResponse;
-import umc.th.juinjang.api.limjang.service.response.UserNotesShareableGetResponse;
 import umc.th.juinjang.api.limjang.service.response.UserNotesGetResponse;
+import umc.th.juinjang.api.limjang.service.response.UserNotesShareableGetResponse;
 import umc.th.juinjang.api.scrap.service.ScarpFinder;
+import umc.th.juinjang.domain.checklist.model.ChecklistAnswer;
+import umc.th.juinjang.domain.checklist.model.ChecklistQuestionCategory;
 import umc.th.juinjang.domain.image.model.Image;
 import umc.th.juinjang.domain.limjang.model.Limjang;
+import umc.th.juinjang.domain.limjang.model.LimjangPurpose;
 import umc.th.juinjang.domain.member.model.Member;
 
 @Service
@@ -27,6 +33,7 @@ public class NoteQueryServiceV2 {
 	private final NoteFinder noteFinder;
 	private final ScarpFinder scarpFinder;
 	private final ImageFinder imageFinder;
+	private final ChecklistAnswerFinder checklistAnswerFinder;
 
 	@Transactional(readOnly = true)
 	public UserNotesGetResponse findUsersNotes(Member member, LimjangSortOptions sortOptions) {
@@ -70,5 +77,74 @@ public class NoteQueryServiceV2 {
 	@Transactional(readOnly = true)
 	public UserNoteGetResponse findNote(Long noteId) {
 		return UserNoteGetResponse.of(noteFinder.getNoteByIdWithAddressAndNotePriceWhereDeletedIsFalse(noteId));
+	}
+
+	public ChecklistConditionResponse checkLimjangChecklistSatisfaction(Long limjangId) {
+		Limjang limjang = noteFinder.getNoteByIdWhereDeletedIsFalse(limjangId);
+		LimjangPurpose purpose = limjang.getPurpose();
+		List<ChecklistAnswer> answers = checklistAnswerFinder.findEntitiesByLimjangId(limjangId);
+
+		Map<ChecklistQuestionCategory, Long> answeredCountByCategory = answers.stream()
+			.collect(Collectors.groupingBy(
+				a -> a.getQuestionId().getCategory(),
+				Collectors.counting()
+			));
+
+		List<ChecklistConditionResponse.CategoryCondition> results = new ArrayList<>();
+		boolean allSatisfied = true;
+
+		for (ChecklistQuestionCategory category : List.of(
+			ChecklistQuestionCategory.LOCATION_CONDITION,
+			ChecklistQuestionCategory.PUBLIC_SPACE,
+			ChecklistQuestionCategory.INDOOR
+		)) {
+			int totalCount = getTotalCount(purpose, category);
+			int requiredCount = getRequiredCount(purpose, category);
+			int answeredCount = answeredCountByCategory.getOrDefault(category, 0L).intValue();
+
+			boolean satisfied = answeredCount >= requiredCount;
+			if (!satisfied)
+				allSatisfied = false;
+
+			results.add(new ChecklistConditionResponse.CategoryCondition(
+				category.name(), answeredCount, totalCount, requiredCount, satisfied
+			));
+		}
+
+		return new ChecklistConditionResponse(allSatisfied, results);
+	}
+
+	private int getTotalCount(LimjangPurpose purpose, ChecklistQuestionCategory category) {
+		return switch (purpose) {
+			case INVESTMENT -> switch (category) {
+				case LOCATION_CONDITION -> 19;
+				case PUBLIC_SPACE -> 8;
+				case INDOOR -> 21;
+				default -> 0;
+			};
+			case RESIDENTIAL_PURPOSE -> switch (category) {
+				case LOCATION_CONDITION -> 9;
+				case PUBLIC_SPACE -> 6;
+				case INDOOR -> 20;
+				default -> 0;
+			};
+		};
+	}
+
+	private int getRequiredCount(LimjangPurpose purpose, ChecklistQuestionCategory category) {
+		return switch (purpose) {
+			case INVESTMENT -> switch (category) {
+				case LOCATION_CONDITION -> 16;
+				case PUBLIC_SPACE -> 5;
+				case INDOOR -> 18;
+				default -> 0;
+			};
+			case RESIDENTIAL_PURPOSE -> switch (category) {
+				case LOCATION_CONDITION -> 7;
+				case PUBLIC_SPACE -> 4;
+				case INDOOR -> 18;
+				default -> 0;
+			};
+		};
 	}
 }

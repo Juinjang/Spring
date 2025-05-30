@@ -1,37 +1,33 @@
 package umc.th.juinjang.api.note.shared.service;
 
-import java.time.Duration;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.RedisConnectionFailureException;
-import org.springframework.data.redis.RedisSystemException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.xml.sax.ErrorHandler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import umc.th.juinjang.api.checklist.service.ChecklistAnswerFinder;
+import umc.th.juinjang.api.checklist.service.response.ChecklistAnswerResponseDTO;
 import umc.th.juinjang.api.note.liked.service.LikedNoteFinder;
-import umc.th.juinjang.api.note.shared.controller.ExploreSortType;
-import umc.th.juinjang.api.note.shared.controller.NoteType;
+import umc.th.juinjang.api.note.shared.service.response.SharedNoteCheckListAndReviewResponse;
+import umc.th.juinjang.api.note.shared.controller.request.ExploreSortType;
+import umc.th.juinjang.api.note.shared.controller.request.NoteType;
 import umc.th.juinjang.api.note.shared.service.response.SharedNoteExploreGetResponse;
+import umc.th.juinjang.api.note.shared.service.response.SharedNoteGetResponse;
 import umc.th.juinjang.api.note.shared.service.response.UserSharedNotesGetResponse;
 import umc.th.juinjang.api.pencil.service.UsedPencilFinder;
-import umc.th.juinjang.api.note.shared.service.response.SharedNoteGetResponse;
 import umc.th.juinjang.common.code.status.ErrorStatus;
 import umc.th.juinjang.common.exception.handler.SharedNoteHandler;
-import umc.th.juinjang.common.redis.RedisKeyFactory;
 import umc.th.juinjang.domain.limjang.model.Limjang;
 import umc.th.juinjang.domain.limjang.model.LimjangPriceType;
 import umc.th.juinjang.domain.limjang.model.LimjangPropertyType;
@@ -39,6 +35,7 @@ import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.note.liked.model.LikedNote;
 import umc.th.juinjang.domain.note.shared.model.SharedNote;
 import umc.th.juinjang.domain.pencil.used.model.UsedPencil;
+import umc.th.juinjang.event.publisher.ApplicationRewardViewCountPublisherAdapter;
 
 @Service
 @Slf4j
@@ -48,7 +45,9 @@ public class SharedNoteQueryService {
 	private final UsedPencilFinder usedPencilFinder;
 	private final SharedNoteFinder sharedNoteFinder;
 	private final LikedNoteFinder likedNoteFinder;
-	private final RedisTemplate<String, String> redisTemplate;
+	private final ChecklistAnswerFinder checklistAnswerFinder;
+	private final ViewCountService viewCountService;
+	private final ApplicationRewardViewCountPublisherAdapter applicationRewardViewCountPublisherAdapter;
 
 	@Transactional(readOnly = true)
 	public SharedNoteGetResponse findSharedNote(Member member, Long sharedNoteId) {
@@ -57,12 +56,7 @@ public class SharedNoteQueryService {
 
 		boolean isBuyer = usedPencilFinder.existsByMemberAndSharedNoteId(member, sharedNoteId);
 
-		long viewCount = getTotalViewCount(sharedNote);
-		if (!isDuplicate(member.getMemberId(), sharedNoteId)) {
-			increaseViewCount(sharedNoteId);
-			viewCount++;
-			recordViewerHistory(member.getMemberId(), sharedNoteId);
-		}
+		long viewCount = getViewCountAndCheckReward(member, sharedNoteId, sharedNote);
 
 		Integer countBuyer = makeBuyerCount(usedPencilFinder.countBySharedNoteId(sharedNoteId));
 		boolean isLiked = likedNoteFinder.existsByMemberAndSharedNote(member, sharedNote);
@@ -76,44 +70,17 @@ public class SharedNoteQueryService {
 		}
 	}
 
-	private long getTotalViewCount(SharedNote sharedNote) {
-		return sharedNote.getViewCount() + getRedisViewCount(sharedNote.getSharedNoteId());
-	}
+	private long getViewCountAndCheckReward(Member member, Long sharedNoteId, SharedNote sharedNote) {
+		long viewCount = viewCountService.getRedisViewCount(sharedNote.getSharedNoteId());
+		if (!viewCountService.isDuplicate(member.getMemberId(), sharedNoteId)) {
+			viewCountService.increaseViewCount(sharedNoteId);
+			viewCount++;
+			viewCountService.recordViewerHistory(member.getMemberId(), sharedNoteId);
 
-	private void recordViewerHistory(long memberId, long sharedNoteId) {
-		try {
-			redisTemplate.opsForValue()
-				.setIfAbsent(RedisKeyFactory.viewHistoryKey(sharedNoteId, memberId), "1", Duration.ofHours(3));
-		} catch (RedisConnectionFailureException | RedisSystemException e) {
-			log.error("Redis 연결 실패 - 중복 조회 기록 불가, sharedNoteId={}, memberId={}", sharedNoteId, memberId, e);
+			applicationRewardViewCountPublisherAdapter.checkViewCountRewardPolicy(sharedNote.getMember(),
+				sharedNote.getSharedNoteId(), viewCount);
 		}
-	}
-
-	private void increaseViewCount(long sharedNoteId) {
-		try {
-			redisTemplate.opsForValue().increment(RedisKeyFactory.viewCountKey(sharedNoteId));
-		} catch (RedisConnectionFailureException | RedisSystemException e) {
-			log.error("Redis 조회수 증가 실패, sharedNoteId={}", sharedNoteId, e);
-		}
-	}
-
-	private boolean isDuplicate(long memberId, long sharedNoteId) {
-		try {
-			return Boolean.TRUE.equals(redisTemplate.hasKey(RedisKeyFactory.viewHistoryKey(sharedNoteId, memberId)));
-		} catch (RedisConnectionFailureException | RedisSystemException e) {
-			log.error("Redis 장애로 조회 기록 확인 실패. sharedNoteId={}, memberId={}", sharedNoteId, memberId, e);
-			return false;
-		}
-	}
-
-	private Long getRedisViewCount(long sharedNoteId) {
-		try {
-			Object value = redisTemplate.opsForValue().get(RedisKeyFactory.viewCountKey(sharedNoteId));
-			return value == null ? 0L : Long.parseLong(value.toString());
-		} catch (RedisConnectionFailureException | RedisSystemException e) {
-			log.error("Redis 장애 발생, 기본값 반환 sharedNoteID={}", sharedNoteId, e);
-			return 0L;
-		}
+		return viewCount;
 	}
 
 	private Integer makeBuyerCount(int count) {
@@ -151,7 +118,7 @@ public class SharedNoteQueryService {
 	private Map<Long, Long> mapIdsAndViewcount(List<SharedNote> sharedNotes) {
 		return sharedNotes.stream().collect(Collectors.toMap(
 			SharedNote::getSharedNoteId,
-			this::getTotalViewCount
+			it -> viewCountService.getRedisViewCount(it.getSharedNoteId())
 		));
 	}
 
@@ -214,11 +181,23 @@ public class SharedNoteQueryService {
 		List<LikedNote> userLikedNotes = likedNoteFinder.findAllByMemberAndDynamic(member, propertyType,
 			priceType, keyword);
 		List<SharedNote> sharedNotes = userLikedNotes.stream().map(LikedNote::getSharedNote).toList();
-		
+
 		Set<Long> purchasedIds = new HashSet<>(usedPencilFinder.findByMemberInSharedNoteIdsAndTypeIsOwned(member,
 			sharedNotes.stream().map(SharedNote::getSharedNoteId).toList()));
 		Map<Long, Long> viewcountMap = mapIdsAndViewcount(sharedNotes);
 
 		return UserSharedNotesGetResponse.ofLiked(sharedNotes, purchasedIds, viewcountMap);
+	}
+
+	@Transactional(readOnly = true)
+	public SharedNoteCheckListAndReviewResponse findChecklistAndReview(Member member, Long sharedNoteId) {
+		SharedNote sharedNote = sharedNoteFinder.findByIdWithNoteAndAddress(sharedNoteId);
+		Limjang limjang = sharedNote.getLimjang();
+		List<ChecklistAnswerResponseDTO.AnswerDto> answers = checklistAnswerFinder.findByLimjangId(
+			limjang.getLimjangId());
+		boolean isOwned = usedPencilFinder.existsByMemberAndSharedNoteId(member, sharedNoteId);
+		// 구매했다면 review 포함, 아니면 null
+		String review = isOwned ? sharedNote.getReview() : null;
+		return new SharedNoteCheckListAndReviewResponse(review, answers);
 	}
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,8 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import umc.th.juinjang.api.dto.ApiResponse;
+import umc.th.juinjang.api.note.shared.controller.request.ExploreSortType;
+import umc.th.juinjang.api.note.shared.controller.request.NoteType;
+import umc.th.juinjang.api.note.shared.controller.request.SharedNotePostRequest;
 import umc.th.juinjang.api.note.shared.service.SharedNoteCommandService;
 import umc.th.juinjang.api.note.shared.service.SharedNoteQueryService;
+import umc.th.juinjang.api.note.shared.service.response.SharedNoteCheckListAndReviewResponse;
 import umc.th.juinjang.api.note.shared.service.response.SharedNoteExploreGetResponse;
 import umc.th.juinjang.api.note.shared.service.response.SharedNoteGetResponse;
 import umc.th.juinjang.api.note.shared.service.response.UserSharedNotesGetResponse;
@@ -56,6 +61,14 @@ public class SharedNoteController {
 		@PathVariable("sharedNoteId") Long sharedNoteId) {
 		sharedNoteCommandService.deleteSharedNote(member, sharedNoteId, LocalDateTime.now());
 		return ApiResponse.of(SHARED_NOTE_DELETE, null);
+		
+	@Operation(summary = "공유 노트 생성 API")
+	@PostMapping("/{noteId}")
+	public ApiResponse<Void> uploadSharedNote(@AuthenticationPrincipal Member member,
+		@PathVariable("noteId") Long noteId,
+		@RequestBody SharedNotePostRequest request) {
+		sharedNoteCommandService.createSharedNote(member, noteId, request);
+		return ApiResponse.onSuccess(null);
 	}
 
 	@Operation(summary = "공유 노트 둘러보기 API")
@@ -83,5 +96,14 @@ public class SharedNoteController {
 	) {
 		return ApiResponse.onSuccess(
 			sharedNoteQueryService.findUserSharedNotes(member, noteType, propertyType, priceType, keyword));
+	}
+
+	@Operation(summary = "체크리스트 및 상세 후기 API")
+	@GetMapping("shared-note/{sharedNoteId}/checklist")
+	public ApiResponse<SharedNoteCheckListAndReviewResponse> findChecklistAndReview(
+		@AuthenticationPrincipal Member member,
+		@PathVariable("sharedNoteId") Long sharedNoteId) {
+		return ApiResponse.onSuccess(
+			sharedNoteQueryService.findChecklistAndReview(member, sharedNoteId));
 	}
 }

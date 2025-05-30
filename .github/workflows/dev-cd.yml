@@ -45,9 +45,28 @@ jobs:
           echo "${{ secrets.APPLE_AUTH }}" > ./src/main/resources/AUTHKEY_JUINJAG.p8
         shell: bash
 
+      # APPLE IN_APP 결제 관련 프로세스 시작
+      - name: Create certs directory
+        run: mkdir -p ./src/main/resources/certs
+
+      - name: Create Apple Certificates
+        run: |
+          echo "${{ secrets.APPLE_IAP_CA_G3_CERT }}" | base64 -d > ./src/main/resources/certs/AppleRootCA-G3.cer
+          echo "${{ secrets.APPLE_IAP_CA_G2_CERT }}" | base64 -d > ./src/main/resources/certs/AppleRootCA-G2.cer
+          echo "${{ secrets.APPLE_IAP_ROOT_CERT }}" | base64 -d > ./src/main/resources/certs/AppleIncRootCertificate.cer
+        shell: bash
+
+      - name: Create certs directory
+        run: mkdir -p ./src/main/resources/keys
+
+      - name: Create IAP .p8
+        run: |
+          echo "${{ secrets.APPLE_IAP_KEY }}" > ./src/main/resources/keys/SubscriptionKey_Q5646J7W54.p8
+        shell: bash
+      # APPLE IN_APP 결제 관련 프로세스 끝
+
       - name: Build With Gradle
         run: ./gradlew build -x test
-
 
       - name: Login to Docker Hub
         run: |

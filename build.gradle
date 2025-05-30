@@ -41,6 +41,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
+    implementation 'org.springframework.retry:spring-retry'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     //
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign' // 4.1.0
 //	implementation 'org.springframework.cloud:spring-cloud-commons:4.1.1'
@@ -85,12 +88,21 @@ dependencies {
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    //Safe Search
+    implementation 'com.google.cloud:google-cloud-vision:3.58.0'
 
+    // Apple
+    implementation 'com.apple.itunes.storekit:app-store-server-library:3.4.0'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+        showStandardStreams = false
+    }
 }
+
 
 def generated = 'src/main/generated'
 tasks.withType(JavaCompile).configureEach {

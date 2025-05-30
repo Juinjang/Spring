@@ -3,6 +3,7 @@ package umc.th.juinjang.api.note.shared.service;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
+import umc.th.juinjang.domain.note.shared.model.SharedNote;
 import umc.th.juinjang.domain.note.shared.repository.SharedNoteRepository;
 
 @Component
@@ -21,5 +22,9 @@ public class SharedNoteUpdater {
 
 	public void decrementLikedCountById(Long sharedNoteId) {
 		sharedNoteRepository.decrementLikedCountById(sharedNoteId);
+	}
+
+	public SharedNote save(SharedNote sharedNote) {
+		return sharedNoteRepository.save(sharedNote);
 	}
 }

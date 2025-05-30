@@ -5,7 +5,6 @@ import static umc.th.juinjang.domain.limjang.model.QAddress.*;
 import static umc.th.juinjang.domain.limjang.model.QLimjang.*;
 import static umc.th.juinjang.domain.limjang.model.QLimjangPrice.*;
 import static umc.th.juinjang.domain.member.model.QMember.*;
-import static umc.th.juinjang.domain.note.liked.model.QLikedNote.*;
 import static umc.th.juinjang.domain.note.shared.model.QSharedNote.*;
 import static umc.th.juinjang.domain.pencil.used.model.QUsedPencil.*;
 import static umc.th.juinjang.domain.report.model.QReport.*;
@@ -26,8 +25,8 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
-import umc.th.juinjang.api.note.shared.controller.ExploreSortType;
-import umc.th.juinjang.api.note.shared.controller.NoteType;
+import umc.th.juinjang.api.note.shared.controller.request.ExploreSortType;
+import umc.th.juinjang.api.note.shared.controller.request.NoteType;
 import umc.th.juinjang.domain.limjang.model.LimjangPriceType;
 import umc.th.juinjang.domain.limjang.model.LimjangPropertyType;
 import umc.th.juinjang.domain.member.model.Member;
@@ -55,7 +54,9 @@ public class SharedNoteQueryDSLRepositoryImpl implements SharedNoteQueryDSLRepos
 				getBcodesStartsWith(code),
 				getWhereByPropertyType(propertyType),
 				getWhereByPriceType(priceType),
-				keywordCondition(keyword))
+				keywordCondition(keyword),
+				sharedNote.deletedAt.isNull()
+			)
 			.orderBy(getOrderBySortOptions(sort))
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
@@ -71,7 +72,8 @@ public class SharedNoteQueryDSLRepositoryImpl implements SharedNoteQueryDSLRepos
 				getBcodesStartsWith(code),
 				getWhereByPropertyType(propertyType),
 				getWhereByPriceType(priceType),
-				keywordCondition(keyword)
+				keywordCondition(keyword),
+				sharedNote.deletedAt.isNull()
 			);
 		long totalCount = countQuery.fetchOne();
 		return new PageImpl<>(content, pageable, totalCount);

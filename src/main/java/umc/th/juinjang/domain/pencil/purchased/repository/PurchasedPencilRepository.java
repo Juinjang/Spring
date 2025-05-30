@@ -1,6 +1,7 @@
 package umc.th.juinjang.domain.pencil.purchased.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,6 +12,14 @@ import umc.th.juinjang.domain.pencil.purchased.model.PurchasedPencil;
 
 public interface PurchasedPencilRepository extends JpaRepository<PurchasedPencil, Long> {
 
-	@Query("SELECT p FROM PurchasedPencil p WHERE p.member = :member AND p.deliveryStatus = 0 ORDER BY p.createdAt DESC")
+	@Query("SELECT p FROM PurchasedPencil p WHERE p.member = :member AND p.deliveryStatus = 0 ORDER BY p.purchasedAt DESC")
 	List<PurchasedPencil> findAllByMemberWhereDeliverySuccessOrderByCreatedAtDesc(@Param("member") Member member);
+
+	@Query("select p from PurchasedPencil p where p.member = :member and p.remainQuantity > :remainQuantity AND p.deliveryStatus = 0 order by p.purchasedAt asc")
+	List<PurchasedPencil> findByMemberAndDeliverySuccessAndRemainQuantityGreaterThanOrderByCreatedAtAsc(
+		@Param("member") Member buyer,
+		@Param("remainQuantity") Long remainQuantity);
+
+	Optional<PurchasedPencil> findByTransactionIdAndMember(String transactionId, Member member);
+
 }
