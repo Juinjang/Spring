@@ -61,7 +61,8 @@ public class SharedNoteController {
 		@PathVariable("sharedNoteId") Long sharedNoteId) {
 		sharedNoteCommandService.deleteSharedNote(member, sharedNoteId, LocalDateTime.now());
 		return ApiResponse.of(SHARED_NOTE_DELETE, null);
-		
+	}
+
 	@Operation(summary = "공유 노트 생성 API")
 	@PostMapping("/{noteId}")
 	public ApiResponse<Void> uploadSharedNote(@AuthenticationPrincipal Member member,

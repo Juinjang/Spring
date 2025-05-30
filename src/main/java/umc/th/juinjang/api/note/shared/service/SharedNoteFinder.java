@@ -31,8 +31,8 @@ public class SharedNoteFinder {
 			.orElseThrow(() -> new SharedNoteHandler(ErrorStatus.SHAREDNOTE_NOT_FOUND));
 	}
 
-	public SharedNote getBySharedNoteIdAndMember(Long sharedNoteId, Member member) {
-		return sharedNoteRepository.findBySharedNoteIdAndMember(sharedNoteId, member).orElseThrow(
+	public SharedNote getBySharedNoteIdAndMemberAndDeletedAtIsNull(Long sharedNoteId, Member member) {
+		return sharedNoteRepository.getBySharedNoteIdAndMemberAndDeletedAtIsNull(sharedNoteId, member).orElseThrow(
 			() -> new SharedNoteHandler(ErrorStatus.SHAREDNOTE_NOT_FOUND));
 	}
 
@@ -53,7 +53,7 @@ public class SharedNoteFinder {
 	public Optional<SharedNote> findLatestByLimjangId(Long limjangId) {
 		return sharedNoteRepository.findLatestByLimjangId(limjangId);
   }
-  
+
 	Page<SharedNote> findSharedNoteInExployer(List<String> code, ExploreSortType sort,
 		LimjangPropertyType propertyType, LimjangPriceType priceType, String keyword, Pageable pageable) {
 		return sharedNoteRepository.findSharedNoteInExployer(code, sort, propertyType, priceType,

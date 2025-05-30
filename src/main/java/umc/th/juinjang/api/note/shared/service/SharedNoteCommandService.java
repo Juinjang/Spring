@@ -129,10 +129,10 @@ public class SharedNoteCommandService {
 
 	@Transactional
 	public void deleteSharedNote(Member member, Long sharedNoteId, LocalDateTime deletedAt) {
-		SharedNote sharedNote = sharedNoteFinder.getBySharedNoteIdAndMember(sharedNoteId,member);
+		SharedNote sharedNote = sharedNoteFinder.getBySharedNoteIdAndMemberAndDeletedAtIsNull(sharedNoteId,member);
 		sharedNote.updateDeletedAt(Timestamp.valueOf(deletedAt));
 	}
-	
+
 	@Transactional
 	public void createSharedNote(Member member, Long noteId, SharedNotePostRequest request) {
 		Integer rewardPencilCount = 0;

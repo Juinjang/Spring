@@ -31,7 +31,7 @@ public interface SharedNoteRepository extends JpaRepository<SharedNote, Long>, S
 	@Query("UPDATE SharedNote sn SET sn.likeCount = sn.likeCount - 1 WHERE sn.sharedNoteId = :sharedNoteId")
 	void decrementLikedCountById(@Param("sharedNoteId") Long sharedNoteId);
 
-	Optional<SharedNote> findBySharedNoteIdAndMember(Long sharedNoteId, Member member);
+	Optional<SharedNote> getBySharedNoteIdAndMemberAndDeletedAtIsNull(Long sharedNoteId, Member member);
 
 	@Query("SELECT sn FROM SharedNote sn WHERE sn.limjang.limjangId = :limjangId ORDER BY sn.createdAt DESC")
 	Optional<SharedNote> findLatestByLimjangId(@Param("limjangId") Long limjangId);
@@ -41,6 +41,6 @@ public interface SharedNoteRepository extends JpaRepository<SharedNote, Long>, S
 
 	@Query("SELECT s.viewCount FROM SharedNote s WHERE s.sharedNoteId = :id")
 	Long findViewCountById(@Param("id") Long id);
-	
+
 	Optional<SharedNote> findBySharedNoteIdAndDeletedAtIsNull(Long id);
 }
