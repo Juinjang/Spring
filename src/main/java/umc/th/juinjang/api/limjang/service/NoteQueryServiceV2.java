@@ -18,6 +18,7 @@ import umc.th.juinjang.api.limjang.service.response.ChecklistConditionResponse;
 import umc.th.juinjang.api.limjang.service.response.UserNoteGetResponse;
 import umc.th.juinjang.api.limjang.service.response.UserNotesGetResponse;
 import umc.th.juinjang.api.limjang.service.response.UserNotesShareableGetResponse;
+import umc.th.juinjang.api.note.shared.service.SharedNoteFinder;
 import umc.th.juinjang.api.scrap.service.ScarpFinder;
 import umc.th.juinjang.domain.checklist.model.ChecklistAnswer;
 import umc.th.juinjang.domain.checklist.model.ChecklistQuestionCategory;
@@ -34,6 +35,7 @@ public class NoteQueryServiceV2 {
 	private final ScarpFinder scarpFinder;
 	private final ImageFinder imageFinder;
 	private final ChecklistAnswerFinder checklistAnswerFinder;
+	private final SharedNoteFinder sharedNoteFinder;
 
 	@Transactional(readOnly = true)
 	public UserNotesGetResponse findUsersNotes(Member member, LimjangSortOptions sortOptions) {
@@ -76,7 +78,9 @@ public class NoteQueryServiceV2 {
 
 	@Transactional(readOnly = true)
 	public UserNoteGetResponse findNote(Long noteId) {
-		return UserNoteGetResponse.of(noteFinder.getNoteByIdWithAddressAndNotePriceWhereDeletedIsFalse(noteId));
+		Limjang note = noteFinder.getNoteByIdWithAddressAndNotePriceWhereDeletedIsFalse(noteId);
+		boolean isShared = sharedNoteFinder.existsByDeletedAtIsNullAndLimjang(note);
+		return UserNoteGetResponse.of(isShared, note);
 	}
 
 	public ChecklistConditionResponse checkLimjangChecklistSatisfaction(Long limjangId) {
