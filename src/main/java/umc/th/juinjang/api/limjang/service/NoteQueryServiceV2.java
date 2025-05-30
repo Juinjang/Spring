@@ -60,12 +60,21 @@ public class NoteQueryServiceV2 {
 
 	@Transactional(readOnly = true)
 	public UserNotesShareableGetResponse findNotesShareable(Member member) {
-		List<Limjang> notes = noteFinder.getAllByMemberWithAddressAndNotePriceWhereRewardPencilIsNotNullAndDeletedIsFalse(
+		List<Limjang> filteredSharedNotes = findUnsharedSharableNotes(member);
+		List<Image> imageList = imageFinder.findAllFirstCreatedImagePerNote(filteredSharedNotes);
+
+		return UserNotesShareableGetResponse.of(filteredSharedNotes, mapToNoteIdAndImageId(imageList),
+			mapToNoteScrapStatus(filteredSharedNotes));
+	}
+
+	private List<Limjang> findUnsharedSharableNotes(Member member) {
+		List<Limjang> notes = noteFinder.getAllByMemberWithAddressAndNotePriceWhereIsSharableIsTrueAndDeletedIsFalse(
 			member);
+		Set<Long> sharedNote = sharedNoteFinder.findAllIdByDeletedAtIsNullAndLimjang(notes);
 
-		List<Image> imageList = imageFinder.findAllFirstCreatedImagePerNote(notes);
-
-		return UserNotesShareableGetResponse.of(notes, mapToNoteIdAndImageId(imageList), mapToNoteScrapStatus(notes));
+		return notes.stream()
+			.filter(note -> !sharedNote.contains(note.getLimjangId()))
+			.toList();
 	}
 
 	private Map<Long, String> mapToNoteIdAndImageId(List<Image> imageList) {
