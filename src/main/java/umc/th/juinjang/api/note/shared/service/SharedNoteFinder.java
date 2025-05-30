@@ -14,6 +14,7 @@ import umc.th.juinjang.api.note.shared.controller.request.ExploreSortType;
 import umc.th.juinjang.api.note.shared.controller.request.NoteType;
 import umc.th.juinjang.common.code.status.ErrorStatus;
 import umc.th.juinjang.common.exception.handler.SharedNoteHandler;
+import umc.th.juinjang.domain.limjang.model.Limjang;
 import umc.th.juinjang.domain.limjang.model.LimjangPriceType;
 import umc.th.juinjang.domain.limjang.model.LimjangPropertyType;
 import umc.th.juinjang.domain.member.model.Member;
@@ -44,11 +45,10 @@ public class SharedNoteFinder {
 		return sharedNoteRepository.getLikeCountById(id);
 	}
 
-
 	public Optional<SharedNote> findLatestByLimjangId(Long limjangId) {
 		return sharedNoteRepository.findLatestByLimjangId(limjangId);
-  }
-  
+	}
+
 	Page<SharedNote> findSharedNoteInExployer(List<String> code, ExploreSortType sort,
 		LimjangPropertyType propertyType, LimjangPriceType priceType, String keyword, Pageable pageable) {
 		return sharedNoteRepository.findSharedNoteInExployer(code, sort, propertyType, priceType,
@@ -70,5 +70,9 @@ public class SharedNoteFinder {
 
 	public Long findViewCountById(Long id) {
 		return sharedNoteRepository.findViewCountById(id);
+	}
+
+	public boolean existsByDeletedAtIsNullAndLimjang(Limjang limjang) {
+		return sharedNoteRepository.existsByDeletedAtIsNullAndLimjang(limjang);
 	}
 }
