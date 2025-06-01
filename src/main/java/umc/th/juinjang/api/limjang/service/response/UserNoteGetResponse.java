@@ -10,6 +10,7 @@ import umc.th.juinjang.domain.limjang.model.LimjangPropertyType;
 import umc.th.juinjang.domain.limjang.model.LimjangPurpose;
 
 public record UserNoteGetResponse(
+	boolean isShared,
 	LimjangPurpose purposeType,
 	LimjangPropertyType propertyType,
 	LimjangPriceType priceType,
@@ -22,8 +23,9 @@ public record UserNoteGetResponse(
 	String floor,
 	Integer pyong
 ) {
-	public static UserNoteGetResponse of(Limjang note) {
+	public static UserNoteGetResponse of(boolean isShared, Limjang note) {
 		return new UserNoteGetResponse(
+			isShared,
 			note.getPurpose(),
 			note.getPropertyType(),
 			note.getPriceType(),

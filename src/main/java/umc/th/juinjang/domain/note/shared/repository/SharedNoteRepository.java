@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import umc.th.juinjang.domain.member.model.Member;
+import umc.th.juinjang.domain.limjang.model.Limjang;
 import umc.th.juinjang.domain.note.shared.model.SharedNote;
 
 public interface SharedNoteRepository extends JpaRepository<SharedNote, Long>, SharedNoteQueryDSLRepository {
@@ -43,4 +44,6 @@ public interface SharedNoteRepository extends JpaRepository<SharedNote, Long>, S
 	Long findViewCountById(@Param("id") Long id);
 
 	Optional<SharedNote> findBySharedNoteIdAndDeletedAtIsNull(Long id);
+
+	boolean existsByDeletedAtIsNullAndLimjang(Limjang limjang);
 }
