@@ -128,6 +128,7 @@ public class SharedNoteCommandService {
 	@Transactional
 	public void createSharedNote(Member member, Long noteId, SharedNotePostRequest request) {
 		Integer rewardPencilCount = 0;
+		Long price = 0L;
 
 		Optional<SharedNote> latestSharedNote = sharedNoteFinder.findLatestByLimjangId(noteId);
 		if (latestSharedNote.isPresent()) {
@@ -160,16 +161,19 @@ public class SharedNoteCommandService {
 				}
 			}
 			rewardPencilCount = 7;
+			price = 10L;
 		}
 		//사진 공유 안함 체크 or 임장노트에 사진이 없으면
 		else if (request.isImageShared() == Boolean.TRUE || limjang.getImageList().isEmpty()) {
 			rewardPencilCount = 2;
+			price = 5L;
 		}
 		limjang.updateRewardPencil(rewardPencilCount);
 		noteUpdater.save(limjang);
 
 		//저장
 		SharedNote sharedNote = SharedNote.toSharedNote(member, limjang, request);
+		sharedNote.updatePrice(price);
 		sharedNoteUpdater.save(sharedNote);
 
 		//사용자 지갑에 rewardPencil만큼 업데이트
