@@ -14,5 +14,6 @@ public interface LimjangQueryDslRepository {
 
 	List<Limjang> findAllByMemberAndDeletedIsFalseOrderByParam(Member member, LimjangSortOptions sort);
 
-	List<Limjang> findAllByMemberAndDeletedIsFalseOrderByParamV2(Member member, LimjangSortOptions sort);
+	List<Limjang> findAllByMemberAndDeletedIsFalseOrderByParamV2(Member member, LimjangSortOptions sort,
+		String keyword);
 }
