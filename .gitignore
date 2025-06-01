@@ -50,3 +50,6 @@ out/
 /src/main/resources/*.json
 /src/main/generated/*
 /src/test/java/resources/application-*.yml
+
+src/main/resources/keys
+src/main/resources/certs
