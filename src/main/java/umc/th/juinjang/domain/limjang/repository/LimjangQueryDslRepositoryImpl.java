@@ -4,12 +4,10 @@ import static com.querydsl.core.types.Order.DESC;
 import static umc.th.juinjang.domain.image.model.QImage.image;
 import static umc.th.juinjang.domain.limjang.model.QLimjang.limjang;
 import static umc.th.juinjang.domain.limjang.model.QLimjangPrice.limjangPrice;
-import static umc.th.juinjang.domain.note.shared.model.QSharedNote.*;
 import static umc.th.juinjang.domain.report.model.QReport.report;
 import static umc.th.juinjang.domain.limjang.model.QAddress.address;
 
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringExpression;
@@ -76,12 +74,12 @@ public class LimjangQueryDslRepositoryImpl implements LimjangQueryDslRepository 
 			.leftJoin(limjang.report, report).fetchJoin()
 			.where(limjang.memberId.eq(member))
 			.where(limjang.deleted.isFalse())
-			.where(keywordCondition(keyword))
+			.where(keywordConditionForSearch(keyword))
 			.orderBy(getOrderByLimjangSortOptions(sort))
 			.fetch();
 	}
 
-	private BooleanExpression keywordCondition(String keyword) {
+	private BooleanExpression keywordConditionForSearch(String keyword) {
 		if (keyword == null || keyword.isBlank()) {
 			return null;
 		}
