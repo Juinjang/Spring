@@ -60,7 +60,7 @@ public class SharedNote extends BaseEntity {
 	private Long likeCount;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "limjang_id", nullable = false, unique = true)
+	@JoinColumn(name = "limjang_id", nullable = false)
 	private Limjang limjang;
 
 	@ManyToOne(fetch = FetchType.LAZY)
