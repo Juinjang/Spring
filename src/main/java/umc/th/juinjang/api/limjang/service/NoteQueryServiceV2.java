@@ -38,8 +38,8 @@ public class NoteQueryServiceV2 {
 	private final SharedNoteFinder sharedNoteFinder;
 
 	@Transactional(readOnly = true)
-	public UserNotesGetResponse findUsersNotes(Member member, LimjangSortOptions sortOptions) {
-		List<Limjang> notes = noteFinder.findAllByMemberOrderByOptions(member, sortOptions);
+	public UserNotesGetResponse findUsersNotes(Member member, LimjangSortOptions sortOptions, String keyword) {
+		List<Limjang> notes = noteFinder.findAllByMemberOrderByOptions(member, sortOptions, keyword);
 		return UserNotesGetResponse.of(notes, mapToNoteScrapStatus(notes));
 	}
 

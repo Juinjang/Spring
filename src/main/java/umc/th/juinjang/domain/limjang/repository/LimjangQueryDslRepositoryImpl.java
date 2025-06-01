@@ -65,7 +65,8 @@ public class LimjangQueryDslRepositoryImpl implements LimjangQueryDslRepository 
 	}
 
 	@Override
-	public List<Limjang> findAllByMemberAndDeletedIsFalseOrderByParamV2(Member member, LimjangSortOptions sort) {
+	public List<Limjang> findAllByMemberAndDeletedIsFalseOrderByParamV2(Member member, LimjangSortOptions sort,
+		String keyword) {
 		return queryFactory
 			.selectFrom(limjang)
 			.join(limjang.limjangPrice, limjangPrice).fetchJoin()
@@ -73,8 +74,20 @@ public class LimjangQueryDslRepositoryImpl implements LimjangQueryDslRepository 
 			.leftJoin(limjang.report, report).fetchJoin()
 			.where(limjang.memberId.eq(member))
 			.where(limjang.deleted.isFalse())
+			.where(keywordConditionForSearch(keyword))
 			.orderBy(getOrderByLimjangSortOptions(sort))
 			.fetch();
+	}
+
+	private BooleanExpression keywordConditionForSearch(String keyword) {
+		if (keyword == null || keyword.isBlank()) {
+			return null;
+		}
+		return keywordOf(
+			removeBlank(limjang.nickname).containsIgnoreCase(keyword),
+			removeBlank(address.roadAddress).containsIgnoreCase(keyword),
+			removeBlank(address.addressDetail).containsIgnoreCase(keyword)
+		);
 	}
 
 	private OrderSpecifier[] getOrderByLimjangSortOptions(LimjangSortOptions sort) {

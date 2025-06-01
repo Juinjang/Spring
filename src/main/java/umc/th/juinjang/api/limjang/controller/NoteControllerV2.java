@@ -46,8 +46,9 @@ public class NoteControllerV2 {
 	@GetMapping("/notes")
 	public ApiResponse<UserNotesGetResponse> findUsersNotes(
 		@RequestParam("sort") LimjangSortOptions sortOptions,
+		@RequestParam(value = "keyword", required = false) String keyword,
 		@AuthenticationPrincipal Member member) {
-		return ApiResponse.onSuccess(noteQueryService.findUsersNotes(member, sortOptions));
+		return ApiResponse.onSuccess(noteQueryService.findUsersNotes(member, sortOptions, keyword));
 	}
 
 	@Operation(summary = "임장 수정 API V2")
