@@ -2,6 +2,7 @@ package umc.th.juinjang.domain.note.shared.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -46,4 +47,7 @@ public interface SharedNoteRepository extends JpaRepository<SharedNote, Long>, S
 	Optional<SharedNote> findBySharedNoteIdAndDeletedAtIsNull(Long id);
 
 	boolean existsByDeletedAtIsNullAndLimjang(Limjang limjang);
+
+	@Query("SELECT s.limjang.limjangId FROM SharedNote s WHERE s.limjang in :limjangs AND s.deletedAt is null ")
+	Set<Long> findLimjangIdsByDeletedAtIsNullAndLimjang(@Param("limjangs") List<Limjang> limjangs);
 }

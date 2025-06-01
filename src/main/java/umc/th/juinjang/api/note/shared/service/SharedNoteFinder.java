@@ -3,6 +3,7 @@ package umc.th.juinjang.api.note.shared.service;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -52,7 +53,7 @@ public class SharedNoteFinder {
 
 	public Optional<SharedNote> findLatestByLimjangId(Long limjangId) {
 		return sharedNoteRepository.findLatestByLimjangId(limjangId);
-  }
+	}
 
 	Page<SharedNote> findSharedNoteInExployer(List<String> code, ExploreSortType sort,
 		LimjangPropertyType propertyType, LimjangPriceType priceType, String keyword, Pageable pageable) {
@@ -79,5 +80,9 @@ public class SharedNoteFinder {
 
 	public boolean existsByDeletedAtIsNullAndLimjang(Limjang limjang) {
 		return sharedNoteRepository.existsByDeletedAtIsNullAndLimjang(limjang);
+	}
+
+	public Set<Long> findLimjangIdsByDeletedAtIsNullAndLimjang(List<Limjang> notes) {
+		return sharedNoteRepository.findLimjangIdsByDeletedAtIsNullAndLimjang(notes);
 	}
 }
