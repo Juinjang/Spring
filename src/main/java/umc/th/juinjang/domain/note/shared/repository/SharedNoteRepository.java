@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.limjang.model.Limjang;
 import umc.th.juinjang.domain.note.shared.model.SharedNote;
 
@@ -30,6 +31,8 @@ public interface SharedNoteRepository extends JpaRepository<SharedNote, Long>, S
 	@Modifying
 	@Query("UPDATE SharedNote sn SET sn.likeCount = sn.likeCount - 1 WHERE sn.sharedNoteId = :sharedNoteId")
 	void decrementLikedCountById(@Param("sharedNoteId") Long sharedNoteId);
+
+	Optional<SharedNote> getBySharedNoteIdAndMemberAndDeletedAtIsNull(Long sharedNoteId, Member member);
 
 	@Query("SELECT sn FROM SharedNote sn WHERE sn.limjang.limjangId = :limjangId ORDER BY sn.createdAt DESC")
 	Optional<SharedNote> findLatestByLimjangId(@Param("limjangId") Long limjangId);

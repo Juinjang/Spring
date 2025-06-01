@@ -3,6 +3,7 @@ package umc.th.juinjang.domain.note.shared.model;
 import java.sql.Timestamp;
 
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.DynamicUpdate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,6 +28,7 @@ import umc.th.juinjang.domain.member.model.Member;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Entity
+@DynamicUpdate
 public class SharedNote extends BaseEntity {
 
 	@Id
@@ -86,6 +88,9 @@ public class SharedNote extends BaseEntity {
 
 	public void updatePrice(long price) {
 		this.price = price;
+	}
+	public void updateDeletedAt(Timestamp deletedAt) {
+		this.deletedAt = deletedAt;
 	}
 }
 

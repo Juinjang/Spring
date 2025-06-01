@@ -1,9 +1,13 @@
 package umc.th.juinjang.api.note.shared.controller;
 
+import static umc.th.juinjang.common.code.status.SuccessStatus.*;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -49,6 +53,14 @@ public class SharedNoteController {
 	public ApiResponse<SharedNoteGetResponse> findSharedNote(@AuthenticationPrincipal Member member,
 		@PathVariable("sharedNoteId") Long sharedNoteId) {
 		return ApiResponse.onSuccess(sharedNoteQueryService.findSharedNote(member, sharedNoteId));
+	}
+
+	@Operation(summary = "임장 노트 공유 중단하기 API")
+	@DeleteMapping("/shared-notes/{sharedNoteId}")
+	public ApiResponse<Void> deleteSharedNote(@AuthenticationPrincipal Member member,
+		@PathVariable("sharedNoteId") Long sharedNoteId) {
+		sharedNoteCommandService.deleteSharedNote(member, sharedNoteId, LocalDateTime.now());
+		return ApiResponse.of(SHARED_NOTE_DELETE, null);
 	}
 
 	@Operation(summary = "공유 노트 생성 API")

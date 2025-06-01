@@ -34,7 +34,10 @@ public enum SuccessStatus implements BaseCode {
 	MEMBER_DELETE(HttpStatus.OK, "MEMBER2000", "회원 탈퇴를 성공하였습니다."),
 
 	// discord alert
-	DISCORD_ALERT_SIGN_IN(HttpStatus.OK, "DISCORD200", "주인장에 신규 유저가 생겼어요!");
+	DISCORD_ALERT_SIGN_IN(HttpStatus.OK, "DISCORD200", "주인장에 신규 유저가 생겼어요!"),
+
+	// 공유 노트 응답
+	SHARED_NOTE_DELETE(HttpStatus.OK, "SHRARED_NOTE200", "노트 공유가 중지 되었습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;
