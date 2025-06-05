@@ -18,6 +18,7 @@ import umc.th.juinjang.api.limjang.service.response.ChecklistConditionResponse;
 import umc.th.juinjang.api.limjang.service.response.UserNoteGetResponse;
 import umc.th.juinjang.api.limjang.service.response.UserNotesGetResponse;
 import umc.th.juinjang.api.limjang.service.response.UserNotesShareableGetResponse;
+import umc.th.juinjang.api.note.shared.service.SharedNoteFinder;
 import umc.th.juinjang.api.scrap.service.ScarpFinder;
 import umc.th.juinjang.domain.checklist.model.ChecklistAnswer;
 import umc.th.juinjang.domain.checklist.model.ChecklistQuestionCategory;
@@ -34,10 +35,11 @@ public class NoteQueryServiceV2 {
 	private final ScarpFinder scarpFinder;
 	private final ImageFinder imageFinder;
 	private final ChecklistAnswerFinder checklistAnswerFinder;
+	private final SharedNoteFinder sharedNoteFinder;
 
 	@Transactional(readOnly = true)
-	public UserNotesGetResponse findUsersNotes(Member member, LimjangSortOptions sortOptions) {
-		List<Limjang> notes = noteFinder.findAllByMemberOrderByOptions(member, sortOptions);
+	public UserNotesGetResponse findUsersNotes(Member member, LimjangSortOptions sortOptions, String keyword) {
+		List<Limjang> notes = noteFinder.findAllByMemberOrderByOptions(member, sortOptions, keyword);
 		return UserNotesGetResponse.of(notes, mapToNoteScrapStatus(notes));
 	}
 
@@ -58,12 +60,21 @@ public class NoteQueryServiceV2 {
 
 	@Transactional(readOnly = true)
 	public UserNotesShareableGetResponse findNotesShareable(Member member) {
-		List<Limjang> notes = noteFinder.getAllByMemberWithAddressAndNotePriceWhereRewardPencilIsNotNullAndDeletedIsFalse(
+		List<Limjang> filteredSharedNotes = findUnsharedSharableNotes(member);
+		List<Image> imageList = imageFinder.findAllFirstCreatedImagePerNote(filteredSharedNotes);
+
+		return UserNotesShareableGetResponse.of(filteredSharedNotes, mapToNoteIdAndImageId(imageList),
+			mapToNoteScrapStatus(filteredSharedNotes));
+	}
+
+	private List<Limjang> findUnsharedSharableNotes(Member member) {
+		List<Limjang> notes = noteFinder.getAllByMemberWithAddressAndNotePriceWhereIsSharableIsTrueAndDeletedIsFalse(
 			member);
+		Set<Long> noteIdInSharedNotes = sharedNoteFinder.findLimjangIdsByDeletedAtIsNullAndLimjang(notes);
 
-		List<Image> imageList = imageFinder.findAllFirstCreatedImagePerNote(notes);
-
-		return UserNotesShareableGetResponse.of(notes, mapToNoteIdAndImageId(imageList), mapToNoteScrapStatus(notes));
+		return notes.stream()
+			.filter(note -> !noteIdInSharedNotes.contains(note.getLimjangId()))
+			.toList();
 	}
 
 	private Map<Long, String> mapToNoteIdAndImageId(List<Image> imageList) {
@@ -76,7 +87,9 @@ public class NoteQueryServiceV2 {
 
 	@Transactional(readOnly = true)
 	public UserNoteGetResponse findNote(Long noteId) {
-		return UserNoteGetResponse.of(noteFinder.getNoteByIdWithAddressAndNotePriceWhereDeletedIsFalse(noteId));
+		Limjang note = noteFinder.getNoteByIdWithAddressAndNotePriceWhereDeletedIsFalse(noteId);
+		boolean isShared = sharedNoteFinder.existsByDeletedAtIsNullAndLimjang(note);
+		return UserNoteGetResponse.of(isShared, note);
 	}
 
 	public ChecklistConditionResponse checkLimjangChecklistSatisfaction(Long limjangId) {

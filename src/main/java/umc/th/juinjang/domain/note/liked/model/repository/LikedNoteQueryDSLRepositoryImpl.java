@@ -17,14 +17,10 @@ import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
-import umc.th.juinjang.api.note.shared.controller.NoteType;
 import umc.th.juinjang.domain.limjang.model.LimjangPriceType;
 import umc.th.juinjang.domain.limjang.model.LimjangPropertyType;
 import umc.th.juinjang.domain.member.model.Member;
-import umc.th.juinjang.domain.member.model.QMember;
 import umc.th.juinjang.domain.note.liked.model.LikedNote;
-import umc.th.juinjang.domain.note.liked.model.QLikedNote;
-import umc.th.juinjang.domain.note.shared.model.SharedNote;
 
 public class LikedNoteQueryDSLRepositoryImpl implements LikedNoteQueryDSLRepository {
 	private final JPAQueryFactory queryFactory;

@@ -2,7 +2,7 @@ package umc.th.juinjang.api.note.shared.service;
 
 import java.util.List;
 import java.util.Optional;
-
+import java.sql.Timestamp;
 import org.hibernate.exception.LockAcquisitionException;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.stereotype.Service;
@@ -52,7 +52,7 @@ public class SharedNoteCommandService {
 	public void createSharedNotePurchase(Member buyer, Long sharedNoteId) {
 		checkAlreadyPurchase(buyer, sharedNoteId);
 
-		SharedNote sharedNote = sharedNoteFinder.getById(sharedNoteId);
+		SharedNote sharedNote = sharedNoteFinder.getByIdWhereDeletedAtIsNull(sharedNoteId);
 		Member seller = sharedNote.getMember();
 		Long price = sharedNote.getPrice();
 
@@ -125,7 +125,14 @@ public class SharedNoteCommandService {
 	}
 
 	@Transactional
+	public void deleteSharedNote(Member member, Long sharedNoteId, LocalDateTime deletedAt) {
+		SharedNote sharedNote = sharedNoteFinder.getBySharedNoteIdAndMemberAndDeletedAtIsNull(sharedNoteId,member);
+		sharedNote.updateDeletedAt(Timestamp.valueOf(deletedAt));
+	}
+
+	@Transactional
 	public void createSharedNote(Member member, Long noteId, SharedNotePostRequest request) {
+
 		Limjang limjang = noteFinder.getNoteByIdWhereDeletedIsFalse(noteId);
 		Optional<SharedNote> latestSharedNote = sharedNoteFinder.findLatestByLimjangId(noteId);
 

@@ -1,6 +1,7 @@
 package umc.th.juinjang.domain.pencilaccount.model;
 
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.DynamicUpdate;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,6 +20,7 @@ import umc.th.juinjang.domain.member.model.Member;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
+@DynamicUpdate
 public class PencilAccount extends BaseEntity {
 
 	@Id
@@ -68,6 +70,13 @@ public class PencilAccount extends BaseEntity {
 
 	public void increaseAcquiredBalance(long price) {
 		this.acquiredBalance += price;
+		this.totalBalance = this.purchasedBalance + this.acquiredBalance;
+	}
+
+	public void increasePurchasedBalance(long price) {
+		this.purchasedBalance += price;
+		this.totalPurchaseAmount += price;
+
 		this.totalBalance = this.purchasedBalance + this.acquiredBalance;
 	}
 

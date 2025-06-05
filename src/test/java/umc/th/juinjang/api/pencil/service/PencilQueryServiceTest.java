@@ -31,7 +31,7 @@ import umc.th.juinjang.domain.pencil.used.repository.UsedPencilRepository;
 import umc.th.juinjang.testutil.fixture.MemberFixture;
 
 @Slf4j
-class PencilServiceTest extends IntegrationTestSupport {
+class PencilQueryServiceTest extends IntegrationTestSupport {
 
 	@Autowired
 	private MemberRepository memberRepository;
@@ -156,11 +156,11 @@ class PencilServiceTest extends IntegrationTestSupport {
 		UUID uuid5 = UUID.randomUUID();
 
 		// 명확한 순서로 데이터 생성 (시간 역순으로)
-		PurchasedPencil pencil1 = createSuccessPurchase(member, "10개 연필팩", 10L, 1000L, "transaction1", uuid1, time1);
-		PurchasedPencil pencil2 = createSuccessPurchase(member, "20개 연필팩", 20L, 2000L, "transaction2", uuid2, time2);
-		PurchasedPencil pencil3 = createSuccessPurchase(member, "30개 연필팩", 30L, 3000L, "transaction3", uuid3, time3);
-		PurchasedPencil pencil4 = createSuccessPurchase(member, "15개 연필팩", 15L, 1500L, "transaction4", uuid4, time4);
-		PurchasedPencil pencil5 = createSuccessPurchase(member, "25개 연필팩", 25L, 2500L, "transaction5", uuid5, time5);
+		PurchasedPencil pencil1 = PurchasedPencil.successOf(member, "10개 연필팩", 10L, 1000L, 0L,"transaction1", uuid1, time1);
+		PurchasedPencil pencil2 = PurchasedPencil.successOf(member, "20개 연필팩", 20L, 2000L, 0L,"transaction2", uuid2, time2);
+		PurchasedPencil pencil3 = PurchasedPencil.successOf(member, "30개 연필팩", 30L, 3000L,0L ,"transaction3", uuid3, time3);
+		PurchasedPencil pencil4 = PurchasedPencil.successOf(member, "15개 연필팩", 15L, 1500L, 0L,"transaction4", uuid4, time4);
+		PurchasedPencil pencil5 = PurchasedPencil.successOf(member, "25개 연필팩", 25L, 2500L, 0L,"transaction5", uuid5, time5);
 
 		purchasedPencilRepository.saveAll(List.of(pencil1, pencil2, pencil3, pencil4, pencil5));
 
@@ -168,7 +168,7 @@ class PencilServiceTest extends IntegrationTestSupport {
 		List<PurchasedPencilResponse> purchasedPencils = pencilService.getPurchasedPencils(member);
 
 		purchasedPencils.forEach(pencil -> {
-				log.info("[PENCILS]: CREATED_AT : {} ", pencil.getCreatedAt());
+				log.info("[PENCILS]: CREATED_AT : {} ", pencil.getPurchasedAt());
 			}
 		);
 		// then
@@ -193,8 +193,7 @@ class PencilServiceTest extends IntegrationTestSupport {
 		LocalDateTime time = LocalDateTime.now();
 		UUID uuid = UUID.randomUUID();
 
-		PurchasedPencil pencil = createServerErrorPurchase(member, "10개 연필팩", 10L, 1000L, "transaction1", uuid,
-			time);
+		PurchasedPencil pencil = PurchasedPencil.failedDueToServerError(member, "10개 연필팩", 10L, 1000L, 10L,"transaction1", uuid, time);
 
 		purchasedPencilRepository.saveAll(List.of(pencil));
 

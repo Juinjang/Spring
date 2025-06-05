@@ -10,6 +10,7 @@ import java.util.stream.IntStream;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,9 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 import umc.th.juinjang.api.checklist.service.ChecklistAnswerFinder;
 import umc.th.juinjang.api.checklist.service.response.ChecklistAnswerResponseDTO;
 import umc.th.juinjang.api.note.liked.service.LikedNoteFinder;
-import umc.th.juinjang.api.note.shared.controller.ExploreSortType;
-import umc.th.juinjang.api.note.shared.controller.NoteType;
 import umc.th.juinjang.api.note.shared.service.response.SharedNoteCheckListAndReviewResponse;
+import umc.th.juinjang.api.note.shared.controller.request.ExploreSortType;
+import umc.th.juinjang.api.note.shared.controller.request.NoteType;
 import umc.th.juinjang.api.note.shared.service.response.SharedNoteExploreGetResponse;
 import umc.th.juinjang.api.note.shared.service.response.SharedNoteGetResponse;
 import umc.th.juinjang.api.note.shared.service.response.UserSharedNotesGetResponse;
@@ -45,7 +46,6 @@ public class SharedNoteQueryService {
 	private final SharedNoteFinder sharedNoteFinder;
 	private final LikedNoteFinder likedNoteFinder;
 	private final ChecklistAnswerFinder checklistAnswerFinder;
-	private final RedisTemplate<String, String> redisTemplate;
 	private final ViewCountService viewCountService;
 	private final ApplicationRewardViewCountPublisherAdapter applicationRewardViewCountPublisherAdapter;
 
