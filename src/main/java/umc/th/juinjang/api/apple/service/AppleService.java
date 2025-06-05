@@ -25,16 +25,20 @@ import com.apple.itunes.storekit.verification.SignedDataVerifier;
 import com.apple.itunes.storekit.verification.VerificationException;
 
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import umc.th.juinjang.api.apple.service.command.AppleTransactionVerifyCommand;
+import umc.th.juinjang.api.pencil.service.PencilCommandService;
 import umc.th.juinjang.api.pencil.service.PencilQueryService;
 import umc.th.juinjang.api.pencil.service.response.VerificationResult;
 
 @Slf4j
 @Service
 @Profile("!local")
+@RequiredArgsConstructor
 public class AppleService {
 
+	private final PencilCommandService pencilCommandService;
 	@Value("${apple.iap.bundle-id}")
 	private String bundleId;
 
@@ -59,6 +63,7 @@ public class AppleService {
 	private SignedDataVerifier signedDataVerifier;
 	private AppStoreServerAPIClient appStoreServerAPIClient;
 	private PencilQueryService pencilQueryService;
+
 
 	@PostConstruct
 	public void init() {
@@ -130,12 +135,13 @@ public class AppleService {
 				JWSTransactionDecodedPayload transactionPayload = signedDataVerifier.verifyAndDecodeTransaction(data.getSignedTransactionInfo());
 				String transactionId = transactionPayload.getTransactionId();
 				appStoreServerAPIClient.sendConsumptionData(transactionId, pencilQueryService.getConsumptionRequest(transactionId));
+			}else if (notificationType == NotificationTypeV2.REFUND) {
+				log.info("Apple IAP ReFund Notification Received.");
+				Data data = notificationPayload.getData();
+				JWSTransactionDecodedPayload transactionPayload = signedDataVerifier.verifyAndDecodeTransaction(data.getSignedTransactionInfo());
+				String transactionId = transactionPayload.getOriginalTransactionId();
+				pencilCommandService.handleRefundPurchase(transactionId);
 			}
-			// else if ( notificationType == NotificationTypeV2.REFUND){
-			//
-			// }else if ( notificationType == NotificationTypeV2.REFUND_DECLINED){
-			//
-			// }
 
 		}catch (VerificationException | APIException | IOException e){
 			throw new RuntimeException("Apple Notification Verification Error");

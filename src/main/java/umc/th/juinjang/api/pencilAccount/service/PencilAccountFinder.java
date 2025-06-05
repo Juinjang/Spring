@@ -21,7 +21,7 @@ public class PencilAccountFinder {
 
 	private final PencilAccountRepository pencilAccountRepository;
 
-	protected PencilAccount findByMember(Member member) {
+	public PencilAccount findByMember(Member member) {
 		return pencilAccountRepository.findByMember(member).orElseThrow(
 			() -> {
 				log.error("[PENCIL_ACCOUNT]");

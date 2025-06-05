@@ -91,6 +91,10 @@ public class PurchasedPencil {
 		this.deliveryStatus = DeliveryStatus.DELIVERY_SUCCESS;
 	}
 
+	public void markAsRefund(){
+		this.transactionStatus = TransactionStatus.REFUNDED;
+	}
+
 	public void updateRetryCount(Long retryCount) {
 		this.retryCount = retryCount;
 	}

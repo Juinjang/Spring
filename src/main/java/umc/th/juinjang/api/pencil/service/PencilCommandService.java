@@ -15,10 +15,13 @@ import umc.th.juinjang.api.pencil.controller.request.AppleIAPPurchaseRequest;
 import umc.th.juinjang.api.pencil.service.response.AppleIAPPurchaseResponse;
 import umc.th.juinjang.api.pencil.service.response.VerificationResult;
 import umc.th.juinjang.api.pencilAccount.service.PencilAccountFinder;
+import umc.th.juinjang.common.code.status.ErrorStatus;
+import umc.th.juinjang.common.exception.handler.SharedNoteHandler;
 import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.pencil.acquired.model.AcquiredPencil;
 import umc.th.juinjang.domain.pencil.purchased.model.PurchasedPencil;
 import umc.th.juinjang.domain.pencil.purchased.model.TransactionStatus;
+import umc.th.juinjang.domain.pencilaccount.model.PencilAccount;
 
 @Slf4j
 @Service
@@ -142,5 +145,35 @@ public class PencilCommandService {
 	private String createTitle(Long pencilAmount) {
 		return String.format("연필 %d개 구매", pencilAmount);
 	}
+
+	@Transactional
+	public void handleRefundPurchase(String transactionId) {
+		PurchasedPencil pencil = purchasedPencilFinder.findByTransactionId(transactionId)
+			.orElseThrow(() -> new EntityNotFoundException("PurchasedPencil not found with transactionId: " + transactionId));
+
+		log.info("Refund processed for transactionId: {}", transactionId);
+
+		pencil.markAsRefund();
+
+		PencilAccount buyerAccount = pencilAccountFinder.findByMemberWithLock(pencil.getMember());
+		executeRefund(buyerAccount, pencil.getPurchaseQuantity(), pencil.getPrice());
+
+	}
+
+	public void executeRefund(PencilAccount buyerAccount, long pencilQuantity, long price) {
+		long purchasedToUse = Math.min(buyerAccount.getPurchasedBalance(), pencilQuantity);
+		buyerAccount.decreasePurchasedBalance(purchasedToUse);
+
+		long remaining = pencilQuantity - purchasedToUse;
+		long acquiredToUse = Math.min(buyerAccount.getAcquiredBalance(), remaining);
+		buyerAccount.decreaseAcquiredBalance(acquiredToUse);
+
+		buyerAccount.increaseTotalRefundAmount(price);
+		// 남은 수량이 0이 아닐 경우 로그 기록
+		if (remaining - acquiredToUse > 0) {
+			log.warn("Not enough balance to fully refund {} pencils. Refunded only {}.", pencilQuantity, (purchasedToUse + acquiredToUse));
+		}
+	}
+
 
 }
