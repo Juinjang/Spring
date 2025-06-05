@@ -35,6 +35,7 @@ public interface SharedNoteRepository extends JpaRepository<SharedNote, Long>, S
 
 	Optional<SharedNote> findTop1ByLimjang_LimjangIdOrderByCreatedAtDesc(Long limjangId);
 
+	Optional<SharedNote> getBySharedNoteIdAndMemberAndDeletedAtIsNull(Long sharedNoteId, Member member);
 
 	@Query("SELECT s.sharedNoteId, s.viewCount FROM SharedNote s WHERE s.sharedNoteId IN :ids")
 	List<Object[]> findAllViewCountById(@Param("ids") List<Long> ids);
