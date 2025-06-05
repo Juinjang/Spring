@@ -23,10 +23,13 @@ import lombok.extern.slf4j.Slf4j;
 import umc.th.juinjang.api.pencil.service.response.AcquiredPencilResponse;
 import umc.th.juinjang.api.pencil.service.response.PurchasedPencilResponse;
 import umc.th.juinjang.api.pencil.service.response.UsedPencilResponse;
+import umc.th.juinjang.api.pencilAccount.service.PencilAccountFinder;
+import umc.th.juinjang.common.exception.handler.PencilAccountHandler;
 import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.pencil.acquired.model.AcquiredPencil;
 import umc.th.juinjang.domain.pencil.purchased.model.PurchasedPencil;
 import umc.th.juinjang.domain.pencil.used.model.UsedPencil;
+import umc.th.juinjang.domain.pencilaccount.model.PencilAccount;
 
 @Slf4j
 @Service
@@ -36,6 +39,7 @@ public class PencilQueryService {
 	private final AcquiredPencilFinder acquiredPencilFinder;
 	private final PurchasedPencilFinder purchasedPencilFinder;
 	private final UsedPencilFinder usedPencilFinder;
+	private final PencilAccountFinder pencilAccountFinder;
 
 	private static final double DOLLAR_EXCHANGE_RATE = 1374.0;
 
@@ -92,61 +96,66 @@ public class PencilQueryService {
 
 
 	private LifetimeDollarsPurchased calculateLifeDollarPurchased(Member member) {
-		Long totalPrice = purchasedPencilFinder.getSumPriceWhereMemberAndSuccess(member);
+		try {
+			PencilAccount buyerAccount = pencilAccountFinder.findByMember(member);
+			long totalPrice = buyerAccount.getTotalPurchaseAmount() - buyerAccount.getTotalRefundAmount() ;
 
-		if ( totalPrice == null ) {
+			if ( totalPrice == 0L) {
+				return LifetimeDollarsPurchased.ZERO_DOLLARS;
+			}
+
+			double usdAmount = totalPrice / DOLLAR_EXCHANGE_RATE;
+
+			if (usdAmount <= 0.0) {
+				return LifetimeDollarsPurchased.ZERO_DOLLARS;
+			} else if (usdAmount < 50) {
+				return LifetimeDollarsPurchased.ONE_CENT_TO_FORTY_NINE_DOLLARS_AND_NINETY_NINE_CENTS;
+			} else if (usdAmount < 100) {
+				return LifetimeDollarsPurchased.FIFTY_DOLLARS_TO_NINETY_NINE_DOLLARS_AND_NINETY_NINE_CENTS;
+			} else if (usdAmount < 500) {
+				return LifetimeDollarsPurchased.ONE_HUNDRED_DOLLARS_TO_FOUR_HUNDRED_NINETY_NINE_DOLLARS_AND_NINETY_NINE_CENTS;
+			} else if (usdAmount < 1000) {
+				return LifetimeDollarsPurchased.FIVE_HUNDRED_DOLLARS_TO_NINE_HUNDRED_NINETY_NINE_DOLLARS_AND_NINETY_NINE_CENTS;
+			} else if (usdAmount < 2000) {
+				return LifetimeDollarsPurchased.ONE_THOUSAND_DOLLARS_TO_ONE_THOUSAND_NINE_HUNDRED_NINETY_NINE_DOLLARS_AND_NINETY_NINE_CENTS;
+			} else {
+				return LifetimeDollarsPurchased.TWO_THOUSAND_DOLLARS_OR_GREATER;
+			}
+		}catch (PencilAccountHandler exception){
 			return LifetimeDollarsPurchased.UNDECLARED;
-		}
-		if ( totalPrice == 0L) {
-			return LifetimeDollarsPurchased.ZERO_DOLLARS;
-		}
-
-		double usdAmount = totalPrice / DOLLAR_EXCHANGE_RATE;
-
-		if (usdAmount <= 0.0) {
-			return LifetimeDollarsPurchased.ZERO_DOLLARS;
-		} else if (usdAmount < 50) {
-			return LifetimeDollarsPurchased.ONE_CENT_TO_FORTY_NINE_DOLLARS_AND_NINETY_NINE_CENTS;
-		} else if (usdAmount < 100) {
-			return LifetimeDollarsPurchased.FIFTY_DOLLARS_TO_NINETY_NINE_DOLLARS_AND_NINETY_NINE_CENTS;
-		} else if (usdAmount < 500) {
-			return LifetimeDollarsPurchased.ONE_HUNDRED_DOLLARS_TO_FOUR_HUNDRED_NINETY_NINE_DOLLARS_AND_NINETY_NINE_CENTS;
-		} else if (usdAmount < 1000) {
-			return LifetimeDollarsPurchased.FIVE_HUNDRED_DOLLARS_TO_NINE_HUNDRED_NINETY_NINE_DOLLARS_AND_NINETY_NINE_CENTS;
-		} else if (usdAmount < 2000) {
-			return LifetimeDollarsPurchased.ONE_THOUSAND_DOLLARS_TO_ONE_THOUSAND_NINE_HUNDRED_NINETY_NINE_DOLLARS_AND_NINETY_NINE_CENTS;
-		} else {
-			return LifetimeDollarsPurchased.TWO_THOUSAND_DOLLARS_OR_GREATER;
 		}
 	}
 
 	private LifetimeDollarsRefunded calculateLifeDollarRefunded(Member member) {
-		Long totalRefundWon = purchasedPencilFinder.getSumPriceWhereMemberAndRefund(member);
+		try{
+			PencilAccount buyerAccount = pencilAccountFinder.findByMember(member);
+			long totalRefundWon = buyerAccount.getTotalRefundAmount() ;
 
-		if ( totalRefundWon == null ) {
+			if ( totalRefundWon == 0L ) {
+				return LifetimeDollarsRefunded.ZERO_DOLLARS;
+			}
+
+			double usdAmount = totalRefundWon / DOLLAR_EXCHANGE_RATE;
+
+			if (usdAmount <= 0.0) {
+				return LifetimeDollarsRefunded.ZERO_DOLLARS;
+			} else if (usdAmount < 50) {
+				return LifetimeDollarsRefunded.ONE_CENT_TO_FORTY_NINE_DOLLARS_AND_NINETY_NINE_CENTS;
+			} else if (usdAmount < 100) {
+				return LifetimeDollarsRefunded.FIFTY_DOLLARS_TO_NINETY_NINE_DOLLARS_AND_NINETY_NINE_CENTS;
+			} else if (usdAmount < 500) {
+				return LifetimeDollarsRefunded.ONE_HUNDRED_DOLLARS_TO_FOUR_HUNDRED_NINETY_NINE_DOLLARS_AND_NINETY_NINE_CENTS;
+			} else if (usdAmount < 1000) {
+				return LifetimeDollarsRefunded.FIVE_HUNDRED_DOLLARS_TO_NINE_HUNDRED_NINETY_NINE_DOLLARS_AND_NINETY_NINE_CENTS;
+			} else if (usdAmount < 2000) {
+				return LifetimeDollarsRefunded.ONE_THOUSAND_DOLLARS_TO_ONE_THOUSAND_NINE_HUNDRED_NINETY_NINE_DOLLARS_AND_NINETY_NINE_CENTS;
+			} else {
+				return LifetimeDollarsRefunded.TWO_THOUSAND_DOLLARS_OR_GREATER;
+			}
+		}catch (PencilAccountHandler exception){
 			return LifetimeDollarsRefunded.UNDECLARED;
 		}
-		if ( totalRefundWon == 0L ) {
-			return LifetimeDollarsRefunded.ZERO_DOLLARS;
-		}
 
-		double usdAmount = totalRefundWon / DOLLAR_EXCHANGE_RATE;
-
-		if (usdAmount <= 0.0) {
-			return LifetimeDollarsRefunded.ZERO_DOLLARS;
-		} else if (usdAmount < 50) {
-			return LifetimeDollarsRefunded.ONE_CENT_TO_FORTY_NINE_DOLLARS_AND_NINETY_NINE_CENTS;
-		} else if (usdAmount < 100) {
-			return LifetimeDollarsRefunded.FIFTY_DOLLARS_TO_NINETY_NINE_DOLLARS_AND_NINETY_NINE_CENTS;
-		} else if (usdAmount < 500) {
-			return LifetimeDollarsRefunded.ONE_HUNDRED_DOLLARS_TO_FOUR_HUNDRED_NINETY_NINE_DOLLARS_AND_NINETY_NINE_CENTS;
-		} else if (usdAmount < 1000) {
-			return LifetimeDollarsRefunded.FIVE_HUNDRED_DOLLARS_TO_NINE_HUNDRED_NINETY_NINE_DOLLARS_AND_NINETY_NINE_CENTS;
-		} else if (usdAmount < 2000) {
-			return LifetimeDollarsRefunded.ONE_THOUSAND_DOLLARS_TO_ONE_THOUSAND_NINE_HUNDRED_NINETY_NINE_DOLLARS_AND_NINETY_NINE_CENTS;
-		} else {
-			return LifetimeDollarsRefunded.TWO_THOUSAND_DOLLARS_OR_GREATER;
-		}
 	}
 
 	private boolean getSampleContentProvided(Member member) {
