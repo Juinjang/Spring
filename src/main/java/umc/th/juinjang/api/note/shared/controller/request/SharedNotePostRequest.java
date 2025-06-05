@@ -9,7 +9,6 @@ public record SharedNotePostRequest(
 	@NotNull Boolean isImageShared,
 	@NotNull Integer year,
 	@NotNull Integer month,
-	@NotBlank String period,
-	@NotNull Long price
+	@NotBlank String period
 ) {
 }

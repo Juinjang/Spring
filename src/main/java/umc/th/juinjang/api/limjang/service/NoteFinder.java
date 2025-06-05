@@ -18,8 +18,9 @@ public class NoteFinder {
 
 	private final LimjangRepository limjangRepository;
 
-	protected List<Limjang> findAllByMemberOrderByOptions(Member member, LimjangSortOptions sortOptions) {
-		return limjangRepository.findAllByMemberAndDeletedIsFalseOrderByParamV2(member, sortOptions);
+	protected List<Limjang> findAllByMemberOrderByOptions(Member member, LimjangSortOptions sortOptions,
+		String keyword) {
+		return limjangRepository.findAllByMemberAndDeletedIsFalseOrderByParamV2(member, sortOptions, keyword);
 	}
 
 	public Limjang getNoteByIdWhereDeletedIsFalse(long id) {
@@ -32,7 +33,7 @@ public class NoteFinder {
 			.orElseThrow(() -> new LimjangHandler(ErrorStatus.LIMJANG_NOTFOUND_ERROR));
 	}
 
-	protected List<Limjang> getAllByMemberWithAddressAndNotePriceWhereRewardPencilIsNotNullAndDeletedIsFalse(
+	protected List<Limjang> getAllByMemberWithAddressAndNotePriceWhereIsSharableIsTrueAndDeletedIsFalse(
 		Member member) {
 		return limjangRepository.findAllByMemberWithAddressAndNotePriceWhereIsSharableIsTrueAndDeletedIsFalse(
 			member);

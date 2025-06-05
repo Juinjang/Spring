@@ -2,12 +2,15 @@ package umc.th.juinjang.domain.note.shared.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import umc.th.juinjang.domain.member.model.Member;
+import umc.th.juinjang.domain.limjang.model.Limjang;
 import umc.th.juinjang.domain.note.shared.model.SharedNote;
 
 public interface SharedNoteRepository extends JpaRepository<SharedNote, Long>, SharedNoteQueryDSLRepository {
@@ -30,8 +33,8 @@ public interface SharedNoteRepository extends JpaRepository<SharedNote, Long>, S
 	@Query("UPDATE SharedNote sn SET sn.likeCount = sn.likeCount - 1 WHERE sn.sharedNoteId = :sharedNoteId")
 	void decrementLikedCountById(@Param("sharedNoteId") Long sharedNoteId);
 
-	@Query("SELECT sn FROM SharedNote sn WHERE sn.limjang.limjangId = :limjangId ORDER BY sn.createdAt DESC")
-	Optional<SharedNote> findLatestByLimjangId(@Param("limjangId") Long limjangId);
+	Optional<SharedNote> findTop1ByLimjang_LimjangIdOrderByCreatedAtDesc(Long limjangId);
+
 
 	@Query("SELECT s.sharedNoteId, s.viewCount FROM SharedNote s WHERE s.sharedNoteId IN :ids")
 	List<Object[]> findAllViewCountById(@Param("ids") List<Long> ids);
@@ -39,4 +42,10 @@ public interface SharedNoteRepository extends JpaRepository<SharedNote, Long>, S
 	@Query("SELECT s.viewCount FROM SharedNote s WHERE s.sharedNoteId = :id")
 	Long findViewCountById(@Param("id") Long id);
 
+	Optional<SharedNote> findBySharedNoteIdAndDeletedAtIsNull(Long id);
+
+	boolean existsByDeletedAtIsNullAndLimjang(Limjang limjang);
+
+	@Query("SELECT s.limjang.limjangId FROM SharedNote s WHERE s.limjang in :limjangs AND s.deletedAt is null ")
+	Set<Long> findLimjangIdsByDeletedAtIsNullAndLimjang(@Param("limjangs") List<Limjang> limjangs);
 }

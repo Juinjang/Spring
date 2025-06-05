@@ -1,9 +1,8 @@
 package umc.th.juinjang.api.note.shared.service;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.List;
-
+import java.util.Optional;
+import java.sql.Timestamp;
 import org.hibernate.exception.LockAcquisitionException;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.stereotype.Service;
@@ -53,7 +52,7 @@ public class SharedNoteCommandService {
 	public void createSharedNotePurchase(Member buyer, Long sharedNoteId) {
 		checkAlreadyPurchase(buyer, sharedNoteId);
 
-		SharedNote sharedNote = sharedNoteFinder.getById(sharedNoteId);
+		SharedNote sharedNote = sharedNoteFinder.getByIdWhereDeletedAtIsNull(sharedNoteId);
 		Member seller = sharedNote.getMember();
 		Long price = sharedNote.getPrice();
 
@@ -126,57 +125,72 @@ public class SharedNoteCommandService {
 	}
 
 	@Transactional
+	public void deleteSharedNote(Member member, Long sharedNoteId, LocalDateTime deletedAt) {
+		SharedNote sharedNote = sharedNoteFinder.getBySharedNoteIdAndMemberAndDeletedAtIsNull(sharedNoteId,member);
+		sharedNote.updateDeletedAt(Timestamp.valueOf(deletedAt));
+	}
+
+	@Transactional
 	public void createSharedNote(Member member, Long noteId, SharedNotePostRequest request) {
-		Integer rewardPencilCount = 0;
 
-		Optional<SharedNote> latestSharedNote = sharedNoteFinder.findLatestByLimjangId(noteId);
-		if (latestSharedNote.isPresent()) {
-			SharedNote note = latestSharedNote.get();
-			if (note.getDeletedAt() == null) {
-				throw new SharedNoteHandler(ErrorStatus.SHAREDNOTE_ALREADY_EXISTS);
-			}
-			if (note.getDeletedAt().toLocalDateTime().isAfter(LocalDateTime.now().minusMonths(6))) {
-				throw new SharedNoteHandler(ErrorStatus.SHAREDNOTE_DELETED_RECENTLY);
-			}
-		}
-
-		//Limjang 조회
 		Limjang limjang = noteFinder.getNoteByIdWhereDeletedIsFalse(noteId);
+		Optional<SharedNote> latestSharedNote = sharedNoteFinder.findLatestByLimjangId(noteId);
 
-		//사진 공유 체크 + 임장노트에 사진이 있으면
-		if (request.isImageShared() == Boolean.TRUE && !limjang.getImageList().isEmpty()) {
-			//SafeSearch 검사 (유해 이미지가 하나라도 있으면 차단)
-			for (var image : limjang.getImageList()) {
-				boolean safe = safeSearchClient.isSafeImage(
-					image.getImageUrl(),
-					Likelihood.UNLIKELY,  // adult
-					Likelihood.POSSIBLE,  // spoof
-					Likelihood.POSSIBLE,  // medical
-					Likelihood.UNLIKELY,  // violence
-					Likelihood.LIKELY   // racy
-				);
-				if (!safe) {
-					throw new SharedNoteHandler(ErrorStatus.SHARED_NOT_ALLOWED);
-				}
-			}
-			rewardPencilCount = 7;
+		// 이미 삭제되지 않은 공유글이 있으면 차단
+		if (latestSharedNote.isPresent() && latestSharedNote.get().getDeletedAt() == null) {
+			throw new SharedNoteHandler(ErrorStatus.SHAREDNOTE_ALREADY_EXISTS);
 		}
-		//사진 공유 안함 체크 or 임장노트에 사진이 없으면
-		else if (request.isImageShared() == Boolean.TRUE || limjang.getImageList().isEmpty()) {
-			rewardPencilCount = 2;
-		}
-		limjang.updateRewardPencil(rewardPencilCount);
-		noteUpdater.save(limjang);
 
-		//저장
+		// 최초 공유라면 보상 지급
+		boolean isFirstTimeShared = latestSharedNote.isEmpty();
+		Integer rewardPencilCount = isFirstTimeShared ? calculateReward(limjang, request) : 0;
+
+		// 공유 저장
 		SharedNote sharedNote = SharedNote.toSharedNote(member, limjang, request);
 		sharedNoteUpdater.save(sharedNote);
 
-		//사용자 지갑에 rewardPencil만큼 업데이트
+		// 보상 처리
+		if (rewardPencilCount > 0) {
+			applyReward(member, limjang, sharedNote.getSharedNoteId(), rewardPencilCount);
+		}
+	}
+
+	private int calculateReward(Limjang limjang, SharedNotePostRequest request) {
+		if (request.isImageShared() == Boolean.TRUE && !limjang.getImageList().isEmpty()) {
+			validateImagesAreSafe(limjang);
+			return 7;
+		}
+		if (request.isImageShared() == Boolean.TRUE || limjang.getImageList().isEmpty()) {
+			return 2;
+		}
+		return 0;
+	}
+
+	private void validateImagesAreSafe(Limjang limjang) {
+		for (var image : limjang.getImageList()) {
+			boolean safe = safeSearchClient.isSafeImage(
+				image.getImageUrl(),
+				Likelihood.UNLIKELY,  // adult
+				Likelihood.POSSIBLE,  // spoof
+				Likelihood.POSSIBLE,  // medical
+				Likelihood.UNLIKELY,  // violence
+				Likelihood.LIKELY     // racy
+			);
+			if (!safe) {
+				throw new SharedNoteHandler(ErrorStatus.SHARED_NOT_ALLOWED);
+			}
+		}
+	}
+
+	private void applyReward(Member member, Limjang limjang, Long sharedNoteId, int rewardPencilCount) {
+		limjang.updateRewardPencil(rewardPencilCount);
+		noteUpdater.save(limjang);
+
 		PencilAccount pencilAccount = pencilAccountFinder.findByMemberWithLock(member);
 		pencilAccount.increaseAcquiredBalance(rewardPencilCount);
+
 		acquiredPencilUpdater.save(
-			createAcquiredPencil(sharedNote.getSharedNoteId(), member, rewardPencilCount.longValue(),
-				AcquiredType.NOTE));
+			createAcquiredPencil(sharedNoteId, member, (long)rewardPencilCount, AcquiredType.NOTE));
 	}
+
 }

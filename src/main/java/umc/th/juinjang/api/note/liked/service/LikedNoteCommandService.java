@@ -24,7 +24,7 @@ public class LikedNoteCommandService {
 
 	@Transactional
 	public LikedNotePostResponse createLikedNote(Member member, Long sharedNoteId) {
-		SharedNote sharedNote = sharedNoteFinder.getById(sharedNoteId);
+		SharedNote sharedNote = sharedNoteFinder.getByIdWhereDeletedAtIsNull(sharedNoteId);
 		LikedNote likedNote = LikedNote.create(member, sharedNote);
 
 		likedNoteUpdater.save(likedNote);
@@ -35,7 +35,7 @@ public class LikedNoteCommandService {
 
 	@Transactional
 	public LikedNoteDeleteResponse deleteLikedNote(Member member, Long sharedNoteId) {
-		SharedNote sharedNote = sharedNoteFinder.getById(sharedNoteId);
+		SharedNote sharedNote = sharedNoteFinder.getByIdWhereDeletedAtIsNull(sharedNoteId);
 		LikedNote likedNote = likedNoteFinder.getByMemberAndSharedNote(member, sharedNote);
 
 		likedNoteDeleter.delete(likedNote);

@@ -43,8 +43,7 @@ dependencies {
 
     implementation 'org.springframework.retry:spring-retry'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
-
-
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     //
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign' // 4.1.0
 //	implementation 'org.springframework.cloud:spring-cloud-commons:4.1.1'
@@ -103,9 +102,6 @@ tasks.named('test') {
         showStandardStreams = false
     }
 }
-
-
-
 
 
 def generated = 'src/main/generated'
