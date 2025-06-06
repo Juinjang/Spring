@@ -55,7 +55,8 @@ public class SharedNoteQueryDSLRepositoryImpl implements SharedNoteQueryDSLRepos
 				getWhereByPropertyType(propertyType),
 				getWhereByPriceType(priceType),
 				keywordCondition(keyword),
-				sharedNote.deletedAt.isNull()
+				sharedNote.deletedAt.isNull(),
+				limjang.deleted.isFalse()
 			)
 			.orderBy(getOrderBySortOptions(sort))
 			.offset(pageable.getOffset())
