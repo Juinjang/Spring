@@ -27,8 +27,8 @@ public class ChecklistQueryServiceV2 {
 	}
 
 	public ReportResponseDTO.ReportV2DTO getReportByNoteId(Long noteId) {
-		Limjang limjang = noteFinder.getNoteByIdWhereDeletedIsFalse(noteId);
-		Report report = reportFinder.findReportByNote(limjang);
-		return ReportConverter.toReportV2Dto(report, limjang);
+		Limjang note = noteFinder.getNoteByIdWithAddressAndNotePriceWhereDeletedIsFalse(noteId);
+		Report report = reportFinder.findReportByNote(note);
+		return ReportConverter.toReportV2Dto(report, note);
 	}
 }
