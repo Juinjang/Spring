@@ -38,4 +38,10 @@ public class NoteFinder {
 		return limjangRepository.findAllByMemberWithAddressAndNotePriceWhereIsSharableIsTrueAndDeletedIsFalse(
 			member);
 	}
+
+	protected List<Limjang> getAllByMemberWithAddressAndNotePriceWhereIsSharableIsTrueAndDeletedIsFalseAndAddressBcodeIsNotNull(
+		Member member) {
+		return limjangRepository.findAllByMemberWithAddressAndNotePriceWhereIsSharableIsTrueAndDeletedIsFalseAndAddressBcodeIsNotNull(
+			member);
+	}
 }

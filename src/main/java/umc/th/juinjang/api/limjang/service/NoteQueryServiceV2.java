@@ -68,7 +68,7 @@ public class NoteQueryServiceV2 {
 	}
 
 	private List<Limjang> findUnsharedSharableNotes(Member member) {
-		List<Limjang> notes = noteFinder.getAllByMemberWithAddressAndNotePriceWhereIsSharableIsTrueAndDeletedIsFalse(
+		List<Limjang> notes = noteFinder.getAllByMemberWithAddressAndNotePriceWhereIsSharableIsTrueAndDeletedIsFalseAndAddressBcodeIsNotNull(
 			member);
 		Set<Long> noteIdInSharedNotes = sharedNoteFinder.findLimjangIdsByDeletedAtIsNullAndLimjang(notes);
 
