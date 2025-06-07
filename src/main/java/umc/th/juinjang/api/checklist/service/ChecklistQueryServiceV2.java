@@ -6,10 +6,11 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import umc.th.juinjang.api.checklist.service.converter.ReportConverter;
 import umc.th.juinjang.api.checklist.service.response.ChecklistAnswerResponseDTO;
-import umc.th.juinjang.api.checklist.service.response.ReportResponseDTO;
+import umc.th.juinjang.api.checklist.service.response.ReportGetResponse;
+import umc.th.juinjang.api.checklist.service.response.ReportWithLimjangResponseDTO;
 import umc.th.juinjang.api.limjang.service.NoteFinder;
+import umc.th.juinjang.api.limjang.service.response.LimjangDetailGetResponse;
 import umc.th.juinjang.domain.limjang.model.Limjang;
 import umc.th.juinjang.domain.report.model.Report;
 
@@ -26,9 +27,9 @@ public class ChecklistQueryServiceV2 {
 		return checklistAnswerFinder.findByLimjangId(noteId);
 	}
 
-	public ReportResponseDTO.ReportV2DTO getReportByNoteId(Long noteId) {
+	public ReportWithLimjangResponseDTO getReportByNoteId(Long noteId) {
 		Limjang note = noteFinder.getNoteByIdWithAddressAndNotePriceWhereDeletedIsFalse(noteId);
 		Report report = reportFinder.findReportByNote(note);
-		return ReportConverter.toReportV2Dto(report, note);
+		return new ReportWithLimjangResponseDTO(ReportGetResponse.of(report), LimjangDetailGetResponse.of(note));
 	}
 }

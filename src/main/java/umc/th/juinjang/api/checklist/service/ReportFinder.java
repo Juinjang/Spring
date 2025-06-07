@@ -4,13 +4,9 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Component;
 
-import umc.th.juinjang.api.checklist.service.converter.ReportConverter;
-import umc.th.juinjang.api.checklist.service.response.ReportResponseDTO;
 import umc.th.juinjang.common.code.status.ErrorStatus;
 import umc.th.juinjang.common.exception.handler.ChecklistHandler;
-import umc.th.juinjang.common.exception.handler.LimjangHandler;
 import umc.th.juinjang.domain.limjang.model.Limjang;
-import umc.th.juinjang.domain.limjang.repository.LimjangRepository;
 import umc.th.juinjang.domain.report.model.Report;
 import umc.th.juinjang.domain.report.repository.ReportRepository;
 
