@@ -28,7 +28,7 @@ public class NoteFinder {
 			.orElseThrow(() -> new LimjangHandler(ErrorStatus.LIMJANG_NOTFOUND_ERROR));
 	}
 
-	protected Limjang getNoteByIdWithAddressAndNotePriceWhereDeletedIsFalse(long id) {
+	public Limjang getNoteByIdWithAddressAndNotePriceWhereDeletedIsFalse(long id) {
 		return limjangRepository.findByIdWithAddressAndNotePriceWhereDeletedIsFalse(id)
 			.orElseThrow(() -> new LimjangHandler(ErrorStatus.LIMJANG_NOTFOUND_ERROR));
 	}
