@@ -22,6 +22,7 @@ import umc.th.juinjang.domain.pencil.acquired.model.AcquiredPencil;
 import umc.th.juinjang.domain.pencil.purchased.model.PurchasedPencil;
 import umc.th.juinjang.domain.pencil.purchased.model.TransactionStatus;
 import umc.th.juinjang.domain.pencilaccount.model.PencilAccount;
+import umc.th.juinjang.event.publisher.PaymentEventPublisher;
 
 @Slf4j
 @Service
@@ -34,6 +35,7 @@ public class PencilCommandService {
 	private final PurchasedPencilFinder purchasedPencilFinder;
 	private final AcquiredPencilFinder acquiredPencilFinder;
 	private final PencilAccountFinder pencilAccountFinder;
+	private final PaymentEventPublisher paymentEventPublisher;
 
 	@Transactional
 	public Boolean markAcquiredPencilAsRead(Long acquiredPencilId) {
@@ -81,18 +83,16 @@ public class PencilCommandService {
 		VerificationResult verificationResult = appleService.verifyAppleTransaction(AppleTransactionVerifyCommand.fromRequest(request));
 
 		if (VerificationResult.isSuccess(verificationResult)){
-			// 성공 시, DB에 저장z
+			// 성공 시, DB에 저장
 			handleSuccessfulApplePurchase(request, member, now);
 
-			// TODO : 디스코드 알림 추가 필요
-			// paymentEventPublisher.publishPaymentEvent(member,request.getPrice(), pencilAmount,TransactionStatus.SUCCESS);
+			paymentEventPublisher.publishPaymentEvent(member,request.getPrice(), request.getPencilQuantity(),TransactionStatus.SUCCESS);
 			return AppleIAPPurchaseResponse.ofSuccess(transactionId);
 		}else{
 			// 실패 시, DB에 저장
 			handleFailureApplePurchase(request, member, now);
 
-			// TODO : 디스코드 알림 추가 필요
-			// paymentEventPublisher.publishPaymentEvent(member,request.getPrice(), pencilAmount,TransactionStatus.VALIDATION_FAILED);
+			paymentEventPublisher.publishPaymentEvent(member,request.getPrice(), request.getPencilQuantity(),TransactionStatus.VALIDATION_FAILED);
 			return AppleIAPPurchaseResponse.ofValidationFailure(transactionId);
 		}
 	}

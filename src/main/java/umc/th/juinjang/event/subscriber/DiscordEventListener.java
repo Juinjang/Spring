@@ -10,6 +10,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import umc.th.juinjang.event.FlagSharedNoteEvent;
+import umc.th.juinjang.event.PaymentEvent;
 import umc.th.juinjang.event.SignUpEvent;
 import umc.th.juinjang.external.openfeign.discord.DiscordAlertProvider;
 
@@ -40,6 +41,15 @@ public class DiscordEventListener {
 			event.targetMemberId(),
 			event.targetSharedNoteId()
 		));
+	}
+
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	@Async
+	public void handlePaymentEvent(PaymentEvent event) {
+			discordAlertProvider.sendPaymentAlertToDiscord(String.format(
+				EventMessage.PAYMENT_COMPLETED_MESSAGE.getMessage(),
+				event.memberId(),event.nickname(),event.pencilQuantity(), event.price(), event.transactionStatus()
+			));
 	}
 
 	private boolean isProdEnv() {
