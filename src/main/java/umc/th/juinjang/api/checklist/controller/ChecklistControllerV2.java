@@ -18,7 +18,7 @@ import umc.th.juinjang.api.checklist.service.ChecklistCommandServiceV2;
 import umc.th.juinjang.api.checklist.service.ChecklistQueryServiceV2;
 import umc.th.juinjang.api.checklist.service.response.ChecklistAnswerAndReportResponseDTO;
 import umc.th.juinjang.api.checklist.service.response.ChecklistAnswerResponseDTO;
-import umc.th.juinjang.api.checklist.service.response.ReportResponseDTO;
+import umc.th.juinjang.api.checklist.service.response.ReportWithLimjangResponseDTO;
 import umc.th.juinjang.api.dto.ApiResponse;
 
 @RestController
@@ -41,7 +41,7 @@ public class ChecklistControllerV2 {
 	@CrossOrigin
 	@Operation(summary = "리포트 조회 V2")
 	@GetMapping("/report/{noteId}")
-	public ApiResponse<ReportResponseDTO.ReportV2DTO> getReport(
+	public ApiResponse<ReportWithLimjangResponseDTO> getReport(
 		@PathVariable(name = "noteId") Long noteId) {
 		return ApiResponse.onSuccess(checklistQueryService.getReportByNoteId(noteId));
 	}

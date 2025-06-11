@@ -1,6 +1,10 @@
 package umc.th.juinjang.api.checklist.service.response;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import umc.th.juinjang.api.limjang.service.response.LimjangDetailResponseDTO;
 
 @AllArgsConstructor
@@ -24,22 +28,5 @@ public class ReportResponseDTO {
 		private Float publicSpaceRate;
 		private Float locationConditionsRate;
 		private Float totalRate;
-	}
-
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	@Builder
-	public static class ReportV2DTO {
-		private Long reportId;
-		private String indoorKeyWord;
-		private String publicSpaceKeyWord;
-		private String locationConditionsWord;
-		private Float indoorRate;
-		private Float publicSpaceRate;
-		private Float locationConditionsRate;
-		private Float totalRate;
-		private Long limjangId;
 	}
 }

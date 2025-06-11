@@ -35,6 +35,7 @@ public interface SharedNoteRepository extends JpaRepository<SharedNote, Long>, S
 
 	Optional<SharedNote> findTop1ByLimjang_LimjangIdOrderByCreatedAtDesc(Long limjangId);
 
+	Optional<SharedNote> getBySharedNoteIdAndMemberAndDeletedAtIsNull(Long sharedNoteId, Member member);
 
 	@Query("SELECT s.sharedNoteId, s.viewCount FROM SharedNote s WHERE s.sharedNoteId IN :ids")
 	List<Object[]> findAllViewCountById(@Param("ids") List<Long> ids);
@@ -46,6 +47,6 @@ public interface SharedNoteRepository extends JpaRepository<SharedNote, Long>, S
 
 	boolean existsByDeletedAtIsNullAndLimjang(Limjang limjang);
 
-	@Query("SELECT s.limjang.limjangId FROM SharedNote s WHERE s.limjang in :limjangs AND s.deletedAt is null ")
+	@Query("SELECT s.limjang.limjangId FROM SharedNote s WHERE s.limjang in :limjangs AND s.deletedAt is null")
 	Set<Long> findLimjangIdsByDeletedAtIsNullAndLimjang(@Param("limjangs") List<Limjang> limjangs);
 }

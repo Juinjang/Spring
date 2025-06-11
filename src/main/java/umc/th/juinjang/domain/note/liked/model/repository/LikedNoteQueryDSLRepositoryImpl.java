@@ -44,7 +44,8 @@ public class LikedNoteQueryDSLRepositoryImpl implements LikedNoteQueryDSLReposit
 				getWhereByPropertyType(propertyType),
 				getWhereByPriceType(priceType),
 				keywordCondition(keyword),
-				sharedNote.deletedAt.isNull()
+				sharedNote.deletedAt.isNull(),
+				limjang.deleted.isFalse()
 			)
 			.orderBy(likedNote.likedNoteId.desc())
 			.fetch();

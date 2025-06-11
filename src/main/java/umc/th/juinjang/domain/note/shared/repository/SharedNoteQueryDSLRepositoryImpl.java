@@ -55,7 +55,8 @@ public class SharedNoteQueryDSLRepositoryImpl implements SharedNoteQueryDSLRepos
 				getWhereByPropertyType(propertyType),
 				getWhereByPriceType(priceType),
 				keywordCondition(keyword),
-				sharedNote.deletedAt.isNull()
+				sharedNote.deletedAt.isNull(),
+				limjang.deleted.isFalse()
 			)
 			.orderBy(getOrderBySortOptions(sort))
 			.offset(pageable.getOffset())
@@ -109,7 +110,7 @@ public class SharedNoteQueryDSLRepositoryImpl implements SharedNoteQueryDSLRepos
 	private BooleanExpression getWhereByNoteType(Member user, NoteType noteType, List<Long> ids) {
 		return switch (noteType) {
 			case OWNED -> sharedNote.sharedNoteId.in(ids);
-			case SHARED -> sharedNote.member.eq(user).and(sharedNote.deletedAt.isNull());
+			case SHARED -> sharedNote.member.eq(user).and(sharedNote.deletedAt.isNull()).and(limjang.deleted.isFalse());
 			default -> null;
 		};
 	}

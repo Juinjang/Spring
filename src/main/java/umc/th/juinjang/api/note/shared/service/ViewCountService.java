@@ -54,6 +54,12 @@ public class ViewCountService {
 
 			if (value == null) {
 				Long viewCountFromDb = sharedNoteFinder.findViewCountById(sharedNoteId);
+
+				if (viewCountFromDb == null) {
+					log.warn("DB의 sharedNote 조회수가 null sharedNoteId={}", sharedNoteId);
+					viewCountFromDb = 0L;
+				}
+				
 				redisTemplate.opsForValue().set(key, viewCountFromDb.toString());
 				return viewCountFromDb;
 			}

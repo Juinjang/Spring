@@ -83,12 +83,14 @@ public class SharedNote extends BaseEntity {
 			.month(dto.month())
 			.period(dto.period())
 			.isImageShared(dto.isImageShared())
+			.viewCount(0L)
 			.build();
 	}
 
 	public void updatePrice(long price) {
 		this.price = price;
 	}
+
 	public void updateDeletedAt(Timestamp deletedAt) {
 		this.deletedAt = deletedAt;
 	}
