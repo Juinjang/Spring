@@ -1,7 +1,6 @@
 package umc.th.juinjang.api.pencil.service;
 
 import static org.assertj.core.api.Assertions.*;
-import static umc.th.juinjang.domain.pencil.purchased.model.PurchasedPencil.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -156,11 +155,16 @@ class PencilQueryServiceTest extends IntegrationTestSupport {
 		UUID uuid5 = UUID.randomUUID();
 
 		// 명확한 순서로 데이터 생성 (시간 역순으로)
-		PurchasedPencil pencil1 = PurchasedPencil.successOf(member, "10개 연필팩", 10L, 1000L, 0L,"transaction1", uuid1, time1);
-		PurchasedPencil pencil2 = PurchasedPencil.successOf(member, "20개 연필팩", 20L, 2000L, 0L,"transaction2", uuid2, time2);
-		PurchasedPencil pencil3 = PurchasedPencil.successOf(member, "30개 연필팩", 30L, 3000L,0L ,"transaction3", uuid3, time3);
-		PurchasedPencil pencil4 = PurchasedPencil.successOf(member, "15개 연필팩", 15L, 1500L, 0L,"transaction4", uuid4, time4);
-		PurchasedPencil pencil5 = PurchasedPencil.successOf(member, "25개 연필팩", 25L, 2500L, 0L,"transaction5", uuid5, time5);
+		PurchasedPencil pencil1 = PurchasedPencil.successOf(member, "10개 연필팩", 10L, 1000L, 0L, "transaction1", uuid1,
+			time1);
+		PurchasedPencil pencil2 = PurchasedPencil.successOf(member, "20개 연필팩", 20L, 2000L, 0L, "transaction2", uuid2,
+			time2);
+		PurchasedPencil pencil3 = PurchasedPencil.successOf(member, "30개 연필팩", 30L, 3000L, 0L, "transaction3", uuid3,
+			time3);
+		PurchasedPencil pencil4 = PurchasedPencil.successOf(member, "15개 연필팩", 15L, 1500L, 0L, "transaction4", uuid4,
+			time4);
+		PurchasedPencil pencil5 = PurchasedPencil.successOf(member, "25개 연필팩", 25L, 2500L, 0L, "transaction5", uuid5,
+			time5);
 
 		purchasedPencilRepository.saveAll(List.of(pencil1, pencil2, pencil3, pencil4, pencil5));
 
@@ -193,7 +197,8 @@ class PencilQueryServiceTest extends IntegrationTestSupport {
 		LocalDateTime time = LocalDateTime.now();
 		UUID uuid = UUID.randomUUID();
 
-		PurchasedPencil pencil = PurchasedPencil.failedDueToServerError(member, "10개 연필팩", 10L, 1000L, 10L,"transaction1", uuid, time);
+		PurchasedPencil pencil = PurchasedPencil.failedDueToServerError(member, "10개 연필팩", 10L, 1000L, 10L,
+			"transaction1", uuid, time);
 
 		purchasedPencilRepository.saveAll(List.of(pencil));
 
@@ -237,6 +242,42 @@ class PencilQueryServiceTest extends IntegrationTestSupport {
 			.containsExactly(
 				Tuple.tuple(Usedtype.OWNED, "빌딩", 1L)
 			);
+	}
+
+	@DisplayName("얻은 연필 목록 중 읽지 않은 연필이 없으면 전체 읽음으로 판단된다.")
+	@Test
+	void returnTrueIfAllAcquiredPencilsAreRead() {
+		// given
+		Member member = MemberFixture.createDefaultMember();
+		memberRepository.save(member);
+
+		AcquiredPencil pencil1 = AcquiredPencil.create(member, "연필 1", 1L, 10L, true, AcquiredType.NOTE);
+		AcquiredPencil pencil2 = AcquiredPencil.create(member, "연필 2", 2L, 20L, true, AcquiredType.SOLD);
+		acquiredPencilRepository.saveAll(List.of(pencil1, pencil2));
+
+		// when
+		boolean isTotalRead = pencilService.isAcquiredPencilReadStatus(member);
+
+		// then
+		assertThat(isTotalRead).isTrue();
+	}
+
+	@DisplayName("얻은 연필 목록 중 읽지 않은 연필이 하나라도 있으면 전체 읽음으로 판단되지 않는다.")
+	@Test
+	void returnFalseIfAnyAcquiredPencilIsUnread() {
+		// given
+		Member member = MemberFixture.createDefaultMember();
+		memberRepository.save(member);
+
+		AcquiredPencil pencil1 = AcquiredPencil.create(member, "연필 1", 1L, 10L, true, AcquiredType.NOTE);
+		AcquiredPencil pencil2 = AcquiredPencil.create(member, "연필 2", 2L, 20L, false, AcquiredType.SOLD);
+		acquiredPencilRepository.saveAll(List.of(pencil1, pencil2));
+
+		// when
+		boolean isTotalRead = pencilService.isAcquiredPencilReadStatus(member);
+
+		// then
+		assertThat(isTotalRead).isFalse();
 	}
 
 	private AcquiredPencil createAcquiredPencilWithTime(LocalDateTime createdAt, String content, Long sharedNoteId,
