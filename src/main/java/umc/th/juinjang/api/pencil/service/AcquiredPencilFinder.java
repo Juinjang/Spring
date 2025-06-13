@@ -19,6 +19,10 @@ public class AcquiredPencilFinder {
 		return acquiredPencilRepository.findAllByMemberOrderByCreatedAtDesc(member);
 	}
 
+	public boolean existsByMemberAndIsReadFalse(Member member) {
+		return acquiredPencilRepository.existsByMemberAndIsReadFalse(member);
+	}
+
 	public AcquiredPencil findById(Long id) {
 		return acquiredPencilRepository.findById(id).orElse(null);
 	}
