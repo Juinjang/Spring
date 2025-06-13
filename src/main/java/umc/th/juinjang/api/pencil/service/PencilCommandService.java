@@ -19,6 +19,7 @@ import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.pencil.acquired.model.AcquiredPencil;
 import umc.th.juinjang.domain.pencil.purchased.model.PurchasedPencil;
 import umc.th.juinjang.domain.pencil.purchased.model.TransactionStatus;
+import umc.th.juinjang.domain.pencilaccount.model.PencilAccount;
 
 @Slf4j
 @Service
@@ -48,7 +49,7 @@ public class PencilCommandService {
 	public AppleIAPPurchaseResponse processAppleIAPPurchase(AppleIAPPurchaseRequest request, Member member,
 		LocalDateTime now) {
 		String transactionId = request.getTransactionId();
-
+		Long purchaseQuantity = request.getPencilQuantity();
 		Optional<PurchasedPencil> existing = purchasedPencilFinder.findByTransactionIdAndMember(transactionId, member);
 
 		if (existing.isEmpty()) {
@@ -59,32 +60,36 @@ public class PencilCommandService {
 
 		PurchasedPencil pencil = existing.get();
 		TransactionStatus status = pencil.getTransactionStatus();
+		PencilAccount buyer = pencilAccountFinder.findByMember(member);
 
 		if (status == TransactionStatus.SUCCESS) {
 			// 트랜잭션이 정상적으로 성공된 기록이 있는 경우
-			return AppleIAPPurchaseResponse.ofSuccess(transactionId);
+			return AppleIAPPurchaseResponse.ofSuccess(transactionId, purchaseQuantity, buyer.getTotalBalance());
 		}
 
 		PurchasedPencil newPencil = retryPurchasedPencil(pencil, member); // 실패 재시도 처리
-		return AppleIAPPurchaseResponse.of(transactionId, newPencil.getTransactionStatus());
+		return AppleIAPPurchaseResponse.of(transactionId, newPencil.getTransactionStatus(), purchaseQuantity,
+			buyer.getTotalBalance());
 	}
 
-
-
 	@Transactional
-	public AppleIAPPurchaseResponse validateAndCommitApplePurchase(AppleIAPPurchaseRequest request, Member member, LocalDateTime now) {
+	public AppleIAPPurchaseResponse validateAndCommitApplePurchase(AppleIAPPurchaseRequest request, Member member,
+		LocalDateTime now) {
 		String transactionId = request.getTransactionId();
 
-		VerificationResult verificationResult = appleService.verifyAppleTransaction(AppleTransactionVerifyCommand.fromRequest(request));
+		VerificationResult verificationResult = appleService.verifyAppleTransaction(
+			AppleTransactionVerifyCommand.fromRequest(request));
 
-		if (VerificationResult.isSuccess(verificationResult)){
-			// 성공 시, DB에 저장z
+		if (VerificationResult.isSuccess(verificationResult)) {
+			// 성공 시, DB에 저장
 			handleSuccessfulApplePurchase(request, member, now);
 
 			// TODO : 디스코드 알림 추가 필요
 			// paymentEventPublisher.publishPaymentEvent(member,request.getPrice(), pencilAmount,TransactionStatus.SUCCESS);
-			return AppleIAPPurchaseResponse.ofSuccess(transactionId);
-		}else{
+			PencilAccount buyer = pencilAccountFinder.findByMember(member);
+			return AppleIAPPurchaseResponse.ofSuccess(transactionId, request.getPencilQuantity(),
+				buyer.getTotalBalance());
+		} else {
 			// 실패 시, DB에 저장
 			handleFailureApplePurchase(request, member, now);
 
@@ -112,12 +117,13 @@ public class PencilCommandService {
 		Long pencilAmount = request.getPencilQuantity();
 
 		String title = createTitle(pencilAmount);
-		purchasedPencilUpdater.save(PurchasedPencil.failedDueToValidation(member, title, pencilAmount, request.getPrice(),
-			request.getPlayTime(), transactionId, request.getAppAccountToken(), now));
+		purchasedPencilUpdater.save(
+			PurchasedPencil.failedDueToValidation(member, title, pencilAmount, request.getPrice(),
+				request.getPlayTime(), transactionId, request.getAppAccountToken(), now));
 	}
 
 	private PurchasedPencil retryPurchasedPencil(PurchasedPencil pencil, Member member) {
-		if ( pencil.getRetryCount() >= 3 ) { // 재시도 횟수가 3회 이상일 경우 실패로 처리
+		if (pencil.getRetryCount() >= 3) { // 재시도 횟수가 3회 이상일 경우 실패로 처리
 			return pencil;
 		}
 
@@ -136,7 +142,6 @@ public class PencilCommandService {
 
 		return pencil;
 	}
-
 
 	private String createTitle(Long pencilAmount) {
 		return String.format("연필 %d개 구매", pencilAmount);
