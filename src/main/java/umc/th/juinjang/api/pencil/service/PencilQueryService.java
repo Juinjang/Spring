@@ -42,4 +42,9 @@ public class PencilQueryService {
 			.map(UsedPencilResponse::from)
 			.toList();
 	}
+
+	public boolean isAcquiredPencilReadStatus(Member member) {
+		// false 인 것이 존재하면 안됨.
+		return !acquiredPencilFinder.existsByMemberAndIsReadFalse(member);
+	}
 }
