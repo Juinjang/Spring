@@ -84,6 +84,7 @@ public class SharedNote extends BaseEntity {
 			.period(dto.period())
 			.isImageShared(dto.isImageShared())
 			.viewCount(0L)
+			.likeCount(0L)
 			.build();
 	}
 
