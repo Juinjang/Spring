@@ -77,6 +77,8 @@ public class Member extends BaseEntity implements UserDetails {
 	@Enumerated(EnumType.STRING)
 	private MemberStatus status;
 
+	private LocalDateTime deletedAt;
+
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 	private List<PencilAccount> pencilAccounts = new ArrayList<>();
 
@@ -215,10 +217,12 @@ public class Member extends BaseEntity implements UserDetails {
 	public void kakaoWithdraw() {
 		this.status = MemberStatus.WITHDRAWN;
 		this.kakaoTargetId = null;
+		this.deletedAt = LocalDateTime.now();
 	}
 
 	public void appleWithdraw() {
 		this.status = MemberStatus.WITHDRAWN;
 		this.appleSub = null;
+		this.deletedAt = LocalDateTime.now();
 	}
 }
