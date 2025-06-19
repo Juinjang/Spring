@@ -31,4 +31,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 	Optional<Member> findByEmailAndKakaoTargetIdAndStatus(String email, Long kakaoTargetId, MemberStatus status);
 
 	Optional<Member> findByEmailAndAppleSubAndStatus(String email, String sub, MemberStatus status);
+
+	Optional<Object> findByMemberIdAndStatus(long id, MemberStatus memberStatus);
 }
