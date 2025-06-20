@@ -145,10 +145,12 @@ public class SharedNoteCommandService {
 
 		// 최초 공유라면 보상 지급
 		boolean isFirstTimeShared = latestSharedNote.isEmpty();
-		Integer rewardPencilCount = isFirstTimeShared ? calculateReward(limjang, request) : 0;
+		int reward = calculateReward(limjang, request);
+		Integer rewardPencilCount = isFirstTimeShared ? reward : 0;
+		Long price = calculatePrice(reward);
 
 		// 공유 저장
-		SharedNote sharedNote = SharedNote.toSharedNote(member, limjang, request);
+		SharedNote sharedNote = SharedNote.toSharedNote(member, limjang, request, price);
 		sharedNoteUpdater.save(sharedNote);
 
 		// 보상 처리
@@ -161,11 +163,15 @@ public class SharedNoteCommandService {
 		if (request.isImageShared() == Boolean.TRUE && !limjang.getImageList().isEmpty()) {
 			validateImagesAreSafe(limjang);
 			return 7;
-		}
-		if (request.isImageShared() == Boolean.TRUE || limjang.getImageList().isEmpty()) {
+		} else
 			return 2;
-		}
-		return 0;
+	}
+
+	private Long calculatePrice(int reward) {
+		if (reward == 7)
+			return 10L;
+		else
+			return 5L;
 	}
 
 	private void validateImagesAreSafe(Limjang limjang) {
