@@ -53,7 +53,7 @@ public class PencilCommandService {
 	public AppleIAPPurchaseResponse processAppleIAPPurchase(AppleIAPPurchaseRequest request, Member member,
 		LocalDateTime now) {
 		String transactionId = request.getTransactionId();
-
+		Long purchaseQuantity = request.getPencilQuantity();
 		Optional<PurchasedPencil> existing = purchasedPencilFinder.findByTransactionIdAndMember(transactionId, member);
 
 		if (existing.isEmpty()) {
@@ -64,23 +64,25 @@ public class PencilCommandService {
 
 		PurchasedPencil pencil = existing.get();
 		TransactionStatus status = pencil.getTransactionStatus();
+		PencilAccount buyer = pencilAccountFinder.findByMember(member);
 
 		if (status == TransactionStatus.SUCCESS) {
 			// 트랜잭션이 정상적으로 성공된 기록이 있는 경우
-			return AppleIAPPurchaseResponse.ofSuccess(transactionId);
+			return AppleIAPPurchaseResponse.ofSuccess(transactionId, purchaseQuantity, buyer.getTotalBalance());
 		}
 
 		PurchasedPencil newPencil = retryPurchasedPencil(pencil, member); // 실패 재시도 처리
-		return AppleIAPPurchaseResponse.of(transactionId, newPencil.getTransactionStatus());
+		return AppleIAPPurchaseResponse.of(transactionId, newPencil.getTransactionStatus(), purchaseQuantity,
+			buyer.getTotalBalance());
 	}
 
-
-
 	@Transactional
-	public AppleIAPPurchaseResponse validateAndCommitApplePurchase(AppleIAPPurchaseRequest request, Member member, LocalDateTime now) {
+	public AppleIAPPurchaseResponse validateAndCommitApplePurchase(AppleIAPPurchaseRequest request, Member member,
+		LocalDateTime now) {
 		String transactionId = request.getTransactionId();
 
-		VerificationResult verificationResult = appleService.verifyAppleTransaction(AppleTransactionVerifyCommand.fromRequest(request));
+		VerificationResult verificationResult = appleService.verifyAppleTransaction(
+			AppleTransactionVerifyCommand.fromRequest(request));
 
 		if (VerificationResult.isSuccess(verificationResult)){
 			// 성공 시, DB에 저장
@@ -115,8 +117,9 @@ public class PencilCommandService {
 		Long pencilAmount = request.getPencilQuantity();
 
 		String title = createTitle(pencilAmount);
-		purchasedPencilUpdater.save(PurchasedPencil.failedDueToValidation(member, title, pencilAmount, request.getPrice(),
-			request.getPlayTime(), transactionId, request.getAppAccountToken(), now));
+		purchasedPencilUpdater.save(
+			PurchasedPencil.failedDueToValidation(member, title, pencilAmount, request.getPrice(),
+				request.getPlayTime(), transactionId, request.getAppAccountToken(), now));
 	}
 
 	@Transactional
@@ -140,7 +143,6 @@ public class PencilCommandService {
 
 		return pencil;
 	}
-
 
 	private String createTitle(Long pencilAmount) {
 		return String.format("연필 %d개 구매", pencilAmount);

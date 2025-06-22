@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import umc.th.juinjang.api.checklist.service.response.ReportWithLimjangResponseDTO;
 import umc.th.juinjang.api.dto.ApiResponse;
 import umc.th.juinjang.api.note.shared.controller.request.ExploreSortType;
 import umc.th.juinjang.api.note.shared.controller.request.NoteType;
@@ -100,11 +102,20 @@ public class SharedNoteController {
 	}
 
 	@Operation(summary = "체크리스트 및 상세 후기 API")
-	@GetMapping("shared-note/{sharedNoteId}/checklist")
+	@GetMapping("/shared-note/{sharedNoteId}/checklist")
 	public ApiResponse<SharedNoteCheckListAndReviewResponse> findChecklistAndReview(
 		@AuthenticationPrincipal Member member,
 		@PathVariable("sharedNoteId") Long sharedNoteId) {
 		return ApiResponse.onSuccess(
 			sharedNoteQueryService.findChecklistAndReview(member, sharedNoteId));
 	}
+
+	@CrossOrigin
+	@Operation(summary = "둘러보기 리포트 조회")
+	@GetMapping("/shared-notes/{sharedNoteId}/report")
+	public ApiResponse<ReportWithLimjangResponseDTO> getReport(
+		@PathVariable(name = "sharedNoteId") Long sharedNoteId) {
+		return ApiResponse.onSuccess(sharedNoteQueryService.getReportBySharedNoteId(sharedNoteId));
+	}
+
 }

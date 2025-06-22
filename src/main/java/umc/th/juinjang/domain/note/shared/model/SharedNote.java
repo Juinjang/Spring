@@ -73,7 +73,7 @@ public class SharedNote extends BaseEntity {
 		return this.likeCount = (likeCount == null ? 1L : likeCount + 1);
 	}
 
-	public static SharedNote toSharedNote(Member member, Limjang limjang, SharedNotePostRequest dto) {
+	public static SharedNote toSharedNote(Member member, Limjang limjang, SharedNotePostRequest dto, Long price) {
 		return SharedNote.builder()
 			.member(member)
 			.limjang(limjang)
@@ -84,6 +84,8 @@ public class SharedNote extends BaseEntity {
 			.period(dto.period())
 			.isImageShared(dto.isImageShared())
 			.viewCount(0L)
+			.likeCount(0L)
+			.price(price)
 			.build();
 	}
 

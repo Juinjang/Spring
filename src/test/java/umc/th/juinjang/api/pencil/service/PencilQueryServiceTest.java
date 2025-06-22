@@ -1,7 +1,6 @@
 package umc.th.juinjang.api.pencil.service;
 
 import static org.assertj.core.api.Assertions.*;
-import static umc.th.juinjang.domain.pencil.purchased.model.PurchasedPencil.*;
 
 import java.time.LocalDateTime;
 import java.util.List;

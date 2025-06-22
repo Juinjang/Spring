@@ -56,11 +56,11 @@ public class Member extends BaseEntity implements UserDetails {
 	private String agreeVersion;
 
 	// apple client id값을 의미
-	@Column(name = "apple_sub", unique = true)
+	@Column(name = "apple_sub")
 	private String appleSub;
 
 	// kakao target id값 의미 (카카오의 유저 식별값. 탈퇴할 때 필요)
-	@Column(name = "target_id", unique = true)
+	@Column(name = "target_id")
 	private Long kakaoTargetId;
 
 	@Lob
@@ -74,7 +74,10 @@ public class Member extends BaseEntity implements UserDetails {
 
 	private String introduction;
 
-	private String status; // TODO : 추후에 ENUM 으로 변경 필요
+	@Enumerated(EnumType.STRING)
+	private MemberStatus status;
+
+	private LocalDateTime deletedAt;
 
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 	private List<PencilAccount> pencilAccounts = new ArrayList<>();
@@ -93,6 +96,49 @@ public class Member extends BaseEntity implements UserDetails {
 
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 	private List<LikedNote> likedNotes = new ArrayList<>();
+
+	public static Member createKakaoMember(String email, Long targetId, String nickname, String agreeVersion) {
+		String introduction = String.format("안녕하세요, %s 입니다.", nickname);
+
+		Member member = Member.builder()
+			.email(email)
+			.provider(MemberProvider.KAKAO)
+			.kakaoTargetId(targetId)
+			.nickname(nickname)
+			.refreshToken("")
+			.refreshTokenExpiresAt(LocalDateTime.now())
+			.agreeVersion(agreeVersion)
+			.introduction(introduction)
+			.status(MemberStatus.ACTIVE)
+			.build();
+
+		PencilAccount createAccount = PencilAccount.createPencilAccount(member);
+		member.addPencilAccount(createAccount);
+
+		return member;
+	}
+
+	// 애플 회원 생성 팩토리 메서드
+	public static Member createAppleMember(String email, String sub, String nickname, String agreeVersion) {
+		String introduction = String.format("안녕하세요, %s 입니다.", nickname);
+
+		Member member = Member.builder()
+			.email(email)
+			.nickname(nickname)
+			.provider(MemberProvider.APPLE)
+			.appleSub(sub)
+			.refreshToken("")
+			.refreshTokenExpiresAt(LocalDateTime.now())
+			.agreeVersion(agreeVersion)
+			.introduction(introduction)
+			.status(MemberStatus.ACTIVE)
+			.build();
+
+		PencilAccount createAccount = PencilAccount.createPencilAccount(member);
+		member.addPencilAccount(createAccount);
+
+		return member;
+	}
 
 	// refreshToken 재발급
 	public void updateRefreshToken(String refreshToken) {
@@ -153,41 +199,6 @@ public class Member extends BaseEntity implements UserDetails {
 		this.agreeVersion = agreeVersion;
 	}
 
-	public static Member createKakaoMember(String email, Long targetId, String nickname, String agreeVersion) {
-		Member member = Member.builder()
-			.email(email)
-			.provider(MemberProvider.KAKAO)
-			.kakaoTargetId(targetId)
-			.nickname(nickname)
-			.refreshToken("")
-			.refreshTokenExpiresAt(LocalDateTime.now())
-			.agreeVersion(agreeVersion)
-			.build();
-
-		PencilAccount createAccount = PencilAccount.createPencilAccount(member);
-		member.addPencilAccount(createAccount);
-
-		return member;
-	}
-
-	// 애플 회원 생성 팩토리 메서드
-	public static Member createAppleMember(String email, String sub, String nickname, String agreeVersion) {
-		Member member = Member.builder()
-			.email(email)
-			.nickname(nickname)
-			.provider(MemberProvider.APPLE)
-			.appleSub(sub)
-			.refreshToken("")
-			.refreshTokenExpiresAt(LocalDateTime.now())
-			.agreeVersion(agreeVersion)
-			.build();
-
-		PencilAccount createAccount = PencilAccount.createPencilAccount(member);
-		member.addPencilAccount(createAccount);
-
-		return member;
-	}
-
 	public PencilAccount getAccount() {
 		if (this.pencilAccounts == null || this.pencilAccounts.isEmpty()) {
 			return null;
@@ -201,5 +212,19 @@ public class Member extends BaseEntity implements UserDetails {
 			this.pencilAccounts = new ArrayList<>();
 		}
 		this.pencilAccounts.add(pencilAccount);
+	}
+
+	public void kakaoWithdraw() {
+		this.status = MemberStatus.WITHDRAWN;
+		this.kakaoTargetId = null;
+		this.nickname = null;
+		this.deletedAt = LocalDateTime.now();
+	}
+
+	public void appleWithdraw() {
+		this.status = MemberStatus.WITHDRAWN;
+		this.appleSub = null;
+		this.nickname = null;
+		this.deletedAt = LocalDateTime.now();
 	}
 }

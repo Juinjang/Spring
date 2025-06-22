@@ -65,6 +65,10 @@ public class PencilQueryService {
 			.toList();
 	}
 
+	public boolean isAcquiredPencilReadStatus(Member member) {
+		// false 인 것이 존재하면 안됨.
+		return !acquiredPencilFinder.existsByMemberAndIsReadFalse(member);
+	}
 	public ConsumptionRequest getConsumptionRequest(String transactionId) {
 		return converterToConsumptionRequest(purchasedPencilFinder.findByTransactionId(transactionId));
 	}

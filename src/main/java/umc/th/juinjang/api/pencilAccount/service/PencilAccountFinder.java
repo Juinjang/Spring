@@ -2,11 +2,8 @@ package umc.th.juinjang.api.pencilAccount.service;
 
 import static umc.th.juinjang.common.code.status.ErrorStatus.*;
 
-import org.springframework.data.jpa.repository.Lock;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Component;
 
-import jakarta.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import umc.th.juinjang.common.exception.handler.PencilAccountHandler;
