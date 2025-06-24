@@ -52,4 +52,4 @@ out/
 /src/test/java/resources/application-*.yml
 
 src/main/resources/keys
-src/main/resources/certs
+#src/main/resources/certs

@@ -48,37 +48,7 @@ jobs:
       # APPLE IN_APP 결제 관련 프로세스 시작
       - name: Create certs and keys directories
         run: |
-          mkdir -p ./src/main/resources/certs
           mkdir -p ./src/main/resources/keys
-
-      - name: Download Apple Root Certificates from Official Site
-        run: |
-          echo "🍎 Downloading Apple Root Certificates from official Apple PKI site..."
-          
-          # Apple 공식 사이트에서 Root Certificate 다운로드
-          curl -f -L -o ./src/main/resources/certs/AppleIncRootCertificate.cer \
-               https://www.apple.com/certificateauthority/AppleIncRootCertificate.cer
-          
-          curl -f -L -o ./src/main/resources/certs/AppleRootCA-G2.cer \
-               https://www.apple.com/certificateauthority/AppleRootCA-G2.cer
-          
-          curl -f -L -o ./src/main/resources/certs/AppleRootCA-G3.cer \
-               https://www.apple.com/certificateauthority/AppleRootCA-G3.cer
-          
-          # 다운로드 결과 확인
-          echo "📋 Certificate download results:"
-          ls -la ./src/main/resources/certs/
-          
-          # 각 certificate 파일이 비어있지 않은지 확인
-          for cert in ./src/main/resources/certs/*.cer; do
-            if [ -s "$cert" ]; then
-              echo "✅ $(basename $cert): $(wc -c < $cert) bytes"
-            else
-              echo "❌ $(basename $cert): Empty file!"
-              exit 1
-            fi
-          done
-        shell: bash
 
       - name: Create IAP .p8 Key
         run: |
