@@ -67,7 +67,6 @@ public class AppleService {
 			true
 		);
 
-
 		String signingKey = loadSigningKey();
 
 		this.appStoreServerAPIClient = new AppStoreServerAPIClient(
@@ -83,8 +82,11 @@ public class AppleService {
 	@Retryable(
 		maxAttempts = 3,
 		backoff = @Backoff(delay = 1000),
-		retryFor = { APIException.class, IOException.class, VerificationException.class })
-	public JWSTransactionDecodedPayload getTransactionInfo(String transactionId) throws APIException, IOException, VerificationException {
+		retryFor = {APIException.class, IOException.class, VerificationException.class})
+	public JWSTransactionDecodedPayload getTransactionInfo(String transactionId) throws
+		APIException,
+		IOException,
+		VerificationException {
 		log.info("Executing GetTransactionInfo for TRANSACTION_ID: {} - Thread: {}",
 			transactionId, Thread.currentThread().getName());
 
@@ -105,17 +107,18 @@ public class AppleService {
 		} catch (IOException | APIException e) {
 			log.warn("❌ Apple transaction verification error. transactionId: {}", command.getTransactionId(), e);
 			return VerificationResult.ofServerError();
-		}catch (VerificationException e) {
+		} catch (VerificationException e) {
 			log.warn("❌ Apple transaction verification error. transactionId: {}", command.getTransactionId(), e);
 			return VerificationResult.ofVerificationError();
 		}
 	}
 
-
-	private boolean validateTransaction(JWSTransactionDecodedPayload decodedPayload, AppleTransactionVerifyCommand command) {
+	private boolean validateTransaction(JWSTransactionDecodedPayload decodedPayload,
+		AppleTransactionVerifyCommand command) {
 		// 트랜잭션 아이디가 정상적으로 일치하는 지 여부
 		if (!decodedPayload.getTransactionId().equals(command.getTransactionId())) {
-			log.warn("트랜잭션 아이디 불일치. 애플 PAYLOAD : {}, REQUEST 요청 : {}",decodedPayload.getTransactionId(), command.getTransactionId());
+			log.warn("트랜잭션 아이디 불일치. 애플 PAYLOAD : {}, REQUEST 요청 : {}", decodedPayload.getTransactionId(),
+				command.getTransactionId());
 			return false;
 		}
 
@@ -196,9 +199,6 @@ public class AppleService {
 		}
 	}
 
-
-
-
 	private String loadSigningKey() {
 		try {
 			log.info("Loading signing key from: {}", privateKeyPath);
@@ -209,11 +209,6 @@ public class AppleService {
 			try (InputStream inputStream = resource.getInputStream()) {
 				privateKeyContent = new String(inputStream.readAllBytes());
 			}
-
-			privateKeyContent = privateKeyContent
-				.replace("-----BEGIN PRIVATE KEY-----", "")
-				.replace("-----END PRIVATE KEY-----", "")
-				.replaceAll("\\s", "");
 
 			log.info("Signing key loaded successfully");
 			return privateKeyContent;
