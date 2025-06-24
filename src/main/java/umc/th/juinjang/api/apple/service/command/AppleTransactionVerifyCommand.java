@@ -9,22 +9,23 @@ import umc.th.juinjang.api.pencil.controller.request.AppleIAPPurchaseRequest;
 @Getter
 public class AppleTransactionVerifyCommand {
 
-	private String transactionId;
-	private String productId;
-	private UUID appAccountToken;
-	private String bundleId;
+	private final String transactionId;
+	private final String productId;
+	private final UUID appAccountToken;
 
 	@Builder
-	private AppleTransactionVerifyCommand(String transactionId, String productId, UUID appAccountToken, String bundleId) {
+	private AppleTransactionVerifyCommand(String transactionId, String productId, UUID appAccountToken) {
 		this.transactionId = transactionId;
 		this.productId = productId;
 		this.appAccountToken = appAccountToken;
-		this.bundleId = bundleId;
 	}
 
-	public static AppleTransactionVerifyCommand fromRequest(AppleIAPPurchaseRequest request){
-		return AppleTransactionVerifyCommand.builder().transactionId(request.getTransactionId())
-			.productId(request.getProductId()).appAccountToken(request.getAppAccountToken()).bundleId(request.getProductId()).build();
+	public static AppleTransactionVerifyCommand fromRequest(AppleIAPPurchaseRequest request) {
+		return AppleTransactionVerifyCommand.builder()
+			.transactionId(request.getTransactionId())
+			.productId(request.getProductId())
+			.appAccountToken(request.getAppAccountToken())
+			.build();
 	}
 
 }

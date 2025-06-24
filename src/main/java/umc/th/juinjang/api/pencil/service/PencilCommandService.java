@@ -67,7 +67,7 @@ public class PencilCommandService {
 			return AppleIAPPurchaseResponse.ofSuccess(transactionId, purchaseQuantity, buyer.getTotalBalance());
 		}
 
-		PurchasedPencil newPencil = retryPurchasedPencil(pencil, member); // 실패 재시도 처리
+		PurchasedPencil newPencil = retryPurchasedPencil(request, pencil, member); // 실패 재시도 처리
 		return AppleIAPPurchaseResponse.of(transactionId, newPencil.getTransactionStatus(), purchaseQuantity,
 			buyer.getTotalBalance());
 	}
@@ -122,14 +122,14 @@ public class PencilCommandService {
 				request.getPlayTime(), transactionId, request.getAppAccountToken(), now));
 	}
 
-	private PurchasedPencil retryPurchasedPencil(PurchasedPencil pencil, Member member) {
+	private PurchasedPencil retryPurchasedPencil(AppleIAPPurchaseRequest request, PurchasedPencil pencil,
+		Member member) {
 		if (pencil.getRetryCount() >= 3) { // 재시도 횟수가 3회 이상일 경우 실패로 처리
 			return pencil;
 		}
 
-		AppleIAPPurchaseRequest retryRequest = AppleIAPPurchaseRequest.ofRetry(pencil);
 		VerificationResult verificationResult = appleService.verifyAppleTransaction(
-			AppleTransactionVerifyCommand.fromRequest(retryRequest)
+			AppleTransactionVerifyCommand.fromRequest(request)
 		);
 
 		if (VerificationResult.isSuccess(verificationResult)) {

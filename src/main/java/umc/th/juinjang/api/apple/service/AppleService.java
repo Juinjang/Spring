@@ -54,6 +54,14 @@ public class AppleService {
 
 	@PostConstruct
 	public void init() {
+
+		log.info("Apple IAP 초기화 시작");
+		log.info("Bundle ID: {}", bundleId);
+		log.info("Key ID: {}", keyId);
+		log.info("Issuer ID: {}", issuerId);
+		log.info("Environment: {}", environmentString);
+		log.info("Private Key Path: {}", privateKeyPath);
+
 		Set<InputStream> rootCertificates = loadRootCertificates();
 
 		Environment environment = Environment.fromValue(environmentString);
@@ -71,8 +79,8 @@ public class AppleService {
 
 		this.appStoreServerAPIClient = new AppStoreServerAPIClient(
 			signingKey,
-			issuerId,
 			keyId,
+			issuerId,
 			bundleId,
 			environment
 		);
