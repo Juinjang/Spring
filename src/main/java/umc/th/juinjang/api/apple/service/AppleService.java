@@ -67,6 +67,14 @@ public class AppleService {
 
 	@PostConstruct
 	public void init() {
+
+		log.info("Apple IAP 초기화 시작");
+		log.info("Bundle ID: {}", bundleId);
+		log.info("Key ID: {}", keyId);
+		log.info("Issuer ID: {}", issuerId);
+		log.info("Environment: {}", environmentString);
+		log.info("Private Key Path: {}", privateKeyPath);
+
 		Set<InputStream> rootCertificates = loadRootCertificates();
 
 		Environment environment = Environment.fromValue(environmentString);
@@ -80,13 +88,12 @@ public class AppleService {
 			true
 		);
 
-
 		String signingKey = loadSigningKey();
 
 		this.appStoreServerAPIClient = new AppStoreServerAPIClient(
 			signingKey,
-			issuerId,
 			keyId,
+			issuerId,
 			bundleId,
 			environment
 		);
@@ -96,8 +103,11 @@ public class AppleService {
 	@Retryable(
 		maxAttempts = 3,
 		backoff = @Backoff(delay = 1000),
-		retryFor = { APIException.class, IOException.class, VerificationException.class })
-	public JWSTransactionDecodedPayload getTransactionInfo(String transactionId) throws APIException, IOException, VerificationException {
+		retryFor = {APIException.class, IOException.class, VerificationException.class})
+	public JWSTransactionDecodedPayload getTransactionInfo(String transactionId) throws
+		APIException,
+		IOException,
+		VerificationException {
 		log.info("Executing GetTransactionInfo for TRANSACTION_ID: {} - Thread: {}",
 			transactionId, Thread.currentThread().getName());
 
@@ -118,42 +128,18 @@ public class AppleService {
 		} catch (IOException | APIException e) {
 			log.warn("❌ Apple transaction verification error. transactionId: {}", command.getTransactionId(), e);
 			return VerificationResult.ofServerError();
-		}catch (VerificationException e) {
+		} catch (VerificationException e) {
 			log.warn("❌ Apple transaction verification error. transactionId: {}", command.getTransactionId(), e);
 			return VerificationResult.ofVerificationError();
 		}
 	}
 
-	public void handleNotification(ResponseBodyV2 responseBody) {
-		try{
-			ResponseBodyV2DecodedPayload notificationPayload = signedDataVerifier.verifyAndDecodeNotification(responseBody.getSignedPayload());
-			NotificationTypeV2 notificationType = notificationPayload.getNotificationType();
-
-			if (notificationType == NotificationTypeV2.CONSUMPTION_REQUEST) {
-				log.info("Apple IAP Consumption Request Notification Received.");
-				Data data = notificationPayload.getData();
-				JWSTransactionDecodedPayload transactionPayload = signedDataVerifier.verifyAndDecodeTransaction(data.getSignedTransactionInfo());
-				String transactionId = transactionPayload.getTransactionId();
-				appStoreServerAPIClient.sendConsumptionData(transactionId, pencilQueryService.getConsumptionRequest(transactionId));
-			}else if (notificationType == NotificationTypeV2.REFUND) {
-				log.info("Apple IAP ReFund Notification Received.");
-				Data data = notificationPayload.getData();
-				JWSTransactionDecodedPayload transactionPayload = signedDataVerifier.verifyAndDecodeTransaction(data.getSignedTransactionInfo());
-				String transactionId = transactionPayload.getOriginalTransactionId();
-				pencilCommandService.handleRefundPurchase(transactionId);
-			}
-
-		}catch (VerificationException | APIException | IOException e){
-			throw new RuntimeException("Apple Notification Verification Error");
-		}
-
-	}
-
-
-	private boolean validateTransaction(JWSTransactionDecodedPayload decodedPayload, AppleTransactionVerifyCommand command) {
+	private boolean validateTransaction(JWSTransactionDecodedPayload decodedPayload,
+		AppleTransactionVerifyCommand command) {
 		// 트랜잭션 아이디가 정상적으로 일치하는 지 여부
 		if (!decodedPayload.getTransactionId().equals(command.getTransactionId())) {
-			log.warn("트랜잭션 아이디 불일치. 애플 PAYLOAD : {}, REQUEST 요청 : {}",decodedPayload.getTransactionId(), command.getTransactionId());
+			log.warn("트랜잭션 아이디 불일치. 애플 PAYLOAD : {}, REQUEST 요청 : {}", decodedPayload.getTransactionId(),
+				command.getTransactionId());
 			return false;
 		}
 
@@ -234,9 +220,6 @@ public class AppleService {
 		}
 	}
 
-
-
-
 	private String loadSigningKey() {
 		try {
 			log.info("Loading signing key from: {}", privateKeyPath);
@@ -248,11 +231,6 @@ public class AppleService {
 				privateKeyContent = new String(inputStream.readAllBytes());
 			}
 
-			privateKeyContent = privateKeyContent
-				.replace("-----BEGIN PRIVATE KEY-----", "")
-				.replace("-----END PRIVATE KEY-----", "")
-				.replaceAll("\\s", "");
-
 			log.info("Signing key loaded successfully");
 			return privateKeyContent;
 
@@ -260,5 +238,29 @@ public class AppleService {
 			log.error("Failed to load signing key: {}", e.getMessage(), e);
 			throw new RuntimeException("Failed to load signing key", e);
 		}
+	}
+public void handleNotification(ResponseBodyV2 responseBody) {
+		try{
+			ResponseBodyV2DecodedPayload notificationPayload = signedDataVerifier.verifyAndDecodeNotification(responseBody.getSignedPayload());
+			NotificationTypeV2 notificationType = notificationPayload.getNotificationType();
+
+			if (notificationType == NotificationTypeV2.CONSUMPTION_REQUEST) {
+				log.info("Apple IAP Consumption Request Notification Received.");
+				Data data = notificationPayload.getData();
+				JWSTransactionDecodedPayload transactionPayload = signedDataVerifier.verifyAndDecodeTransaction(data.getSignedTransactionInfo());
+				String transactionId = transactionPayload.getTransactionId();
+				appStoreServerAPIClient.sendConsumptionData(transactionId, pencilQueryService.getConsumptionRequest(transactionId));
+			}else if (notificationType == NotificationTypeV2.REFUND) {
+				log.info("Apple IAP ReFund Notification Received.");
+				Data data = notificationPayload.getData();
+				JWSTransactionDecodedPayload transactionPayload = signedDataVerifier.verifyAndDecodeTransaction(data.getSignedTransactionInfo());
+				String transactionId = transactionPayload.getOriginalTransactionId();
+				pencilCommandService.handleRefundPurchase(transactionId);
+			}
+
+		}catch (VerificationException | APIException | IOException e){
+			throw new RuntimeException("Apple Notification Verification Error");
+		}
+
 	}
 }
