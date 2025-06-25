@@ -15,8 +15,6 @@ import umc.th.juinjang.api.pencil.controller.request.AppleIAPPurchaseRequest;
 import umc.th.juinjang.api.pencil.service.response.AppleIAPPurchaseResponse;
 import umc.th.juinjang.api.pencil.service.response.VerificationResult;
 import umc.th.juinjang.api.pencilAccount.service.PencilAccountFinder;
-import umc.th.juinjang.common.code.status.ErrorStatus;
-import umc.th.juinjang.common.exception.handler.SharedNoteHandler;
 import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.pencil.acquired.model.AcquiredPencil;
 import umc.th.juinjang.domain.pencil.purchased.model.PurchasedPencil;
@@ -84,17 +82,21 @@ public class PencilCommandService {
 		VerificationResult verificationResult = appleService.verifyAppleTransaction(
 			AppleTransactionVerifyCommand.fromRequest(request));
 
-		if (VerificationResult.isSuccess(verificationResult)){
+		if (VerificationResult.isSuccess(verificationResult)) {
 			// 성공 시, DB에 저장
 			handleSuccessfulApplePurchase(request, member, now);
 
-			paymentEventPublisher.publishPaymentEvent(member,request.getPrice(), request.getPencilQuantity(),TransactionStatus.SUCCESS);
-			return AppleIAPPurchaseResponse.ofSuccess(transactionId);
-		}else{
+			paymentEventPublisher.publishPaymentEvent(member, request.getPrice(), request.getPencilQuantity(),
+				TransactionStatus.SUCCESS);
+			PencilAccount buyer = pencilAccountFinder.findByMember(member);
+			return AppleIAPPurchaseResponse.ofSuccess(transactionId, request.getPencilQuantity(),
+				buyer.getTotalBalance());
+		} else {
 			// 실패 시, DB에 저장
 			handleFailureApplePurchase(request, member, now);
 
-			paymentEventPublisher.publishPaymentEvent(member,request.getPrice(), request.getPencilQuantity(),TransactionStatus.VALIDATION_FAILED);
+			paymentEventPublisher.publishPaymentEvent(member, request.getPrice(), request.getPencilQuantity(),
+				TransactionStatus.VALIDATION_FAILED);
 			return AppleIAPPurchaseResponse.ofValidationFailure(transactionId);
 		}
 	}
@@ -122,7 +124,8 @@ public class PencilCommandService {
 				request.getPlayTime(), transactionId, request.getAppAccountToken(), now));
 	}
 
-	private PurchasedPencil retryPurchasedPencil(AppleIAPPurchaseRequest request, PurchasedPencil pencil,
+	@Transactional
+	public PurchasedPencil retryPurchasedPencil(AppleIAPPurchaseRequest request, PurchasedPencil pencil,
 		Member member) {
 		if (pencil.getRetryCount() >= 3) { // 재시도 횟수가 3회 이상일 경우 실패로 처리
 			return pencil;
@@ -150,7 +153,8 @@ public class PencilCommandService {
 	@Transactional
 	public void handleRefundPurchase(String transactionId) {
 		PurchasedPencil pencil = purchasedPencilFinder.findByTransactionId(transactionId)
-			.orElseThrow(() -> new EntityNotFoundException("PurchasedPencil not found with transactionId: " + transactionId));
+			.orElseThrow(
+				() -> new EntityNotFoundException("PurchasedPencil not found with transactionId: " + transactionId));
 
 		log.info("Refund processed for transactionId: {}", transactionId);
 
@@ -172,9 +176,9 @@ public class PencilCommandService {
 		buyerAccount.increaseTotalRefundAmount(price);
 		// 남은 수량이 0이 아닐 경우 로그 기록
 		if (remaining - acquiredToUse > 0) {
-			log.warn("Not enough balance to fully refund {} pencils. Refunded only {}.", pencilQuantity, (purchasedToUse + acquiredToUse));
+			log.warn("Not enough balance to fully refund {} pencils. Refunded only {}.", pencilQuantity,
+				(purchasedToUse + acquiredToUse));
 		}
 	}
-
 
 }

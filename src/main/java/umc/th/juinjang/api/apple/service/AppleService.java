@@ -14,10 +14,10 @@ import org.springframework.stereotype.Service;
 
 import com.apple.itunes.storekit.client.APIException;
 import com.apple.itunes.storekit.client.AppStoreServerAPIClient;
+import com.apple.itunes.storekit.model.ConsumptionRequest;
 import com.apple.itunes.storekit.model.Data;
 import com.apple.itunes.storekit.model.Environment;
 import com.apple.itunes.storekit.model.JWSTransactionDecodedPayload;
-import com.apple.itunes.storekit.model.NotificationTypeV2;
 import com.apple.itunes.storekit.model.ResponseBodyV2;
 import com.apple.itunes.storekit.model.ResponseBodyV2DecodedPayload;
 import com.apple.itunes.storekit.model.TransactionInfoResponse;
@@ -28,9 +28,10 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import umc.th.juinjang.api.apple.service.command.AppleTransactionVerifyCommand;
-import umc.th.juinjang.api.pencil.service.PencilCommandService;
 import umc.th.juinjang.api.pencil.service.PencilQueryService;
 import umc.th.juinjang.api.pencil.service.response.VerificationResult;
+import umc.th.juinjang.common.code.status.ErrorStatus;
+import umc.th.juinjang.common.exception.handler.AppleHandler;
 
 @Slf4j
 @Service
@@ -38,7 +39,6 @@ import umc.th.juinjang.api.pencil.service.response.VerificationResult;
 @RequiredArgsConstructor
 public class AppleService {
 
-	private final PencilCommandService pencilCommandService;
 	@Value("${apple.iap.bundle-id}")
 	private String bundleId;
 
@@ -63,7 +63,6 @@ public class AppleService {
 	private SignedDataVerifier signedDataVerifier;
 	private AppStoreServerAPIClient appStoreServerAPIClient;
 	private PencilQueryService pencilQueryService;
-
 
 	@PostConstruct
 	public void init() {
@@ -131,6 +130,35 @@ public class AppleService {
 		} catch (VerificationException e) {
 			log.warn("❌ Apple transaction verification error. transactionId: {}", command.getTransactionId(), e);
 			return VerificationResult.ofVerificationError();
+		}
+	}
+
+	public void sendConsumptionData(String transactionId, ConsumptionRequest request) {
+		try {
+			appStoreServerAPIClient.sendConsumptionData(transactionId, request);
+		} catch (IOException | APIException e) {
+			throw new AppleHandler(ErrorStatus.APPLE_VERIFICATION_ERROR);
+		}
+
+	}
+
+	public ResponseBodyV2DecodedPayload getNotificationPayload(ResponseBodyV2 responseBody) {
+		try {
+			return signedDataVerifier.verifyAndDecodeNotification(
+				responseBody.getSignedPayload());
+		} catch (VerificationException e) {
+			throw new AppleHandler(ErrorStatus.APPLE_VERIFICATION_ERROR);
+		}
+	}
+
+	public JWSTransactionDecodedPayload getSignedTransactionPayload(
+		Data data
+	) {
+		try {
+			return signedDataVerifier.verifyAndDecodeTransaction(
+				data.getSignedTransactionInfo());
+		} catch (VerificationException e) {
+			throw new AppleHandler(ErrorStatus.APPLE_VERIFICATION_ERROR);
 		}
 	}
 
@@ -239,28 +267,5 @@ public class AppleService {
 			throw new RuntimeException("Failed to load signing key", e);
 		}
 	}
-public void handleNotification(ResponseBodyV2 responseBody) {
-		try{
-			ResponseBodyV2DecodedPayload notificationPayload = signedDataVerifier.verifyAndDecodeNotification(responseBody.getSignedPayload());
-			NotificationTypeV2 notificationType = notificationPayload.getNotificationType();
 
-			if (notificationType == NotificationTypeV2.CONSUMPTION_REQUEST) {
-				log.info("Apple IAP Consumption Request Notification Received.");
-				Data data = notificationPayload.getData();
-				JWSTransactionDecodedPayload transactionPayload = signedDataVerifier.verifyAndDecodeTransaction(data.getSignedTransactionInfo());
-				String transactionId = transactionPayload.getTransactionId();
-				appStoreServerAPIClient.sendConsumptionData(transactionId, pencilQueryService.getConsumptionRequest(transactionId));
-			}else if (notificationType == NotificationTypeV2.REFUND) {
-				log.info("Apple IAP ReFund Notification Received.");
-				Data data = notificationPayload.getData();
-				JWSTransactionDecodedPayload transactionPayload = signedDataVerifier.verifyAndDecodeTransaction(data.getSignedTransactionInfo());
-				String transactionId = transactionPayload.getOriginalTransactionId();
-				pencilCommandService.handleRefundPurchase(transactionId);
-			}
-
-		}catch (VerificationException | APIException | IOException e){
-			throw new RuntimeException("Apple Notification Verification Error");
-		}
-
-	}
 }

@@ -16,7 +16,6 @@ import com.apple.itunes.storekit.model.LifetimeDollarsRefunded;
 import com.apple.itunes.storekit.model.Platform;
 import com.apple.itunes.storekit.model.PlayTime;
 import com.apple.itunes.storekit.model.RefundPreference;
-import com.apple.itunes.storekit.model.UserStatus;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,12 +35,11 @@ import umc.th.juinjang.domain.pencilaccount.model.PencilAccount;
 @RequiredArgsConstructor
 public class PencilQueryService {
 
+	private static final double DOLLAR_EXCHANGE_RATE = 1374.0;
 	private final AcquiredPencilFinder acquiredPencilFinder;
 	private final PurchasedPencilFinder purchasedPencilFinder;
 	private final UsedPencilFinder usedPencilFinder;
 	private final PencilAccountFinder pencilAccountFinder;
-
-	private static final double DOLLAR_EXCHANGE_RATE = 1374.0;
 
 	public List<AcquiredPencilResponse> getAcquiredPencils(Member member) {
 		List<AcquiredPencil> acquiredPencils = acquiredPencilFinder.findAllByMemberOrderByCreatedAtDesc(member);
@@ -69,12 +67,13 @@ public class PencilQueryService {
 		// false 인 것이 존재하면 안됨.
 		return !acquiredPencilFinder.existsByMemberAndIsReadFalse(member);
 	}
+
 	public ConsumptionRequest getConsumptionRequest(String transactionId) {
 		return converterToConsumptionRequest(purchasedPencilFinder.findByTransactionId(transactionId));
 	}
 
 	private ConsumptionRequest converterToConsumptionRequest(Optional<PurchasedPencil> purchasedPencil) {
-		if( purchasedPencil.isPresent()){
+		if (purchasedPencil.isPresent()) {
 			PurchasedPencil purchase = purchasedPencil.get();
 			Member member = purchase.getMember();
 
@@ -83,7 +82,8 @@ public class PencilQueryService {
 			request.setPlayTime(calculatePlayTime(purchase.getPlayTime()));
 			request.setAppAccountToken(purchase.getAppAccountToken());
 			request.setDeliveryStatus(DeliveryStatus.fromValue(purchase.getDeliveryStatus().getAppleCode()));
-			request.setConsumptionStatus(converterToConsumptionStatus(purchase.getPurchaseQuantity(),purchase.getRemainQuantity()));
+			request.setConsumptionStatus(
+				converterToConsumptionStatus(purchase.getPurchaseQuantity(), purchase.getRemainQuantity()));
 			request.setAccountTenure(calculateAccountTenure(member));
 			request.setLifetimeDollarsPurchased(calculateLifeDollarPurchased(member));
 			request.setLifetimeDollarsRefunded(calculateLifeDollarRefunded(member));
@@ -98,13 +98,12 @@ public class PencilQueryService {
 		return null;
 	}
 
-
 	private LifetimeDollarsPurchased calculateLifeDollarPurchased(Member member) {
 		try {
 			PencilAccount buyerAccount = pencilAccountFinder.findByMember(member);
-			long totalPrice = buyerAccount.getTotalPurchaseAmount() - buyerAccount.getTotalRefundAmount() ;
+			long totalPrice = buyerAccount.getTotalPurchaseAmount() - buyerAccount.getTotalRefundAmount();
 
-			if ( totalPrice == 0L) {
+			if (totalPrice == 0L) {
 				return LifetimeDollarsPurchased.ZERO_DOLLARS;
 			}
 
@@ -125,17 +124,17 @@ public class PencilQueryService {
 			} else {
 				return LifetimeDollarsPurchased.TWO_THOUSAND_DOLLARS_OR_GREATER;
 			}
-		}catch (PencilAccountHandler exception){
+		} catch (PencilAccountHandler exception) {
 			return LifetimeDollarsPurchased.UNDECLARED;
 		}
 	}
 
 	private LifetimeDollarsRefunded calculateLifeDollarRefunded(Member member) {
-		try{
+		try {
 			PencilAccount buyerAccount = pencilAccountFinder.findByMember(member);
-			long totalRefundWon = buyerAccount.getTotalRefundAmount() ;
+			long totalRefundWon = buyerAccount.getTotalRefundAmount();
 
-			if ( totalRefundWon == 0L ) {
+			if (totalRefundWon == 0L) {
 				return LifetimeDollarsRefunded.ZERO_DOLLARS;
 			}
 
@@ -156,7 +155,7 @@ public class PencilQueryService {
 			} else {
 				return LifetimeDollarsRefunded.TWO_THOUSAND_DOLLARS_OR_GREATER;
 			}
-		}catch (PencilAccountHandler exception){
+		} catch (PencilAccountHandler exception) {
 			return LifetimeDollarsRefunded.UNDECLARED;
 		}
 
@@ -165,7 +164,6 @@ public class PencilQueryService {
 	private boolean getSampleContentProvided(Member member) {
 		return acquiredPencilFinder.existsByMember(member);
 	}
-
 
 	private ConsumptionStatus converterToConsumptionStatus(Long purchaseQuantity, Long remainQuantity) {
 		if (remainQuantity == null || purchaseQuantity == null) {
@@ -182,7 +180,6 @@ public class PencilQueryService {
 
 		return ConsumptionStatus.UNDECLARED;
 	}
-
 
 	private AccountTenure calculateAccountTenure(Member member) {
 		// 회원 가입일로부터 현재까지의 기간을 계산
