@@ -26,4 +26,8 @@ public class AcquiredPencilFinder {
 	public AcquiredPencil findById(Long id) {
 		return acquiredPencilRepository.findById(id).orElse(null);
 	}
+
+	public boolean existsByMember(Member member) {
+		return acquiredPencilRepository.existsByMember(member);
+	}
 }

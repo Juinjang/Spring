@@ -22,6 +22,9 @@ public class DiscordAlertProvider {
 	@Value("${discord.report-shared-note}")
 	private String reportSharedNoteWebhookUrl;
 
+	@Value("${discord.execute-payment}")
+	private String executePaymentWebhookUrl;
+
 	public DiscordAlertProvider(WebClient.Builder builder) {
 		this.webClient = builder.build();
 	}
@@ -49,6 +52,14 @@ public class DiscordAlertProvider {
 			sendWebClient(reportSharedNoteWebhookUrl, content);
 		} catch (FeignException e) {
 			log.info(StatusMessage.DISCORD_ALERT_ERROR.getMessage() + " " + e.getMessage());
+		}
+	}
+
+	public void sendPaymentAlertToDiscord(String content) {
+		try {
+			sendWebClient(executePaymentWebhookUrl, content);
+		} catch (FeignException e) {
+			log.info("{} {}", StatusMessage.DISCORD_ALERT_ERROR.getMessage(), e.getMessage());
 		}
 	}
 }

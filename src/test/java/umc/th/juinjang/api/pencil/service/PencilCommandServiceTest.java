@@ -138,7 +138,7 @@ public class PencilCommandServiceTest extends IntegrationTestSupport {
 
 	private AppleIAPPurchaseRequest createValidRequest() {
 		return AppleIAPPurchaseRequest
-			.of(transactionId, appAccountToken, 20L, 3000L, productId,10L);
+			.of(transactionId, appAccountToken, 20L, 3000L, productId,10);
 	}
 }
 

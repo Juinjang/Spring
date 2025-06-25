@@ -84,4 +84,8 @@ public class PencilAccount extends BaseEntity {
 		this.acquiredBalance -= price;
 		this.totalBalance = this.purchasedBalance + this.acquiredBalance;
 	}
+
+	public void increaseTotalRefundAmount(long price) {
+		this.totalRefundAmount += price;
+	}
 }

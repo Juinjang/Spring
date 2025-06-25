@@ -12,6 +12,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.apple.itunes.storekit.model.ConsumptionRequest;
+import com.apple.itunes.storekit.model.ConsumptionStatus;
+import com.apple.itunes.storekit.model.LifetimeDollarsPurchased;
+import com.apple.itunes.storekit.model.LifetimeDollarsRefunded;
+import com.apple.itunes.storekit.model.Platform;
+import com.apple.itunes.storekit.model.PlayTime;
+
 import lombok.extern.slf4j.Slf4j;
 import umc.th.juinjang.api.IntegrationTestSupport;
 import umc.th.juinjang.api.pencil.service.response.AcquiredPencilResponse;
@@ -155,16 +162,11 @@ class PencilQueryServiceTest extends IntegrationTestSupport {
 		UUID uuid5 = UUID.randomUUID();
 
 		// 명확한 순서로 데이터 생성 (시간 역순으로)
-		PurchasedPencil pencil1 = PurchasedPencil.successOf(member, "10개 연필팩", 10L, 1000L, 0L, "transaction1", uuid1,
-			time1);
-		PurchasedPencil pencil2 = PurchasedPencil.successOf(member, "20개 연필팩", 20L, 2000L, 0L, "transaction2", uuid2,
-			time2);
-		PurchasedPencil pencil3 = PurchasedPencil.successOf(member, "30개 연필팩", 30L, 3000L, 0L, "transaction3", uuid3,
-			time3);
-		PurchasedPencil pencil4 = PurchasedPencil.successOf(member, "15개 연필팩", 15L, 1500L, 0L, "transaction4", uuid4,
-			time4);
-		PurchasedPencil pencil5 = PurchasedPencil.successOf(member, "25개 연필팩", 25L, 2500L, 0L, "transaction5", uuid5,
-			time5);
+		PurchasedPencil pencil1 = PurchasedPencil.successOf(member, "10개 연필팩", 10L, 1000L, 0,"transaction1", uuid1, time1);
+		PurchasedPencil pencil2 = PurchasedPencil.successOf(member, "20개 연필팩", 20L, 2000L, 0,"transaction2", uuid2, time2);
+		PurchasedPencil pencil3 = PurchasedPencil.successOf(member, "30개 연필팩", 30L, 3000L,0 ,"transaction3", uuid3, time3);
+		PurchasedPencil pencil4 = PurchasedPencil.successOf(member, "15개 연필팩", 15L, 1500L, 0,"transaction4", uuid4, time4);
+		PurchasedPencil pencil5 = PurchasedPencil.successOf(member, "25개 연필팩", 25L, 2500L, 0,"transaction5", uuid5, time5);
 
 		purchasedPencilRepository.saveAll(List.of(pencil1, pencil2, pencil3, pencil4, pencil5));
 
@@ -197,8 +199,7 @@ class PencilQueryServiceTest extends IntegrationTestSupport {
 		LocalDateTime time = LocalDateTime.now();
 		UUID uuid = UUID.randomUUID();
 
-		PurchasedPencil pencil = PurchasedPencil.failedDueToServerError(member, "10개 연필팩", 10L, 1000L, 10L,
-			"transaction1", uuid, time);
+		PurchasedPencil pencil = PurchasedPencil.failedDueToServerError(member, "10개 연필팩", 10L, 1000L, 10,"transaction1", uuid, time);
 
 		purchasedPencilRepository.saveAll(List.of(pencil));
 
@@ -244,41 +245,52 @@ class PencilQueryServiceTest extends IntegrationTestSupport {
 			);
 	}
 
-	@DisplayName("얻은 연필 목록 중 읽지 않은 연필이 없으면 전체 읽음으로 판단된다.")
+	@DisplayName("ConsumptionRequest가 PurchasedPencil 데이터를 기반으로 올바르게 생성된다.")
 	@Test
-	void returnTrueIfAllAcquiredPencilsAreRead() {
+	void getConsumptionRequestFromPurchasedPencil() {
 		// given
 		Member member = MemberFixture.createDefaultMember();
 		memberRepository.save(member);
 
-		AcquiredPencil pencil1 = AcquiredPencil.create(member, "연필 1", 1L, 10L, true, AcquiredType.NOTE);
-		AcquiredPencil pencil2 = AcquiredPencil.create(member, "연필 2", 2L, 20L, true, AcquiredType.SOLD);
-		acquiredPencilRepository.saveAll(List.of(pencil1, pencil2));
+		LocalDateTime now = LocalDateTime.now();
+		String transactionId = "test-transaction-id";
+		UUID appAccountToken = UUID.randomUUID();
+
+		PurchasedPencil pencil = PurchasedPencil.successOf(
+			member,
+			"테스트 연필팩",
+			20L,
+			2000L,
+			10,
+			transactionId,
+			appAccountToken,
+			now
+		);
+
+		purchasedPencilRepository.save(pencil);
+
+		// AcquiredPencil 데이터를 하나라도 만들어줘야 sampleContentProvided == true
+		acquiredPencilRepository.save(
+			AcquiredPencil.create(member, "노트 작성", 1L, 10L, false, AcquiredType.NOTE)
+		);
 
 		// when
-		boolean isTotalRead = pencilService.isAcquiredPencilReadStatus(member);
+		ConsumptionRequest request = pencilService.getConsumptionRequest(transactionId);
 
 		// then
-		assertThat(isTotalRead).isTrue();
+		assertThat(request).isNotNull();
+		assertThat(request.getAppAccountToken()).isEqualTo(appAccountToken);
+		assertThat(request.getDeliveryStatus().getValue()).isEqualTo(pencil.getDeliveryStatus().getAppleCode());
+		assertThat(request.getPlayTime()).isEqualTo(PlayTime.FIVE_TO_SIXTY_MINUTES);
+		assertThat(request.getLifetimeDollarsPurchased()).isEqualTo(LifetimeDollarsPurchased.ONE_CENT_TO_FORTY_NINE_DOLLARS_AND_NINETY_NINE_CENTS);
+		assertThat(request.getLifetimeDollarsRefunded()).isEqualTo(LifetimeDollarsRefunded.ZERO_DOLLARS);
+		assertThat(request.getCustomerConsented()).isTrue();
+		assertThat(request.getSampleContentProvided()).isTrue();
+		assertThat(request.getPlatform()).isEqualTo(Platform.APPLE);
+
+		assertThat(request.getConsumptionStatus()).isEqualTo(ConsumptionStatus.NOT_CONSUMED);
 	}
 
-	@DisplayName("얻은 연필 목록 중 읽지 않은 연필이 하나라도 있으면 전체 읽음으로 판단되지 않는다.")
-	@Test
-	void returnFalseIfAnyAcquiredPencilIsUnread() {
-		// given
-		Member member = MemberFixture.createDefaultMember();
-		memberRepository.save(member);
-
-		AcquiredPencil pencil1 = AcquiredPencil.create(member, "연필 1", 1L, 10L, true, AcquiredType.NOTE);
-		AcquiredPencil pencil2 = AcquiredPencil.create(member, "연필 2", 2L, 20L, false, AcquiredType.SOLD);
-		acquiredPencilRepository.saveAll(List.of(pencil1, pencil2));
-
-		// when
-		boolean isTotalRead = pencilService.isAcquiredPencilReadStatus(member);
-
-		// then
-		assertThat(isTotalRead).isFalse();
-	}
 
 	private AcquiredPencil createAcquiredPencilWithTime(LocalDateTime createdAt, String content, Long sharedNoteId,
 		Long acquiredQuantity, boolean isRead, AcquiredType type, Member member) {

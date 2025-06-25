@@ -13,11 +13,11 @@ public class AppleIAPPurchaseRequest {
 	private Long pencilQuantity;
 	private Long price;
 	private String productId;
-	private Long playTime;
+	private Integer playTime;
 
 	@Builder
 	private AppleIAPPurchaseRequest(String transactionId, UUID appAccountToken, Long pencilQuantity, Long price,
-		String productId , Long playTime) {
+		String productId , Integer playTime) {
 		this.transactionId = transactionId;
 		this.appAccountToken = appAccountToken;
 		this.pencilQuantity = pencilQuantity;
@@ -27,7 +27,7 @@ public class AppleIAPPurchaseRequest {
 	}
 
 	public static AppleIAPPurchaseRequest of(String transactionId, UUID appAccountToken, Long pencilQuantity,
-		Long price, String productId, Long playTime) {
+		Long price, String productId, Integer playTime) {
 		return AppleIAPPurchaseRequest.builder()
 			.transactionId(transactionId)
 			.appAccountToken(appAccountToken)

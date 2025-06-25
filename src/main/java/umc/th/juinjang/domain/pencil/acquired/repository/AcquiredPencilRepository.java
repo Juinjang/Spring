@@ -11,4 +11,5 @@ public interface AcquiredPencilRepository extends JpaRepository<AcquiredPencil, 
 	List<AcquiredPencil> findAllByMemberOrderByCreatedAtDesc(Member member);
 
 	boolean existsByMemberAndIsReadFalse(Member member);
+	boolean existsByMember(Member member);
 }

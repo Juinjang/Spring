@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -13,19 +14,29 @@ import org.springframework.stereotype.Service;
 
 import com.apple.itunes.storekit.client.APIException;
 import com.apple.itunes.storekit.client.AppStoreServerAPIClient;
+import com.apple.itunes.storekit.model.ConsumptionRequest;
+import com.apple.itunes.storekit.model.Data;
 import com.apple.itunes.storekit.model.Environment;
 import com.apple.itunes.storekit.model.JWSTransactionDecodedPayload;
+import com.apple.itunes.storekit.model.ResponseBodyV2;
+import com.apple.itunes.storekit.model.ResponseBodyV2DecodedPayload;
 import com.apple.itunes.storekit.model.TransactionInfoResponse;
 import com.apple.itunes.storekit.verification.SignedDataVerifier;
 import com.apple.itunes.storekit.verification.VerificationException;
 
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import umc.th.juinjang.api.apple.service.command.AppleTransactionVerifyCommand;
+import umc.th.juinjang.api.pencil.service.PencilQueryService;
 import umc.th.juinjang.api.pencil.service.response.VerificationResult;
+import umc.th.juinjang.common.code.status.ErrorStatus;
+import umc.th.juinjang.common.exception.handler.AppleHandler;
 
 @Slf4j
 @Service
+@Profile("!local")
+@RequiredArgsConstructor
 public class AppleService {
 
 	@Value("${apple.iap.bundle-id}")
@@ -51,6 +62,7 @@ public class AppleService {
 
 	private SignedDataVerifier signedDataVerifier;
 	private AppStoreServerAPIClient appStoreServerAPIClient;
+	private PencilQueryService pencilQueryService;
 
 	@PostConstruct
 	public void init() {
@@ -118,6 +130,35 @@ public class AppleService {
 		} catch (VerificationException e) {
 			log.warn("❌ Apple transaction verification error. transactionId: {}", command.getTransactionId(), e);
 			return VerificationResult.ofVerificationError();
+		}
+	}
+
+	public void sendConsumptionData(String transactionId, ConsumptionRequest request) {
+		try {
+			appStoreServerAPIClient.sendConsumptionData(transactionId, request);
+		} catch (IOException | APIException e) {
+			throw new AppleHandler(ErrorStatus.APPLE_VERIFICATION_ERROR);
+		}
+
+	}
+
+	public ResponseBodyV2DecodedPayload getNotificationPayload(ResponseBodyV2 responseBody) {
+		try {
+			return signedDataVerifier.verifyAndDecodeNotification(
+				responseBody.getSignedPayload());
+		} catch (VerificationException e) {
+			throw new AppleHandler(ErrorStatus.APPLE_VERIFICATION_ERROR);
+		}
+	}
+
+	public JWSTransactionDecodedPayload getSignedTransactionPayload(
+		Data data
+	) {
+		try {
+			return signedDataVerifier.verifyAndDecodeTransaction(
+				data.getSignedTransactionInfo());
+		} catch (VerificationException e) {
+			throw new AppleHandler(ErrorStatus.APPLE_VERIFICATION_ERROR);
 		}
 	}
 
@@ -226,4 +267,5 @@ public class AppleService {
 			throw new RuntimeException("Failed to load signing key", e);
 		}
 	}
+
 }

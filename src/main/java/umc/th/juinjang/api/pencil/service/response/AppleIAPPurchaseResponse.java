@@ -10,6 +10,9 @@ public class AppleIAPPurchaseResponse {
 	private final TransactionStatus status;
 	private final String transactionId;
 	private final Long purchaseQuantity;
+	/**
+	 *  구매한 후에 남아 있는 연필 개수
+	 */
 	private final Long remainQuantity;
 
 	@Builder
