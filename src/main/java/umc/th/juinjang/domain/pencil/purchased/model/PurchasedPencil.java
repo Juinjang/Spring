@@ -136,8 +136,8 @@ public class PurchasedPencil {
 			.build();
 	}
 
-	public void decreaseRemainQuantity(long quantity) {
-		this.remainQuantity -= quantity;
+	public void decreaseUsedQuantity(long quantity) {
+		this.usedQuantity -= quantity;
 	}
 
 	public void markAsSuccess() {

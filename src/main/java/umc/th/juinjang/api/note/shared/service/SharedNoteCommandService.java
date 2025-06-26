@@ -95,7 +95,8 @@ public class SharedNoteCommandService {
 	}
 
 	private AcquiredPencil createAcquiredPencil(Long sharedNoteId, Member seller, Long price, AcquiredType type) {
-		return AcquiredPencil.create(seller, "", sharedNoteId, price, false, type);
+		PencilAccount sellerAccount = pencilAccountFinder.findByMember(seller);
+		return AcquiredPencil.create(seller, "", sharedNoteId, price, sellerAccount.getTotalBalance(), false, type);
 	}
 
 	private void consumePurchasedPencils(Member buyer, long unpaidPencil) {
@@ -111,7 +112,7 @@ public class SharedNoteCommandService {
 			long available = purchasedPencil.getRemainQuantity();
 			long toConsume = Math.min(available, remainingToConsume);
 
-			purchasedPencil.decreaseRemainQuantity(toConsume); // remainQuantity -= toConsume
+			purchasedPencil.decreaseUsedQuantity(toConsume); // remainQuantity -= toConsume
 			remainingToConsume -= toConsume;
 		}
 
