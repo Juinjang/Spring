@@ -197,13 +197,17 @@ public class SharedNoteQueryService {
 	@Transactional(readOnly = true)
 	public SharedNoteCheckListAndReviewResponse findChecklistAndReview(Member member, Long sharedNoteId) {
 		SharedNote sharedNote = sharedNoteFinder.findByIdWithNoteAndAddress(sharedNoteId);
-		Limjang limjang = sharedNote.getLimjang();
+		Limjang note = sharedNote.getLimjang();
 		List<ChecklistAnswerResponseDTO.AnswerDto> answers = checklistAnswerFinder.findByLimjangId(
-			limjang.getLimjangId());
+			note.getLimjangId());
+
+		Report report = reportFinder.findReportByNote(note);
+
 		boolean isOwned = usedPencilFinder.existsByMemberAndSharedNoteId(member, sharedNoteId);
 		// 구매했다면 review 포함, 아니면 null
 		String review = isOwned ? sharedNote.getReview() : null;
-		return new SharedNoteCheckListAndReviewResponse(review, answers);
+		Float totalRate = isOwned ? report.getTotalRate() : null;
+		return new SharedNoteCheckListAndReviewResponse(review, totalRate, answers);
 	}
 
 	public ReportWithLimjangResponseDTO getReportBySharedNoteId(Long sharedNoteId) {
