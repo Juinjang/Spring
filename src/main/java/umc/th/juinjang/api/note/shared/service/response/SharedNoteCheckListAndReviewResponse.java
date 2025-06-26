@@ -6,6 +6,7 @@ import umc.th.juinjang.api.checklist.service.response.ChecklistAnswerResponseDTO
 
 public record SharedNoteCheckListAndReviewResponse(
 	String review,
+	Float totalRate,
 	List<ChecklistAnswerResponseDTO.AnswerDto> checklistAnswers
 ) {
 }
