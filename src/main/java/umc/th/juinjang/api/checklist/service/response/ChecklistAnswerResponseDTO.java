@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import umc.th.juinjang.domain.checklist.model.ChecklistAnswer;
+import umc.th.juinjang.domain.checklist.model.ChecklistQuestionCategory;
 import umc.th.juinjang.domain.checklist.model.ChecklistQuestionType;
 
 public class ChecklistAnswerResponseDTO {
@@ -17,7 +18,7 @@ public class ChecklistAnswerResponseDTO {
 	public static class AnswerDto {
 		private Long answerId;
 		private Long questionId;
-		//        private ChecklistQuestionCategory category;
+		private ChecklistQuestionCategory category;
 		private Long limjangId;
 		private String answer;
 		private ChecklistQuestionType answerType;
@@ -26,6 +27,7 @@ public class ChecklistAnswerResponseDTO {
 			return AnswerDto.builder()
 				.answerId(entity.getAnswerId())
 				.questionId(entity.getQuestionId().getQuestionId())
+				.category(entity.getQuestionId().getCategory())
 				.limjangId(entity.getLimjangId().getLimjangId())
 				.answer(entity.getAnswer())
 				.answerType(entity.getQuestionId().getAnswerType())

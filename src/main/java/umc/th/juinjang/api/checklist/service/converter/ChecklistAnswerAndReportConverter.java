@@ -1,16 +1,16 @@
 package umc.th.juinjang.api.checklist.service.converter;
 
-import umc.th.juinjang.api.limjang.service.converter.LimjangDetailConverter;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import umc.th.juinjang.api.checklist.service.response.ChecklistAnswerAndReportResponseDTO;
 import umc.th.juinjang.api.checklist.service.response.ChecklistAnswerResponseDTO;
 import umc.th.juinjang.api.checklist.service.response.ReportResponseDTO;
+import umc.th.juinjang.api.limjang.service.converter.LimjangDetailConverter;
 import umc.th.juinjang.api.limjang.service.response.LimjangDetailResponseDTO;
 import umc.th.juinjang.domain.checklist.model.ChecklistAnswer;
 import umc.th.juinjang.domain.limjang.model.Limjang;
 import umc.th.juinjang.domain.report.model.Report;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class ChecklistAnswerAndReportConverter {
 
@@ -20,7 +20,7 @@ public class ChecklistAnswerAndReportConverter {
 			.map(answer -> new ChecklistAnswerResponseDTO.AnswerDto(
 				answer.getAnswerId(),
 				answer.getQuestionId().getQuestionId(),
-				//answer.getQuestionId().getCategory(),
+				answer.getQuestionId().getCategory(),
 				answer.getLimjangId().getLimjangId(),
 				answer.getAnswer(),
 				answer.getQuestionId().getAnswerType()))
