@@ -2,6 +2,7 @@ package umc.th.juinjang.domain.pencil.acquired.model;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -24,7 +25,8 @@ public class AcquiredPencil extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long acquiredPencilId;
+	@Column(name = "acquired_pencil_id")
+	private Long id;
 
 	@ManyToOne
 	@JoinColumn(name = "member_id", nullable = false)
@@ -36,42 +38,48 @@ public class AcquiredPencil extends BaseEntity {
 
 	private Long acquiredQuantity;
 
+	private Long remainQuantity;
+
 	private boolean isRead;
 
 	@Enumerated(EnumType.STRING)
 	private AcquiredType type; // Note, Add, Sold
 
 	@Builder
-	private AcquiredPencil(Member member, String content, Long sharedNoteId, Long acquiredQuantity, boolean isRead,
-		AcquiredType type, LocalDateTime createdAt) {
+	private AcquiredPencil(Member member, String content, Long sharedNoteId, Long acquiredQuantity, Long remainQuantity,
+		boolean isRead, AcquiredType type, LocalDateTime createdAt) {
 		this.member = member;
 		this.content = content;
 		this.sharedNoteId = sharedNoteId;
 		this.acquiredQuantity = acquiredQuantity;
+		this.remainQuantity = remainQuantity;
 		this.isRead = isRead;
 		this.type = type;
 		setCreatedAt(createdAt);
 	}
 
 	public static AcquiredPencil create(Member member, String content, Long sharedNoteId, Long acquiredQuantity,
+		Long remainQuantity,
 		boolean isRead, AcquiredType type) {
 		return AcquiredPencil.builder()
 			.member(member)
 			.content(content)
 			.sharedNoteId(sharedNoteId)
 			.acquiredQuantity(acquiredQuantity)
+			.remainQuantity(remainQuantity)
 			.isRead(isRead)
 			.type(type)
 			.build();
 	}
 
 	public static AcquiredPencil createWithDate(Member member, String content, Long sharedNoteId, Long acquiredQuantity,
-		boolean isRead, AcquiredType type, LocalDateTime createdAt) {
+		Long remainQuantity, boolean isRead, AcquiredType type, LocalDateTime createdAt) {
 		return AcquiredPencil.builder()
 			.member(member)
 			.content(content)
 			.sharedNoteId(sharedNoteId)
 			.acquiredQuantity(acquiredQuantity)
+			.remainQuantity(remainQuantity)
 			.isRead(isRead)
 			.type(type)
 			.createdAt(createdAt)
