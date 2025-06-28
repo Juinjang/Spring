@@ -23,12 +23,6 @@
         </layout>
     </appender>
 
-    <appender name="SQL_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>${CONSOLE_LOG_PATTERN}</Pattern>
-        </layout>
-    </appender>
-
     <appender name="CONSOLE_INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/console/info-${SERVER_INFO}-console.log</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
