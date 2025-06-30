@@ -53,15 +53,14 @@ public class OAuthServiceV2 {
 
 	@Transactional
 	public LoginResponseDto kakaoLogin(Long targetId, KakaoLoginRequestDto dto) {
-		Optional<Member> member =
+		Member member =
 			memberRepository.findByEmailAndKakaoTargetIdAndStatus(
 				dto.getEmail(),
 				targetId,
 				MemberStatus.ACTIVE
-			);
+			).orElseThrow(() -> handleKakaoLoginError(dto.getEmail(), targetId));
 
-		return member.map(this::createToken)
-			.orElseThrow(() -> handleKakaoLoginError(dto.getEmail(), targetId));
+		return createToken(member);
 	}
 
 	@Transactional
@@ -92,15 +91,14 @@ public class OAuthServiceV2 {
 
 	@Transactional
 	public LoginResponseVersion2Dto kakaoLoginVersion2(Long targetId, KakaoLoginRequestDto dto) {
-		Optional<Member> member =
+		Member member =
 			memberRepository.findByEmailAndKakaoTargetIdAndStatus(
 				dto.getEmail(),
 				targetId,
 				MemberStatus.ACTIVE
-			);
+			).orElseThrow(() -> handleKakaoLoginError(dto.getEmail(), targetId));
 
-		return member.map(this::createTokenVersion2)
-			.orElseThrow(() -> handleKakaoLoginError(dto.getEmail(), targetId));
+		return createTokenVersion2(member);
 	}
 
 	@Transactional
@@ -207,15 +205,14 @@ public class OAuthServiceV2 {
 		String email = appleInfo.getEmail();
 		String sub = appleInfo.getSub();
 
-		Optional<Member> member =
+		Member member =
 			memberRepository.findByEmailAndAppleSubAndStatus(
 				email,
 				sub,
 				MemberStatus.ACTIVE
-			);
+			).orElseThrow(() -> handleAppleLoginError(email, sub));
 
-		return member.map(this::createToken)
-			.orElseThrow(() -> handleAppleLoginError(email, sub));
+		return createToken(member);
 	}
 
 	@Transactional
@@ -257,15 +254,14 @@ public class OAuthServiceV2 {
 		if (email == null || sub == null)
 			throw new ExceptionHandler(INVALID_APPLE_ID_TOKEN);
 
-		Optional<Member> member =
+		Member member =
 			memberRepository.findByEmailAndAppleSubAndStatus(
 				email,
 				sub,
 				MemberStatus.ACTIVE
-			);
+			).orElseThrow(() -> handleAppleLoginError(email, sub));
 
-		return member.map(this::createTokenVersion2)
-			.orElseThrow(() -> handleAppleLoginError(email, sub));
+		return createTokenVersion2(member);
 	}
 
 	@Transactional
