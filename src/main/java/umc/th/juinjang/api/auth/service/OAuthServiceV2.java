@@ -306,8 +306,11 @@ public class OAuthServiceV2 {
 			log.info("카카오 탈퇴 성공");
 			log.info("member id :: {}", member.getMemberId());
 
-			member.kakaoWithdraw();
-			memberRepository.save(member);
+			Member withdrawMember = (Member)memberRepository.findByMemberIdAndStatus(member.getMemberId(),
+					MemberStatus.ACTIVE)
+				.orElseThrow(() -> new MemberHandler(MEMBER_NOT_FOUND));
+
+			withdrawMember.kakaoWithdraw();
 
 			return true;
 		} else { // 실패 처리 로직
@@ -330,8 +333,11 @@ public class OAuthServiceV2 {
 		log.info("애플 탈퇴 성공");
 		log.info("member id :: {}", member.getMemberId());
 
-		member.appleWithdraw();
-		memberRepository.save(member);
+		Member withdrawMember = (Member)memberRepository.findByMemberIdAndStatus(member.getMemberId(),
+				MemberStatus.ACTIVE)
+			.orElseThrow(() -> new MemberHandler(MEMBER_NOT_FOUND));
+
+		withdrawMember.appleWithdraw();
 	}
 
 	private MemberHandler handleKakaoLoginError(String email, Long targetId) {
