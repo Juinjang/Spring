@@ -9,13 +9,13 @@ import umc.th.juinjang.domain.pencil.acquired.model.AcquiredPencil;
 @Getter
 public class AcquiredPencilResponse {
 
-	private Long acquiredPencilId;
-	private String content;
-	private Long sharedNoteId;
-	private Long acquiredQuantity;
-	private boolean isRead;
-	private String type;
-	private LocalDateTime createdAt;
+	private final Long acquiredPencilId;
+	private final String content;
+	private final Long sharedNoteId;
+	private final Long acquiredQuantity;
+	private final boolean isRead;
+	private final String type;
+	private final LocalDateTime createdAt;
 
 	@Builder
 	public AcquiredPencilResponse(Long acquiredPencilId, String content, Long sharedNoteId, Long acquiredQuantity,
@@ -31,7 +31,7 @@ public class AcquiredPencilResponse {
 
 	public static AcquiredPencilResponse from(AcquiredPencil acquiredPencil) {
 		return AcquiredPencilResponse.builder()
-			.acquiredPencilId(acquiredPencil.getAcquiredPencilId())
+			.acquiredPencilId(acquiredPencil.getId())
 			.content(acquiredPencil.getContent())
 			.sharedNoteId(acquiredPencil.getSharedNoteId())
 			.acquiredQuantity(acquiredPencil.getAcquiredQuantity())

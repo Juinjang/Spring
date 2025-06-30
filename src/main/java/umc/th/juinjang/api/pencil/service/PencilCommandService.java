@@ -107,10 +107,13 @@ public class PencilCommandService {
 		Long pencilAmount = request.getPencilQuantity();
 
 		String title = createTitle(pencilAmount);
-		purchasedPencilUpdater.save(PurchasedPencil.successOf(member, title, pencilAmount, request.getPrice(),
-			request.getPlayTime(), transactionId, request.getAppAccountToken(), now));
+		PencilAccount buyer = pencilAccountFinder.findByMemberWithLock(member);
+		buyer.increasePurchasedBalance(pencilAmount);
 
-		pencilAccountFinder.findByMemberWithLock(member).increasePurchasedBalance(pencilAmount);
+		purchasedPencilUpdater.save(
+			PurchasedPencil.successOf(member, title, pencilAmount, buyer.getTotalBalance(), request.getPrice(),
+				request.getPlayTime(), transactionId, request.getAppAccountToken(), now));
+
 	}
 
 	@Transactional

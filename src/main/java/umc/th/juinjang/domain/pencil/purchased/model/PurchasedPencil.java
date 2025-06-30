@@ -31,7 +31,8 @@ public class PurchasedPencil {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long purchasedPencilId;
+	@Column(name = "purchased_pencil_id")
+	private Long id;
 
 	@ManyToOne
 	@JoinColumn(name = "member_id", nullable = false)
@@ -39,7 +40,10 @@ public class PurchasedPencil {
 
 	private String title;
 	private Long purchaseQuantity;
+	@Comment("구매 후 사용자에게 남은 연필의 개수")
 	private Long remainQuantity;
+	@Comment("구매 후 사용하고 남은 연필의 개수")
+	private Long usedQuantity;
 	private Long price;
 
 	@Comment("애플 인앱 결제에서, 프론트에서 전달해주는 트랜잭션 아이디")
@@ -48,9 +52,11 @@ public class PurchasedPencil {
 	@Comment("애플 인앱 결제에서, 프론트에서 전달해주는 애플 앱 토큰")
 	private UUID appAccountToken;
 
+	@Comment("해당 결제한 연필이 정상적으로 고객에게 전달됐는 지 여부")
 	@Convert(converter = DeliveryStatusConverter.class)
 	private DeliveryStatus deliveryStatus;
 
+	@Comment("트랜잭션이 정상적으로 진행됐는 가 여부")
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private TransactionStatus transactionStatus;
@@ -65,7 +71,7 @@ public class PurchasedPencil {
 	private LocalDateTime updatedAt;
 
 	@Builder
-	public PurchasedPencil(Member member, String title, Long purchaseQuantity,
+	public PurchasedPencil(Member member, String title, Long purchaseQuantity, Long usedQuantity,
 		Long remainQuantity, TransactionStatus transactionStatus, Integer playTime,
 		Long price, String transactionId, UUID appAccountToken, DeliveryStatus deliveryStatus,
 		LocalDateTime purchasedAt) {
@@ -73,6 +79,7 @@ public class PurchasedPencil {
 		this.title = title;
 		this.purchaseQuantity = purchaseQuantity;
 		this.remainQuantity = remainQuantity;
+		this.usedQuantity = usedQuantity;
 		this.price = price;
 		this.playTime = playTime;
 		this.transactionId = transactionId;
@@ -80,23 +87,6 @@ public class PurchasedPencil {
 		this.deliveryStatus = deliveryStatus;
 		this.transactionStatus = transactionStatus;
 		this.purchasedAt = purchasedAt;
-	}
-
-	public void decreaseRemainQuantity(long quantity) {
-		this.remainQuantity -= quantity;
-	}
-
-	public void markAsSuccess(){
-		this.transactionStatus = TransactionStatus.SUCCESS;
-		this.deliveryStatus = DeliveryStatus.DELIVERY_SUCCESS;
-	}
-
-	public void markAsRefund(){
-		this.transactionStatus = TransactionStatus.REFUNDED;
-	}
-
-	public void updateRetryCount(Long retryCount) {
-		this.retryCount = retryCount;
 	}
 
 	private static PurchasedPencilBuilder baseBuilder(
@@ -107,7 +97,7 @@ public class PurchasedPencil {
 			.member(member)
 			.title(title)
 			.purchaseQuantity(quantity)
-			.remainQuantity(quantity)
+			.usedQuantity(quantity)
 			.price(price)
 			.playTime(playTime)
 			.transactionId(transactionId)
@@ -116,12 +106,13 @@ public class PurchasedPencil {
 	}
 
 	// ✅ 결제 성공
-	public static PurchasedPencil successOf(Member member, String title, Long quantity,
+	public static PurchasedPencil successOf(Member member, String title, Long quantity, Long remainQuantity,
 		Long price, Integer playTime, String transactionId,
 		UUID token, LocalDateTime purchasedAt) {
 		return baseBuilder(member, title, quantity, price, playTime, transactionId, token, purchasedAt)
 			.transactionStatus(TransactionStatus.SUCCESS)
 			.deliveryStatus(DeliveryStatus.DELIVERY_SUCCESS)
+			.remainQuantity(remainQuantity)
 			.build();
 	}
 
@@ -131,6 +122,7 @@ public class PurchasedPencil {
 		return baseBuilder(member, title, quantity, price, playTime, transactionId, token, purchasedAt)
 			.transactionStatus(TransactionStatus.DB_FAILED)
 			.deliveryStatus(DeliveryStatus.SERVER_ERROR)
+			.remainQuantity(0L)
 			.build();
 	}
 
@@ -140,7 +132,25 @@ public class PurchasedPencil {
 		return baseBuilder(member, title, quantity, price, playTime, transactionId, token, purchasedAt)
 			.transactionStatus(TransactionStatus.VALIDATION_FAILED)
 			.deliveryStatus(DeliveryStatus.OTHER_REASONS)
+			.remainQuantity(0L)
 			.build();
+	}
+
+	public void decreaseUsedQuantity(long quantity) {
+		this.usedQuantity -= quantity;
+	}
+
+	public void markAsSuccess() {
+		this.transactionStatus = TransactionStatus.SUCCESS;
+		this.deliveryStatus = DeliveryStatus.DELIVERY_SUCCESS;
+	}
+
+	public void markAsRefund() {
+		this.transactionStatus = TransactionStatus.REFUNDED;
+	}
+
+	public void updateRetryCount(Long retryCount) {
+		this.retryCount = retryCount;
 	}
 }
 

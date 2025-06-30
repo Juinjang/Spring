@@ -4,10 +4,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import umc.th.juinjang.domain.note.shared.model.ViewCountPolicy;
 import umc.th.juinjang.api.pencil.service.AcquiredPencilUpdater;
 import umc.th.juinjang.api.pencilAccount.service.PencilAccountFinder;
 import umc.th.juinjang.domain.member.model.Member;
+import umc.th.juinjang.domain.note.shared.model.ViewCountPolicy;
 import umc.th.juinjang.domain.pencil.acquired.model.AcquiredPencil;
 import umc.th.juinjang.domain.pencil.acquired.model.AcquiredType;
 import umc.th.juinjang.domain.pencilaccount.model.PencilAccount;

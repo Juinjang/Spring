@@ -111,7 +111,7 @@ public class SharedNoteCommandService {
 			long available = purchasedPencil.getRemainQuantity();
 			long toConsume = Math.min(available, remainingToConsume);
 
-			purchasedPencil.decreaseRemainQuantity(toConsume); // remainQuantity -= toConsume
+			purchasedPencil.decreaseUsedQuantity(toConsume); // remainQuantity -= toConsume
 			remainingToConsume -= toConsume;
 		}
 
