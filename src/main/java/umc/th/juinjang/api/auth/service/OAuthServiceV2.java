@@ -52,16 +52,16 @@ public class OAuthServiceV2 {
 	private String kakaoAdminKey;
 
 	@Transactional
-	public LoginResponseDto kakaoLogin(Long targetId, KakaoLoginRequestDto kakaoLoginRequestDto) {
+	public LoginResponseDto kakaoLogin(Long targetId, KakaoLoginRequestDto dto) {
 		Optional<Member> member =
 			memberRepository.findByEmailAndKakaoTargetIdAndStatus(
-				kakaoLoginRequestDto.getEmail(),
+				dto.getEmail(),
 				targetId,
 				MemberStatus.ACTIVE
 			);
 
 		return member.map(this::createToken)
-			.orElseThrow(() -> new MemberHandler(MEMBER_NOT_FOUND_IN_KAKAO));
+			.orElseThrow(() -> handleKakaoLoginError(dto.getEmail(), targetId));
 	}
 
 	@Transactional
@@ -100,7 +100,7 @@ public class OAuthServiceV2 {
 			);
 
 		return member.map(this::createTokenVersion2)
-			.orElseThrow(() -> new MemberHandler(MEMBER_NOT_FOUND_IN_KAKAO));
+			.orElseThrow(() -> handleKakaoLoginError(dto.getEmail(), targetId));
 	}
 
 	@Transactional
@@ -215,7 +215,7 @@ public class OAuthServiceV2 {
 			);
 
 		return member.map(this::createToken)
-			.orElseThrow(() -> new MemberHandler(MEMBER_NOT_FOUND_IN_KAKAO));
+			.orElseThrow(() -> handleAppleLoginError(email, sub));
 	}
 
 	@Transactional
@@ -265,7 +265,7 @@ public class OAuthServiceV2 {
 			);
 
 		return member.map(this::createTokenVersion2)
-			.orElseThrow(() -> new MemberHandler(MEMBER_NOT_FOUND_IN_KAKAO));
+			.orElseThrow(() -> handleAppleLoginError(email, sub));
 	}
 
 	@Transactional
@@ -334,5 +334,67 @@ public class OAuthServiceV2 {
 		log.info("member id :: {}", member.getMemberId());
 
 		member.appleWithdraw();
+	}
+
+	private MemberHandler handleKakaoLoginError(String email, Long targetId) {
+		if (email == null || email.trim().isEmpty()) {
+			return new MemberHandler(MEMBER_EMAIL_NOT_FOUND);
+		}
+
+		Optional<Member> getMemberByEmail = memberRepository.findByEmail(email);
+		Optional<Member> getMemberByTargetId = memberRepository.findByKakaoTargetId(targetId);
+
+		if (getMemberByEmail.isPresent()) {
+			Member foundMember = getMemberByEmail.get();
+
+			if (!foundMember.getProvider().equals(MemberProvider.KAKAO)) {
+				return new MemberHandler(MEMBER_NOT_FOUND_IN_KAKAO);
+			}
+		}
+
+		if (getMemberByTargetId.isPresent()) {
+			Member foundMember = getMemberByTargetId.get();
+			if (!foundMember.getProvider().equals(MemberProvider.KAKAO)) {
+				return new MemberHandler(MEMBER_NOT_FOUND_IN_KAKAO);
+			}
+		}
+
+		return new MemberHandler(MEMBER_NOT_FOUND);
+	}
+
+	private MemberHandler handleAppleLoginError(String email, String sub) {
+		if (email == null || email.trim().isEmpty()) {
+			return new MemberHandler(MEMBER_EMAIL_NOT_FOUND);
+		}
+
+		if (sub == null || sub.trim().isEmpty()) {
+			return new MemberHandler(INVALID_APPLE_ID_TOKEN);
+		}
+
+		Optional<Member> getMemberByEmail = memberRepository.findByEmail(email);
+		Optional<Member> getMemberBySub = memberRepository.findByAppleSub(sub);
+
+		if (getMemberByEmail.isPresent()) {
+			Member foundMember = getMemberByEmail.get();
+
+			if (!foundMember.getProvider().equals(MemberProvider.APPLE)) {
+				return new MemberHandler(MEMBER_NOT_FOUND_IN_APPLE);
+			}
+		}
+
+		if (getMemberBySub.isPresent()) {
+			Member foundMember = getMemberBySub.get();
+
+			if (!foundMember.getProvider().equals(MemberProvider.APPLE)) {
+				return new MemberHandler(MEMBER_NOT_FOUND_IN_APPLE);
+			}
+
+			if (!foundMember.getEmail().equals(email)) {
+				return new MemberHandler(FAILED_TO_LOGIN);
+			}
+		}
+
+		// 둘 다 찾아지지 않는 경우 - 회원가입이 필요
+		return new MemberHandler(MEMBER_NOT_FOUND);
 	}
 }

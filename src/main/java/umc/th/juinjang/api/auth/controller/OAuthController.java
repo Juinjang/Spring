@@ -23,7 +23,7 @@ import umc.th.juinjang.api.auth.controller.request.KakaoLoginRequestDto;
 import umc.th.juinjang.api.auth.controller.request.KakaoSignUpRequestDto;
 import umc.th.juinjang.api.auth.controller.request.KakaoSignUpRequestVersion2Dto;
 import umc.th.juinjang.api.auth.controller.request.WithdrawReasonRequestDto;
-import umc.th.juinjang.api.auth.service.OAuthService;
+import umc.th.juinjang.api.auth.service.OAuthServiceV2;
 import umc.th.juinjang.api.auth.service.WithdrawService;
 import umc.th.juinjang.api.auth.service.response.LoginResponseDto;
 import umc.th.juinjang.api.auth.service.response.LoginResponseVersion2Dto;
@@ -39,8 +39,8 @@ import umc.th.juinjang.domain.member.model.Member;
 @Validated
 public class OAuthController {
 
-	private final OAuthService oauthService;
-	// private final OAuthServiceV2 oauthService;
+	// private final OAuthService oauthService;
+	private final OAuthServiceV2 oauthService;
 	private final WithdrawService withdrawService;
 
 	// 카카오 로그인
