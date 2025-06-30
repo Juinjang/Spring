@@ -95,8 +95,7 @@ public class SharedNoteCommandService {
 	}
 
 	private AcquiredPencil createAcquiredPencil(Long sharedNoteId, Member seller, Long price, AcquiredType type) {
-		PencilAccount sellerAccount = pencilAccountFinder.findByMember(seller);
-		return AcquiredPencil.create(seller, "", sharedNoteId, price, sellerAccount.getTotalBalance(), false, type);
+		return AcquiredPencil.create(seller, "", sharedNoteId, price, false, type);
 	}
 
 	private void consumePurchasedPencils(Member buyer, long unpaidPencil) {

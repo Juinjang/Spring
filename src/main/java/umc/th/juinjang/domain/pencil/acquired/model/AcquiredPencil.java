@@ -38,8 +38,6 @@ public class AcquiredPencil extends BaseEntity {
 
 	private Long acquiredQuantity;
 
-	private Long remainQuantity;
-
 	private boolean isRead;
 
 	@Enumerated(EnumType.STRING)
@@ -52,34 +50,30 @@ public class AcquiredPencil extends BaseEntity {
 		this.content = content;
 		this.sharedNoteId = sharedNoteId;
 		this.acquiredQuantity = acquiredQuantity;
-		this.remainQuantity = remainQuantity;
 		this.isRead = isRead;
 		this.type = type;
 		setCreatedAt(createdAt);
 	}
 
 	public static AcquiredPencil create(Member member, String content, Long sharedNoteId, Long acquiredQuantity,
-		Long remainQuantity,
 		boolean isRead, AcquiredType type) {
 		return AcquiredPencil.builder()
 			.member(member)
 			.content(content)
 			.sharedNoteId(sharedNoteId)
 			.acquiredQuantity(acquiredQuantity)
-			.remainQuantity(remainQuantity)
 			.isRead(isRead)
 			.type(type)
 			.build();
 	}
 
 	public static AcquiredPencil createWithDate(Member member, String content, Long sharedNoteId, Long acquiredQuantity,
-		Long remainQuantity, boolean isRead, AcquiredType type, LocalDateTime createdAt) {
+		boolean isRead, AcquiredType type, LocalDateTime createdAt) {
 		return AcquiredPencil.builder()
 			.member(member)
 			.content(content)
 			.sharedNoteId(sharedNoteId)
 			.acquiredQuantity(acquiredQuantity)
-			.remainQuantity(remainQuantity)
 			.isRead(isRead)
 			.type(type)
 			.createdAt(createdAt)

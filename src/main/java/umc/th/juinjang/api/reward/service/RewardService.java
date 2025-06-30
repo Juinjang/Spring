@@ -40,9 +40,8 @@ public class RewardService {
 	}
 
 	private AcquiredPencil createAcquiredPencil(Member member, Long sharedNoteId, Long milestone, Long rewardPencil) {
-		PencilAccount account = pencilAccountFinder.findByMember(member);
 		return AcquiredPencil.create(member, viewCountPolicy.getMessageForMilestone(milestone), sharedNoteId,
-			rewardPencil, account.getTotalBalance(), false, AcquiredType.VIEWCOUNT);
+			rewardPencil, false, AcquiredType.VIEWCOUNT);
 	}
 
 	private Reward createReward(Member member, Long sharedNoteId, Long milestone, Long rewardPencil) {
