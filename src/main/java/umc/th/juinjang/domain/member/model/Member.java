@@ -216,6 +216,7 @@ public class Member extends BaseEntity implements UserDetails {
 
 	public void kakaoWithdraw() {
 		this.status = MemberStatus.WITHDRAWN;
+		this.email = null;
 		this.kakaoTargetId = null;
 		this.nickname = null;
 		this.deletedAt = LocalDateTime.now();
@@ -223,6 +224,7 @@ public class Member extends BaseEntity implements UserDetails {
 
 	public void appleWithdraw() {
 		this.status = MemberStatus.WITHDRAWN;
+		this.email = null;
 		this.appleSub = null;
 		this.nickname = null;
 		this.deletedAt = LocalDateTime.now();
