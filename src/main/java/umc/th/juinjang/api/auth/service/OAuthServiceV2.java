@@ -311,6 +311,7 @@ public class OAuthServiceV2 {
 			log.info("member id :: {}", member.getMemberId());
 
 			member.kakaoWithdraw();
+			memberRepository.save(member);
 
 			return true;
 		} else { // 실패 처리 로직
@@ -334,6 +335,7 @@ public class OAuthServiceV2 {
 		log.info("member id :: {}", member.getMemberId());
 
 		member.appleWithdraw();
+		memberRepository.save(member);
 	}
 
 	private MemberHandler handleKakaoLoginError(String email, Long targetId) {
