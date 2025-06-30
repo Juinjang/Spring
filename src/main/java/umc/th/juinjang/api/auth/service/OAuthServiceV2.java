@@ -118,7 +118,7 @@ public class OAuthServiceV2 {
 					dto.getEmail(),
 					targetId,
 					dto.getNickname(),
-					null
+					dto.getAgreeVersion()
 				)
 			);
 
