@@ -43,7 +43,6 @@ public class Member extends BaseEntity implements UserDetails {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long memberId;
 
-	@Column(nullable = false)
 	private String email;
 
 	private String nickname;
