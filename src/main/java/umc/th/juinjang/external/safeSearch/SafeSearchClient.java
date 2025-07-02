@@ -1,6 +1,5 @@
 package umc.th.juinjang.external.safeSearch;
 
-import java.io.IOException;
 import java.util.Collections;
 
 import org.springframework.stereotype.Component;
@@ -58,7 +57,8 @@ public class SafeSearchClient {
 			return isAnnotationSafe(annotation, adultThreshold, spoofThreshold, medicalThreshold, violenceThreshold,
 				racyThreshold);
 
-		} catch (IOException e) {
+		} catch (Exception e) {
+			log.error("Vision API 호출 실패 (Exception)", e);
 			throw new RuntimeException("Vision API 호출 실패", e);
 		}
 	}
