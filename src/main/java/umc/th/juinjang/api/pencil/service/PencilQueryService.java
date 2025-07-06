@@ -25,7 +25,6 @@ import umc.th.juinjang.api.pencil.service.response.UsedPencilResponse;
 import umc.th.juinjang.api.pencilAccount.service.PencilAccountFinder;
 import umc.th.juinjang.common.exception.handler.PencilAccountHandler;
 import umc.th.juinjang.domain.member.model.Member;
-import umc.th.juinjang.domain.pencil.acquired.model.AcquiredPencil;
 import umc.th.juinjang.domain.pencil.purchased.model.PurchasedPencil;
 import umc.th.juinjang.domain.pencil.used.model.UsedPencil;
 import umc.th.juinjang.domain.pencilaccount.model.PencilAccount;
@@ -42,10 +41,7 @@ public class PencilQueryService {
 	private final PencilAccountFinder pencilAccountFinder;
 
 	public List<AcquiredPencilResponse> getAcquiredPencils(Member member) {
-		List<AcquiredPencil> acquiredPencils = acquiredPencilFinder.findAllByMemberOrderByCreatedAtDesc(member);
-		return acquiredPencils.stream()
-			.map(AcquiredPencilResponse::from)
-			.toList();
+		return acquiredPencilFinder.findAllByMemberOrderByCreatedAtDesc(member);
 	}
 
 	public List<PurchasedPencilResponse> getPurchasedPencils(Member member) {
