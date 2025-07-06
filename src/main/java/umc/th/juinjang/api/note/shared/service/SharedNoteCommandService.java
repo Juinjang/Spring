@@ -95,7 +95,8 @@ public class SharedNoteCommandService {
 	}
 
 	private AcquiredPencil createAcquiredPencil(Long sharedNoteId, Member seller, Long price, AcquiredType type) {
-		return AcquiredPencil.create(seller, "", sharedNoteId, price, false, type);
+		String content = "노트 공유 완료!";
+		return AcquiredPencil.create(seller, content, sharedNoteId, price, false, type);
 	}
 
 	private void consumePurchasedPencils(Member buyer, long unpaidPencil) {
