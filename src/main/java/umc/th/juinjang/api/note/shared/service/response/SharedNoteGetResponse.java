@@ -126,6 +126,6 @@ public record SharedNoteGetResponse(
 		if (isImageShared) {
 			return limjang.getImageList().stream().map(Image::getImageUrl).limit(maxSize).toList();
 		}
-		return null;
+		return List.of();
 	}
 }

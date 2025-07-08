@@ -2,8 +2,6 @@ package umc.th.juinjang.event.subscriber;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -19,16 +17,13 @@ import umc.th.juinjang.external.openfeign.discord.DiscordAlertProvider;
 public class DiscordEventListener {
 
 	private final DiscordAlertProvider discordAlertProvider;
-	private final Environment environment;
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	@Async
 	public void handleSignUpEvent(SignUpEvent event) {
-		if (isProdEnv()) {
-			discordAlertProvider.sendMemberCreateAlertToDiscord(
-				String.format(EventMessage.SIGN_UP_MESSAGE.getMessage(), event.memberProvider(), event.count(),
-					event.name()));
-		}
+		discordAlertProvider.sendMemberCreateAlertToDiscord(
+			String.format(EventMessage.SIGN_UP_MESSAGE.getMessage(), event.memberProvider(), event.count(),
+				event.name()));
 	}
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -46,13 +41,10 @@ public class DiscordEventListener {
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	@Async
 	public void handlePaymentEvent(PaymentEvent event) {
-			discordAlertProvider.sendPaymentAlertToDiscord(String.format(
-				EventMessage.PAYMENT_COMPLETED_MESSAGE.getMessage(),
-				event.memberId(),event.nickname(),event.pencilQuantity(), event.price(), event.transactionStatus()
-			));
+		discordAlertProvider.sendPaymentAlertToDiscord(String.format(
+			EventMessage.PAYMENT_COMPLETED_MESSAGE.getMessage(),
+			event.memberId(), event.nickname(), event.pencilQuantity(), event.price(), event.transactionStatus()
+		));
 	}
 
-	private boolean isProdEnv() {
-		return environment.acceptsProfiles(Profiles.of("prod"));
-	}
 }
