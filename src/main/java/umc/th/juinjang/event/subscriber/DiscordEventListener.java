@@ -2,8 +2,6 @@ package umc.th.juinjang.event.subscriber;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
