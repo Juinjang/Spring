@@ -96,5 +96,11 @@ public class SharedNote extends BaseEntity {
 	public void updateDeletedAt(Timestamp deletedAt) {
 		this.deletedAt = deletedAt;
 	}
+
+	// 23년 12월 초반 임장
+	public String getPullPeriod() {
+		String shortYear = String.valueOf(this.year).substring(2);
+		return shortYear + "년 " + this.month + "월 " + this.period + " 임장";
+	}
 }
 
