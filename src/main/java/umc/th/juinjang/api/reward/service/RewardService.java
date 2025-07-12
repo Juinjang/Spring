@@ -1,9 +1,11 @@
 package umc.th.juinjang.api.reward.service;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import umc.th.juinjang.api.pencil.service.AcquiredPencilUpdater;
 import umc.th.juinjang.api.pencilAccount.service.PencilAccountFinder;
 import umc.th.juinjang.domain.member.model.Member;
@@ -16,6 +18,7 @@ import umc.th.juinjang.domain.reward.model.RewardType;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class RewardService {
 
 	private final AcquiredPencilUpdater acquiredPencilUpdater;
@@ -24,7 +27,7 @@ public class RewardService {
 	private final RewardFinder rewardFinder;
 	private final RewardUpdater rewardUpdater;
 
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void giveViewCountReward(Member member, Long sharedNoteId, Long milestone, Long rewardPencil) {
 
 		if (alreadyViewCountRewardEarned(RewardType.VIEWCOUNT, sharedNoteId, milestone)) {
@@ -37,6 +40,9 @@ public class RewardService {
 		acquiredPencilUpdater.save(
 			createAcquiredPencil(member, sharedNoteId, milestone, rewardPencil));
 		rewardUpdater.save(createReward(member, sharedNoteId, milestone, rewardPencil));
+		
+		log.info("유저에게 조회수 리워드 지급 완료: memberId={}, sharedNoteId={}, milestone={}, rewardPencil={}",
+			member.getMemberId(), sharedNoteId, milestone, rewardPencil);
 	}
 
 	private AcquiredPencil createAcquiredPencil(Member member, Long sharedNoteId, Long milestone, Long rewardPencil) {
