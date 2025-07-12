@@ -70,7 +70,7 @@ public class Address extends BaseEntity {
 
 	public String getShortAddress() {
 		return Stream.of(sigungo, bname1, bname2)
-			.filter(Objects::nonNull)
+			.filter(s -> s != null && !s.isBlank())
 			.collect(Collectors.joining(" "));
 	}
 
