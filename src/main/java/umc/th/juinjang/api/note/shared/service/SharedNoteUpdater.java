@@ -12,8 +12,8 @@ public class SharedNoteUpdater {
 
 	private final SharedNoteRepository sharedNoteRepository;
 
-	void updateViewCount(long sharedNoteId, long addAmount) {
-		sharedNoteRepository.incrementViewCount(sharedNoteId, addAmount);
+	public void updateViewCount(long sharedNoteId) {
+		sharedNoteRepository.incrementViewCount(sharedNoteId);
 	}
 
 	public void incrementLikedCountById(Long sharedNoteId) {

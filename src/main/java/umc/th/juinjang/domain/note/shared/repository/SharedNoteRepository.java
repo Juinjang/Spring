@@ -19,8 +19,8 @@ public interface SharedNoteRepository extends JpaRepository<SharedNote, Long>, S
 	Optional<SharedNote> findByIdWithNoteAndAddress(@Param("sharedNoteId") Long sharedNoteId);
 
 	@Modifying
-	@Query("UPDATE SharedNote s SET s.viewCount = :updateViewCount WHERE s.sharedNoteId = :sharedNoteId")
-	void incrementViewCount(@Param("sharedNoteId") Long sharedNoteId, @Param("updateViewCount") Long updateViewCount);
+	@Query("UPDATE SharedNote s SET s.viewCount = s.viewCount + 1 WHERE s.sharedNoteId = :sharedNoteId")
+	void incrementViewCount(@Param("sharedNoteId") Long sharedNoteId);
 
 	@Modifying
 	@Query("UPDATE SharedNote sn SET sn.likeCount = sn.likeCount + 1 WHERE sn.sharedNoteId = :sharedNoteId")

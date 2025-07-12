@@ -21,6 +21,7 @@ public class ViewCountService {
 
 	private final RedisTemplate<String, String> redisTemplate;
 	private final SharedNoteFinder sharedNoteFinder;
+	private final SharedNoteUpdater sharedNoteUpdater;
 	private final ApplicationRewardViewCountPublisherAdapter applicationRewardViewCountPublisherAdapter;
 
 	public void recordViewerHistory(long memberId, long sharedNoteId) {
@@ -46,7 +47,7 @@ public class ViewCountService {
 		long viewCount = sharedNoteFinder.findViewCountById(sharedNoteId);
 
 		if (!isDuplicate(member.getMemberId(), sharedNoteId) && sharedNote.getDeletedAt() == null) {
-			sharedNote.increaseViewCount();
+			sharedNoteUpdater.updateViewCount(sharedNoteId);
 			viewCount++;
 			recordViewerHistory(member.getMemberId(), sharedNoteId);
 
