@@ -17,14 +17,14 @@ public record SharedNoteExploreGetResponse(
 ) {
 
 	public static SharedNoteExploreGetResponse of(long totalResults, List<SharedNote> sharedNotes,
-		Set<Long> isPurchaseMap, Set<Long> likedNotes, Map<Long, Long> viewCountMap
+		Set<Long> isPurchaseMap, Set<Long> likedNotes, Map<Long, Long> viewCountMap, long requestMemberId
 	) {
 		return new SharedNoteExploreGetResponse(totalResults,
 			sharedNotes.stream()
 				.map(it -> SharedNoteExploreResponse.of(
 					it,
 					it.getLimjang(),
-					isPurchaseMap.contains(it.getSharedNoteId()),
+					isPurchaseMap.contains(it.getSharedNoteId()) || it.getMember().getMemberId() == requestMemberId,
 					likedNotes.contains(it.getSharedNoteId()),
 					viewCountMap.get(it.getSharedNoteId()),
 					it.getMember()))

@@ -17,11 +17,11 @@ public record UserSharedNotesGetResponse(
 ) {
 
 	public static UserSharedNotesGetResponse ofLiked(List<SharedNote> sharedNotes, Set<Long> isPurchaseMap,
-		Map<Long, Long> viewCountMap) {
+		Map<Long, Long> viewCountMap, long requestMemberId) {
 		return new UserSharedNotesGetResponse(sharedNotes.stream().map(it -> UsersSharedNoteResponse.of(
 			it,
 			it.getLimjang(),
-			isPurchaseMap.contains(it.getSharedNoteId()),
+			isPurchaseMap.contains(it.getSharedNoteId()) || it.getMember().getMemberId() == requestMemberId,
 			true,
 			viewCountMap.get(it.getSharedNoteId()),
 			it.getMember()
@@ -33,7 +33,7 @@ public record UserSharedNotesGetResponse(
 		return new UserSharedNotesGetResponse(sharedNotes.stream().map(it -> UsersSharedNoteResponse.of(
 			it,
 			it.getLimjang(),
-			false,
+			true,
 			likedNotes.contains(it.getSharedNoteId()),
 			viewCountMap.get(it.getSharedNoteId()),
 			member
