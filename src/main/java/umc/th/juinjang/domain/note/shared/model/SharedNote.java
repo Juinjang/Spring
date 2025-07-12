@@ -73,6 +73,10 @@ public class SharedNote extends BaseEntity {
 		return this.likeCount = (likeCount == null ? 1L : likeCount + 1);
 	}
 
+	public void increaseViewCount() {
+		this.viewCount++;
+	}
+
 	public static SharedNote toSharedNote(Member member, Limjang limjang, SharedNotePostRequest dto, Long price) {
 		return SharedNote.builder()
 			.member(member)
@@ -97,7 +101,6 @@ public class SharedNote extends BaseEntity {
 		this.deletedAt = deletedAt;
 	}
 
-	// 23년 12월 초반 임장
 	public String getPullPeriod() {
 		String shortYear = String.valueOf(this.year).substring(2);
 		return shortYear + "년 " + this.month + "월 " + this.period + " 임장";

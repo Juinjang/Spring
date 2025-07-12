@@ -19,12 +19,11 @@ public class RewardViewCountEventListener {
 	private final ViewCountPolicy viewCountPolicy;
 	private final RewardService rewardService;
 
-	@Async
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	@Async
 	public void handleRewardViewCountEvent(RewardViewCountEvent rewardViewCountEvent) {
 
-		Long reward = viewCountPolicy.getRewardForExactMilestone(
-			rewardViewCountEvent.viewCount());
+		Long reward = viewCountPolicy.getRewardForExactMilestone(rewardViewCountEvent.viewCount());
 
 		if (reward == null) {
 			return;
