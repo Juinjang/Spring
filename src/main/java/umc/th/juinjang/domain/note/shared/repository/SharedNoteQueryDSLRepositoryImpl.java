@@ -10,6 +10,7 @@ import static umc.th.juinjang.domain.pencil.used.model.QUsedPencil.*;
 import static umc.th.juinjang.domain.report.model.QReport.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -64,9 +65,10 @@ public class SharedNoteQueryDSLRepositoryImpl implements SharedNoteQueryDSLRepos
 			.fetch();
 
 		JPAQuery<Long> countQuery = queryFactory
-			.select(sharedNote.count())
-			.from(sharedNote)
+			.select(sharedNote.count()).from(sharedNote)
 			.join(sharedNote.limjang, limjang)
+			.join(sharedNote.member, member)
+			.join(limjang.limjangPrice, limjangPrice)
 			.join(limjang.addressEntity, address)
 			.leftJoin(limjang.report, report)
 			.where(
@@ -74,9 +76,10 @@ public class SharedNoteQueryDSLRepositoryImpl implements SharedNoteQueryDSLRepos
 				getWhereByPropertyType(propertyType),
 				getWhereByPriceType(priceType),
 				keywordCondition(keyword),
-				sharedNote.deletedAt.isNull()
+				sharedNote.deletedAt.isNull(),
+				limjang.deleted.isFalse()
 			);
-		long totalCount = countQuery.fetchOne();
+		long totalCount = Optional.ofNullable(countQuery.fetchOne()).orElse(0L);
 		return new PageImpl<>(content, pageable, totalCount);
 	}
 

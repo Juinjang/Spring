@@ -62,7 +62,7 @@ public record SharedNoteGetResponse(
 			limjang.getPriceType(),
 			buyerCount,
 			findImagesUrlBySharingStatus(sharedNote.isImageShared(), limjang, 2),
-			address.getFullAddress(),
+			address.getRoadAddress(),
 			address.getShortAddress(),
 			limjang.getLimjangPrice().getPrice(limjang.getPriceType(), limjang.getPurpose()),
 			limjang.getPriceType() == LimjangPriceType.MONTHLY_RENT ? limjang.getLimjangPrice().getMonthlyRent() :
@@ -103,7 +103,7 @@ public record SharedNoteGetResponse(
 			limjang.getPriceType(),
 			buyerCount,
 			findImagesUrlBySharingStatus(sharedNote.isImageShared(), limjang, 3),
-			address.getFullAddress(),
+			address.getRoadAddress(),
 			address.getShortAddress(),
 			limjang.getLimjangPrice().getPrice(limjang.getPriceType(), limjang.getPurpose()),
 			limjang.getPriceType() == LimjangPriceType.MONTHLY_RENT ? limjang.getLimjangPrice().getMonthlyRent() :

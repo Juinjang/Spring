@@ -59,20 +59,25 @@ public class SharedNoteQueryService {
 		SharedNote sharedNote = sharedNoteFinder.findByIdWithNoteAndAddress(sharedNoteId);
 		Limjang limjang = sharedNote.getLimjang();
 
-		boolean isBuyer = usedPencilFinder.existsByMemberAndSharedNoteId(member, sharedNoteId);
+		boolean isBuyerOrOwner = getIsBuyerOrOwner(member, sharedNote);
 
 		long viewCount = getViewCountAndCheckReward(member, sharedNoteId, sharedNote);
 
 		Integer countBuyer = makeBuyerCount(usedPencilFinder.countBySharedNoteId(sharedNoteId));
 		boolean isLiked = likedNoteFinder.existsByMemberAndSharedNote(member, sharedNote);
 
-		if (isBuyer) {
-			return SharedNoteGetResponse.ofPurchased(isBuyer, limjang, limjang.getAddressEntity(), sharedNote,
+		if (isBuyerOrOwner) {
+			return SharedNoteGetResponse.ofPurchased(isBuyerOrOwner, limjang, limjang.getAddressEntity(), sharedNote,
 				sharedNote.getMember(), countBuyer, isLiked, viewCount);
 		} else {
-			return SharedNoteGetResponse.ofNotPurchased(isBuyer, limjang, limjang.getAddressEntity(), sharedNote,
+			return SharedNoteGetResponse.ofNotPurchased(isBuyerOrOwner, limjang, limjang.getAddressEntity(), sharedNote,
 				sharedNote.getMember(), countBuyer, isLiked, viewCount);
 		}
+	}
+
+	private boolean getIsBuyerOrOwner(Member requestMember, SharedNote sharedNote) {
+		return usedPencilFinder.existsByMemberAndSharedNoteId(requestMember, sharedNote.getSharedNoteId()) ||
+			sharedNote.getMember().getMemberId().equals(requestMember.getMemberId());
 	}
 
 	private long getViewCountAndCheckReward(Member member, Long sharedNoteId, SharedNote sharedNote) {
