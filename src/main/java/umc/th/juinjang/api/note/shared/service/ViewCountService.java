@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import umc.th.juinjang.common.redis.RedisKeyFactory;
+import umc.th.juinjang.domain.member.model.Member;
+import umc.th.juinjang.domain.note.shared.model.SharedNote;
+import umc.th.juinjang.event.publisher.ApplicationRewardViewCountPublisherAdapter;
 
 @Component
 @RequiredArgsConstructor
@@ -18,6 +21,8 @@ public class ViewCountService {
 
 	private final RedisTemplate<String, String> redisTemplate;
 	private final SharedNoteFinder sharedNoteFinder;
+	private final SharedNoteUpdater sharedNoteUpdater;
+	private final ApplicationRewardViewCountPublisherAdapter applicationRewardViewCountPublisherAdapter;
 
 	public void recordViewerHistory(long memberId, long sharedNoteId) {
 		try {
@@ -25,14 +30,6 @@ public class ViewCountService {
 				.setIfAbsent(RedisKeyFactory.viewHistoryKey(sharedNoteId, memberId), "1", Duration.ofHours(3));
 		} catch (RedisConnectionFailureException | RedisSystemException e) {
 			log.error("Redis 연결 실패 - 중복 조회 기록 불가, sharedNoteId={}, memberId={}", sharedNoteId, memberId, e);
-		}
-	}
-
-	public void increaseViewCount(long sharedNoteId) {
-		try {
-			redisTemplate.opsForValue().increment(RedisKeyFactory.viewCountKey(sharedNoteId));
-		} catch (RedisConnectionFailureException | RedisSystemException e) {
-			log.error("Redis 조회수 증가 실패, sharedNoteId={}", sharedNoteId, e);
 		}
 	}
 
@@ -45,29 +42,18 @@ public class ViewCountService {
 		}
 	}
 
-	public Long getRedisViewCount(long sharedNoteId) {
+	public long getViewCount(Member member, SharedNote sharedNote) {
+		long sharedNoteId = sharedNote.getSharedNoteId();
+		long viewCount = sharedNoteFinder.findViewCountById(sharedNoteId);
 
-		String key = RedisKeyFactory.viewCountKey(sharedNoteId);
+		if (!isDuplicate(member.getMemberId(), sharedNoteId) && sharedNote.getDeletedAt() == null) {
+			sharedNoteUpdater.updateViewCount(sharedNoteId);
+			viewCount++;
+			recordViewerHistory(member.getMemberId(), sharedNoteId);
 
-		try {
-			Object value = redisTemplate.opsForValue().get(key);
-
-			if (value == null) {
-				Long viewCountFromDb = sharedNoteFinder.findViewCountById(sharedNoteId);
-
-				if (viewCountFromDb == null) {
-					log.warn("DB의 sharedNote 조회수가 null sharedNoteId={}", sharedNoteId);
-					viewCountFromDb = 0L;
-				}
-				
-				redisTemplate.opsForValue().set(key, viewCountFromDb.toString());
-				return viewCountFromDb;
-			}
-
-			return Long.parseLong(value.toString());
-		} catch (RedisConnectionFailureException | RedisSystemException e) {
-			log.error("Redis 장애 발생, 기본값 반환 sharedNoteID={}", sharedNoteId, e);
-			return 0L;
+			applicationRewardViewCountPublisherAdapter.checkViewCountRewardPolicy(sharedNote.getMember(),
+				sharedNote.getSharedNoteId(), viewCount);
 		}
+		return viewCount;
 	}
 }

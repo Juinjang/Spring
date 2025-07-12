@@ -39,7 +39,6 @@ import umc.th.juinjang.domain.note.liked.model.LikedNote;
 import umc.th.juinjang.domain.note.shared.model.SharedNote;
 import umc.th.juinjang.domain.pencil.used.model.UsedPencil;
 import umc.th.juinjang.domain.report.model.Report;
-import umc.th.juinjang.event.publisher.ApplicationRewardViewCountPublisherAdapter;
 
 @Service
 @Slf4j
@@ -51,17 +50,16 @@ public class SharedNoteQueryService {
 	private final LikedNoteFinder likedNoteFinder;
 	private final ChecklistAnswerFinder checklistAnswerFinder;
 	private final ViewCountService viewCountService;
-	private final ApplicationRewardViewCountPublisherAdapter applicationRewardViewCountPublisherAdapter;
 	private final ReportFinder reportFinder;
 
-	@Transactional(readOnly = true)
+	@Transactional
 	public SharedNoteGetResponse findSharedNote(Member member, Long sharedNoteId) {
 		SharedNote sharedNote = sharedNoteFinder.findByIdWithNoteAndAddress(sharedNoteId);
 		Limjang limjang = sharedNote.getLimjang();
 
 		boolean isBuyerOrOwner = getIsBuyerOrOwner(member, sharedNote);
 
-		long viewCount = getViewCountAndCheckReward(member, sharedNoteId, sharedNote);
+		long viewCount = viewCountService.getViewCount(member, sharedNote);
 
 		Integer countBuyer = makeBuyerCount(usedPencilFinder.countBySharedNoteId(sharedNoteId));
 		boolean isLiked = likedNoteFinder.existsByMemberAndSharedNote(member, sharedNote);
@@ -78,19 +76,6 @@ public class SharedNoteQueryService {
 	private boolean getIsBuyerOrOwner(Member requestMember, SharedNote sharedNote) {
 		return usedPencilFinder.existsByMemberAndSharedNoteId(requestMember, sharedNote.getSharedNoteId()) ||
 			sharedNote.getMember().getMemberId().equals(requestMember.getMemberId());
-	}
-
-	private long getViewCountAndCheckReward(Member member, Long sharedNoteId, SharedNote sharedNote) {
-		long viewCount = viewCountService.getRedisViewCount(sharedNote.getSharedNoteId());
-		if (!viewCountService.isDuplicate(member.getMemberId(), sharedNoteId)) {
-			viewCountService.increaseViewCount(sharedNoteId);
-			viewCount++;
-			viewCountService.recordViewerHistory(member.getMemberId(), sharedNoteId);
-
-			applicationRewardViewCountPublisherAdapter.checkViewCountRewardPolicy(sharedNote.getMember(),
-				sharedNote.getSharedNoteId(), viewCount);
-		}
-		return viewCount;
 	}
 
 	private Integer makeBuyerCount(int count) {
@@ -128,7 +113,7 @@ public class SharedNoteQueryService {
 	private Map<Long, Long> mapIdsAndViewcount(List<SharedNote> sharedNotes) {
 		return sharedNotes.stream().collect(Collectors.toMap(
 			SharedNote::getSharedNoteId,
-			it -> viewCountService.getRedisViewCount(it.getSharedNoteId())
+			SharedNote::getViewCount
 		));
 	}
 
