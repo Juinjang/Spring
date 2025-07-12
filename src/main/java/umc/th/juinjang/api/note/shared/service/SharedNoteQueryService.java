@@ -107,7 +107,7 @@ public class SharedNoteQueryService {
 
 		Map<Long, Long> viewcountMap = mapIdsAndViewcount(sharedNotes);
 		return SharedNoteExploreGetResponse.of(pages.getTotalElements(), sharedNotes, purchasedIds, likedNoteIds,
-			viewcountMap);
+			viewcountMap, member.getMemberId());
 	}
 
 	private Map<Long, Long> mapIdsAndViewcount(List<SharedNote> sharedNotes) {
@@ -181,7 +181,7 @@ public class SharedNoteQueryService {
 			sharedNotes.stream().map(SharedNote::getSharedNoteId).toList()));
 		Map<Long, Long> viewcountMap = mapIdsAndViewcount(sharedNotes);
 
-		return UserSharedNotesGetResponse.ofLiked(sharedNotes, purchasedIds, viewcountMap);
+		return UserSharedNotesGetResponse.ofLiked(sharedNotes, purchasedIds, viewcountMap, member.getMemberId());
 	}
 
 	@Transactional(readOnly = true)
