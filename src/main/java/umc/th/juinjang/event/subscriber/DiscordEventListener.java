@@ -1,12 +1,12 @@
 package umc.th.juinjang.event.subscriber;
 
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+import lombok.RequiredArgsConstructor;
+import umc.th.juinjang.domain.pencil.purchased.model.TransactionStatus;
 import umc.th.juinjang.event.FlagSharedNoteEvent;
 import umc.th.juinjang.event.PaymentEvent;
 import umc.th.juinjang.event.SignUpEvent;
@@ -41,10 +41,17 @@ public class DiscordEventListener {
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	@Async
 	public void handlePaymentEvent(PaymentEvent event) {
-		discordAlertProvider.sendPaymentAlertToDiscord(String.format(
-			EventMessage.PAYMENT_COMPLETED_MESSAGE.getMessage(),
+		String message = event.transactionStatus().equals(TransactionStatus.SUCCESS) ?
+			String.format(
+				EventMessage.PAYMENT_COMPLETED_MESSAGE.getMessage(),
+				event.memberId(), event.nickname(), event.pencilQuantity(), event.price(), event.transactionStatus()
+			)
+			: String.format(
+			EventMessage.PAYMENT_REFUNDED_MESSAGE.getMessage(),
 			event.memberId(), event.nickname(), event.pencilQuantity(), event.price(), event.transactionStatus()
-		));
+		);
+
+		discordAlertProvider.sendPaymentAlertToDiscord(message);
 	}
 
 }

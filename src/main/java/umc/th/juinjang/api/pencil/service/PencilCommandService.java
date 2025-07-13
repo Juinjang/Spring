@@ -166,6 +166,8 @@ public class PencilCommandService {
 		PencilAccount buyerAccount = pencilAccountFinder.findByMemberWithLock(pencil.getMember());
 		executeRefund(buyerAccount, pencil.getPurchaseQuantity(), pencil.getPrice());
 
+		paymentEventPublisher.publishPaymentEvent(pencil.getMember(), pencil.getPrice(), pencil.getPurchaseQuantity(),
+			TransactionStatus.REFUNDED);
 	}
 
 	public void executeRefund(PencilAccount buyerAccount, long pencilQuantity, long price) {
