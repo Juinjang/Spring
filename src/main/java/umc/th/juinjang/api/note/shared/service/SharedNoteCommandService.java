@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import umc.th.juinjang.api.limjang.service.NoteFinder;
 import umc.th.juinjang.api.limjang.service.NoteUpdater;
 import umc.th.juinjang.api.note.shared.controller.request.SharedNotePostRequest;
+import umc.th.juinjang.api.note.shared.service.response.SharedNotePostResponse;
 import umc.th.juinjang.api.pencil.service.AcquiredPencilUpdater;
 import umc.th.juinjang.api.pencil.service.PurchasedPencilUpdater;
 import umc.th.juinjang.api.pencil.service.UsedPencilFinder;
@@ -134,7 +135,7 @@ public class SharedNoteCommandService {
 	}
 
 	@Transactional
-	public void createSharedNote(Member member, Long noteId, SharedNotePostRequest request) {
+	public SharedNotePostResponse createSharedNote(Member member, Long noteId, SharedNotePostRequest request) {
 
 		Limjang limjang = noteFinder.getNoteByIdWhereDeletedIsFalse(noteId);
 		Optional<SharedNote> latestSharedNote = sharedNoteFinder.findLatestByLimjangId(noteId);
@@ -152,12 +153,13 @@ public class SharedNoteCommandService {
 
 		// 공유 저장
 		SharedNote sharedNote = SharedNote.toSharedNote(member, limjang, request, price);
-		sharedNoteUpdater.save(sharedNote);
+		sharedNote = sharedNoteUpdater.save(sharedNote);
 
 		// 보상 처리
 		if (rewardPencilCount > 0) {
 			applyReward(member, limjang, sharedNote.getSharedNoteId(), rewardPencilCount);
 		}
+		return new SharedNotePostResponse(sharedNote.getSharedNoteId());
 	}
 
 	private int calculateReward(Limjang limjang, SharedNotePostRequest request) {

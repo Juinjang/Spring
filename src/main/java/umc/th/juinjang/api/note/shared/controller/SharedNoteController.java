@@ -29,6 +29,7 @@ import umc.th.juinjang.api.note.shared.service.SharedNoteQueryService;
 import umc.th.juinjang.api.note.shared.service.response.SharedNoteCheckListAndReviewResponse;
 import umc.th.juinjang.api.note.shared.service.response.SharedNoteExploreGetResponse;
 import umc.th.juinjang.api.note.shared.service.response.SharedNoteGetResponse;
+import umc.th.juinjang.api.note.shared.service.response.SharedNotePostResponse;
 import umc.th.juinjang.api.note.shared.service.response.UserSharedNotesGetResponse;
 import umc.th.juinjang.domain.limjang.model.LimjangPriceType;
 import umc.th.juinjang.domain.limjang.model.LimjangPropertyType;
@@ -67,11 +68,10 @@ public class SharedNoteController {
 
 	@Operation(summary = "공유 노트 생성 API")
 	@PostMapping("/{noteId}")
-	public ApiResponse<Void> uploadSharedNote(@AuthenticationPrincipal Member member,
+	public ApiResponse<SharedNotePostResponse> uploadSharedNote(@AuthenticationPrincipal Member member,
 		@PathVariable("noteId") Long noteId,
 		@RequestBody SharedNotePostRequest request) {
-		sharedNoteCommandService.createSharedNote(member, noteId, request);
-		return ApiResponse.onSuccess(null);
+		return ApiResponse.onSuccess(sharedNoteCommandService.createSharedNote(member, noteId, request));
 	}
 
 	@Operation(summary = "공유 노트 둘러보기 API")
