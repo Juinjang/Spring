@@ -4,6 +4,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import umc.th.juinjang.domain.image.model.Image;
+import umc.th.juinjang.domain.limjang.model.Address;
 import umc.th.juinjang.domain.limjang.model.Limjang;
 import umc.th.juinjang.domain.limjang.model.LimjangPriceType;
 import umc.th.juinjang.domain.limjang.model.LimjangPropertyType;
@@ -22,9 +23,14 @@ public record UserNoteGetResponse(
 	String monthlyRent,
 	String updatedAt,
 	String floor,
-	Integer pyong
+	Integer pyong,
+	String bcode,
+	String sido,
+	String sigungu,
+	String bname1,
+	String bname2
 ) {
-	public static UserNoteGetResponse of(boolean isShared, Limjang note) {
+	public static UserNoteGetResponse of(boolean isShared, Limjang note, Address address) {
 		return new UserNoteGetResponse(
 			isShared,
 			note.getPurpose(),
@@ -32,12 +38,18 @@ public record UserNoteGetResponse(
 			note.getPriceType(),
 			note.getNickname(),
 			note.getImageList().stream().map(Image::getImageUrl).limit(3).toList(),
-			note.getAddressEntity().getRoadAddress(),
-			note.getAddressEntity().getAddressDetail(),
+			address.getRoadAddress(),
+			address.getAddressDetail(),
 			note.getLimjangPrice().getPrice(note.getPriceType(), note.getPurpose()),
 			note.getPriceType() == LimjangPriceType.MONTHLY_RENT ? note.getLimjangPrice().getMonthlyRent() : null,
 			note.getUpdatedAt().format(DateTimeFormatter.ofPattern("yy.MM.dd")),
 			note.getFloor(),
-			note.getPyong());
+			note.getPyong(),
+			address.getBcode(),
+			address.getSido(),
+			address.getSigungo(),
+			address.getBname1(),
+			address.getBname2()
+		);
 	}
 }
