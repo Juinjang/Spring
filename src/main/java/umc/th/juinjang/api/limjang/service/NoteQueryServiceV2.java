@@ -89,7 +89,7 @@ public class NoteQueryServiceV2 {
 	public UserNoteGetResponse findNote(Long noteId) {
 		Limjang note = noteFinder.getNoteByIdWithAddressAndNotePriceWhereDeletedIsFalse(noteId);
 		boolean isShared = sharedNoteFinder.existsByDeletedAtIsNullAndLimjang(note);
-		return UserNoteGetResponse.of(isShared, note);
+		return UserNoteGetResponse.of(isShared, note, note.getAddressEntity());
 	}
 
 	public ChecklistConditionResponse checkLimjangChecklistSatisfaction(Long limjangId) {
