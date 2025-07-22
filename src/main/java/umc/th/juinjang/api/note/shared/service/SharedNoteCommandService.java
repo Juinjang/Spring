@@ -185,7 +185,7 @@ public class SharedNoteCommandService {
 				Likelihood.LIKELY,  // spoof
 				Likelihood.LIKELY,  // medical
 				Likelihood.POSSIBLE,  // violence
-				Likelihood.VERY_LIKELY     // racy
+				Likelihood.LIKELY     // racy
 			);
 			if (!safe) {
 				throw new SharedNoteHandler(ErrorStatus.SHARED_NOT_ALLOWED);
