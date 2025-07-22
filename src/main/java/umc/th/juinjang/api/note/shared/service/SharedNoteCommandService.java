@@ -181,11 +181,11 @@ public class SharedNoteCommandService {
 		for (var image : limjang.getImageList()) {
 			boolean safe = safeSearchClient.isSafeImage(
 				image.getImageUrl(),
-				Likelihood.UNLIKELY,  // adult
-				Likelihood.POSSIBLE,  // spoof
-				Likelihood.POSSIBLE,  // medical
-				Likelihood.UNLIKELY,  // violence
-				Likelihood.LIKELY     // racy
+				Likelihood.POSSIBLE,  // adult
+				Likelihood.LIKELY,  // spoof
+				Likelihood.LIKELY,  // medical
+				Likelihood.POSSIBLE,  // violence
+				Likelihood.VERY_LIKELY     // racy
 			);
 			if (!safe) {
 				throw new SharedNoteHandler(ErrorStatus.SHARED_NOT_ALLOWED);
