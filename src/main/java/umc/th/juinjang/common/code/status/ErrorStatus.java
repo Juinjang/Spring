@@ -119,8 +119,11 @@ public enum ErrorStatus implements BaseErrorCode {
 
 	// LikedNote
 	LIKEDNOTE_CONFLICT(HttpStatus.CONFLICT, "LIKEDNOTE4000", "이미 좋아요한 노트입니다"),
-	LIKEDNOTE_NOT_FOUND(HttpStatus.NOT_FOUND, "LIKEDNOTE4001", "이미 취소했거나 좋아요한 적이 없습니다.");
+	LIKEDNOTE_NOT_FOUND(HttpStatus.NOT_FOUND, "LIKEDNOTE4001", "이미 취소했거나 좋아요한 적이 없습니다."),
 
+	// Terms_Agreement
+	TERMS_AGREEMENT_DUPLICATED(HttpStatus.BAD_REQUEST, "TERMS_AGREEMENT_4000", "이미 약관에 동의하였습니다.");
+	
 	private final HttpStatus httpStatus;
 	private final String code;
 	private final String message;
