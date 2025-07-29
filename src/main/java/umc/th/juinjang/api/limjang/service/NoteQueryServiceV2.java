@@ -1,6 +1,7 @@
 package umc.th.juinjang.api.limjang.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -63,13 +64,34 @@ public class NoteQueryServiceV2 {
 		List<Limjang> filteredSharedNotes = findUnsharedSharableNotes(member);
 		List<Image> imageList = imageFinder.findAllFirstCreatedImagePerNote(filteredSharedNotes);
 
+		// 예상 리워드 판별
+		Map<Long, Long> mapToExpectedReward = mapInCalculateReward(filteredSharedNotes);
+
 		return UserNotesShareableGetResponse.of(filteredSharedNotes, mapToNoteIdAndImageId(imageList),
-			mapToNoteScrapStatus(filteredSharedNotes));
+			mapToNoteScrapStatus(filteredSharedNotes), mapToExpectedReward);
+	}
+
+	private Map<Long, Long> mapInCalculateReward(List<Limjang> notes) {
+		Set<Long> noteIdsWithPastSharedHistory =
+			sharedNoteFinder.findLimjangIdsByDeletedAtIsNotNullAndLimjang(notes);
+
+		Map<Long, Long> mapToExpectedRewardPencil = new HashMap<>();
+		for (Limjang note : notes) {
+			mapToExpectedRewardPencil.put(note.getLimjangId(), calculateReward(note, noteIdsWithPastSharedHistory));
+		}
+		return mapToExpectedRewardPencil;
+	}
+
+	private Long calculateReward(Limjang note, Set<Long> previouslySharedNoteIds) {
+		if (previouslySharedNoteIds.contains(note.getLimjangId()))
+			return null;
+		return note.getImageList().isEmpty() ? 2L : 7L;
 	}
 
 	private List<Limjang> findUnsharedSharableNotes(Member member) {
 		List<Limjang> notes = noteFinder.getAllByMemberWithAddressAndNotePriceWhereIsSharableIsTrueAndDeletedIsFalseAndAddressBcodeIsNotNull(
 			member);
+		// 이미 공유 중인 임장들 필터링
 		Set<Long> noteIdInSharedNotes = sharedNoteFinder.findLimjangIdsByDeletedAtIsNullAndLimjang(notes);
 
 		return notes.stream()
