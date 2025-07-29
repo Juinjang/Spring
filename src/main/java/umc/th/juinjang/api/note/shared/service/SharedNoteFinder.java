@@ -85,4 +85,8 @@ public class SharedNoteFinder {
 	public Set<Long> findLimjangIdsByDeletedAtIsNullAndLimjang(List<Limjang> notes) {
 		return sharedNoteRepository.findLimjangIdsByDeletedAtIsNullAndLimjang(notes);
 	}
+
+	public Set<Long> findLimjangIdsByDeletedAtIsNotNullAndLimjang(List<Limjang> notes) {
+		return sharedNoteRepository.findLimjangIdsByDeletedAtIsNotNullAndLimjang(notes);
+	}
 }

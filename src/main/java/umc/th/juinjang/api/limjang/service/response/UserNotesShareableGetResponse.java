@@ -24,10 +24,11 @@ public record UserNotesShareableGetResponse(
 		String monthlyRent,
 		Integer pyong,
 		String floor,
-		String shortAddress
+		String shortAddress,
+		Long rewardPencil
 	) {
 
-		static UserNoteShareableResponse of(Limjang limjang, String imageUrl, boolean isScraped) {
+		static UserNoteShareableResponse of(Limjang limjang, String imageUrl, boolean isScraped, Long rewardPencil) {
 			return new UserNoteShareableResponse(
 				limjang.getLimjangId(), limjang.getPurpose(), limjang.getPropertyType(), limjang.getPriceType(),
 				limjang.getNickname(),
@@ -39,17 +40,18 @@ public record UserNotesShareableGetResponse(
 					null,
 				limjang.getPyong(),
 				limjang.getFloor(),
-				limjang.getAddressEntity().getShortAddress()
+				limjang.getAddressEntity().getShortAddress(),
+				rewardPencil
 			);
 		}
 	}
 
 	public static UserNotesShareableGetResponse of(List<Limjang> limjangs, Map<Long, String> imageUrl,
-		Map<Long, Boolean> isScraped) {
+		Map<Long, Boolean> isScraped, Map<Long, Long> expectedReward) {
 		return new UserNotesShareableGetResponse(
 			limjangs.stream()
 				.map(it -> UserNoteShareableResponse.of(it, imageUrl.get(it.getLimjangId()),
-					isScraped.get(it.getLimjangId())))
+					isScraped.get(it.getLimjangId()), expectedReward.get(it.getLimjangId())))
 				.toList());
 	}
 }

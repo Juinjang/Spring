@@ -49,4 +49,7 @@ public interface SharedNoteRepository extends JpaRepository<SharedNote, Long>, S
 
 	@Query("SELECT s.limjang.limjangId FROM SharedNote s WHERE s.limjang in :limjangs AND s.deletedAt is null")
 	Set<Long> findLimjangIdsByDeletedAtIsNullAndLimjang(@Param("limjangs") List<Limjang> limjangs);
+
+	@Query("SELECT s.limjang.limjangId FROM SharedNote s WHERE s.limjang in :limjangs AND s.deletedAt is not null")
+	Set<Long> findLimjangIdsByDeletedAtIsNotNullAndLimjang(@Param("limjangs") List<Limjang> limjangs);
 }
