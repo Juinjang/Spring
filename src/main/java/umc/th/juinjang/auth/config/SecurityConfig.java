@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -27,14 +26,6 @@ import umc.th.juinjang.auth.jwt.JwtService;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-	private final AuthenticationConfiguration authenticationConfiguration;
-
-	private final JwtService jwtService;
-
-	private final JwtExceptionFilter jwtExceptionFilter;
-
-	private final Environment environment;
-
 	// 공통적으로 허용되는 URL 패턴
 	private static final String[] COMMON_WHITELIST_URLS = {
 		"/h2-console/**",
@@ -44,9 +35,9 @@ public class SecurityConfig {
 		"/actuator/prometheus",
 		"/api/auth/v2/apple/**",
 		"/api/auth/v2/kakao/**",
-		"/api/members/nickname/exists"
+		"/api/members/nickname/exists",
+		"/api/app/version/ios"
 	};
-
 	// 개발 환경에서만 추가로 허용되는 URL 패턴
 	private static final String[] DEV_WHITELIST_URLS = {
 		"/swagger-ui/**",
@@ -57,6 +48,10 @@ public class SecurityConfig {
 		"/configuration/ui",
 		"/v3/api-docs/**"
 	};
+	private final AuthenticationConfiguration authenticationConfiguration;
+	private final JwtService jwtService;
+	private final JwtExceptionFilter jwtExceptionFilter;
+	private final Environment environment;
 
 	@Bean
 	@Order(0)
@@ -87,7 +82,7 @@ public class SecurityConfig {
 
 		http
 			.csrf(AbstractHttpConfigurer::disable)
-			.formLogin(Customizer.withDefaults())
+			.formLogin(AbstractHttpConfigurer::disable)
 			.sessionManagement((sessionManagement) ->
 					sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				//                        세션을 사용하지 않는다고 설정함
@@ -98,6 +93,7 @@ public class SecurityConfig {
 				authorizeRequests
 					.requestMatchers(
 						AntPathRequestMatcher.antMatcher("/api/members/nickname/exists"),
+						AntPathRequestMatcher.antMatcher("/api/app/version/ios"),
 						AntPathRequestMatcher.antMatcher("/h2-console/**")
 					).permitAll()
 					.requestMatchers(
