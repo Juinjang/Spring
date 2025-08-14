@@ -45,6 +45,17 @@ jobs:
           echo "${{ secrets.APPLE_AUTH }}" > ./src/main/resources/AUTHKEY_JUINJAG.p8
         shell: bash
 
+      # APPLE IN_APP 결제 관련 프로세스 시작
+      - name: Create certs and keys directories
+        run: |
+          mkdir -p ./src/main/resources/keys
+
+      - name: Create IAP .p8 Key
+        run: |
+          echo "${{ secrets.APPLE_IAP_KEY }}" > ./src/main/resources/keys/${{ secrets.APPLE_IAP_KEY_NAME }}
+        shell: bash
+      # APPLE IN_APP 결제 관련 프로세스 끝
+
       - name: Build With Gradle
         run: ./gradlew build -x test
 
