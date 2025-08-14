@@ -1,31 +1,57 @@
 package umc.th.juinjang.event.subscriber;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
+
+import lombok.RequiredArgsConstructor;
+import umc.th.juinjang.domain.pencil.purchased.model.TransactionStatus;
+import umc.th.juinjang.event.FlagSharedNoteEvent;
+import umc.th.juinjang.event.PaymentEvent;
 import umc.th.juinjang.event.SignUpEvent;
-import umc.th.juinjang.external.discord.DiscordAlertProvider;
+import umc.th.juinjang.external.openfeign.discord.DiscordAlertProvider;
 
 @Component
 @RequiredArgsConstructor
 public class DiscordEventListener {
 
-  private final DiscordAlertProvider discordAlertProvider;
-  private final Environment environment;
+	private final DiscordAlertProvider discordAlertProvider;
 
-  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-  @Async
-  public void handleSignUpEvent (SignUpEvent event){
-    if (isProdEnv()) {
-      discordAlertProvider.sendAlertToDiscord(String.format(EventMessage.SIGN_UP_MESSAGE.getMessage(), event.memberProvider(), event.count(), event.name()));
-    }
-  }
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	@Async
+	public void handleSignUpEvent(SignUpEvent event) {
+		discordAlertProvider.sendMemberCreateAlertToDiscord(
+			String.format(EventMessage.SIGN_UP_MESSAGE.getMessage(), event.memberProvider(), event.count(),
+				event.name()));
+	}
 
-  private boolean isProdEnv() {
-    return environment.acceptsProfiles(Profiles.of("prod"));
-  }
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	@Async
+	public void handleFlagSharedNoteEvent(FlagSharedNoteEvent event) {
+		discordAlertProvider.sendReportSharedNoteAlertToDiscord(String.format(
+			EventMessage.FLAG_SHARED_NOTE_MESSAGE.getMessage(),
+			event.flaggedByMemberId(),
+			event.flagSharedNoteType().getDescription(),
+			event.targetMemberId(),
+			event.targetSharedNoteId()
+		));
+	}
+
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	@Async
+	public void handlePaymentEvent(PaymentEvent event) {
+		String message = event.transactionStatus().equals(TransactionStatus.SUCCESS) ?
+			String.format(
+				EventMessage.PAYMENT_COMPLETED_MESSAGE.getMessage(),
+				event.memberId(), event.nickname(), event.pencilQuantity(), event.price(), event.transactionStatus()
+			)
+			: String.format(
+			EventMessage.PAYMENT_REFUNDED_MESSAGE.getMessage(),
+			event.memberId(), event.nickname(), event.pencilQuantity(), event.price(), event.transactionStatus()
+		);
+
+		discordAlertProvider.sendPaymentAlertToDiscord(message);
+	}
+
 }

@@ -1,6 +1,6 @@
 package umc.th.juinjang.event;
 
-import umc.th.juinjang.model.entity.enums.MemberProvider;
+import umc.th.juinjang.domain.member.model.MemberProvider;
 
 public record SignUpEvent(
     MemberProvider memberProvider,

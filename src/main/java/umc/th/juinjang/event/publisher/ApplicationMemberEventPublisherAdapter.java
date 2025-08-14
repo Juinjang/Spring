@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import umc.th.juinjang.event.SignUpEvent;
-import umc.th.juinjang.model.entity.Member;
+import umc.th.juinjang.domain.member.model.Member;
 
 @RequiredArgsConstructor
 @Component

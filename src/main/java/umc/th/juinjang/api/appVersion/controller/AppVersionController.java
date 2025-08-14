@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import umc.th.juinjang.api.appVersion.controller.response.AppVersionResponse;
-import umc.th.juinjang.apiPayload.ApiResponse;
+import umc.th.juinjang.api.dto.ApiResponse;
 import umc.th.juinjang.config.AppVersionProperties;
 
 @RestController
