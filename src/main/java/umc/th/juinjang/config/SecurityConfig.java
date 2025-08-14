@@ -19,9 +19,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import lombok.RequiredArgsConstructor;
-import umc.th.juinjang.jwt.JwtAuthenticationFilter;
-import umc.th.juinjang.jwt.JwtExceptionFilter;
-import umc.th.juinjang.service.auth.JwtService;
+import umc.th.juinjang.auth.jwt.JwtAuthenticationFilter;
+import umc.th.juinjang.auth.jwt.JwtExceptionFilter;
+import umc.th.juinjang.auth.jwt.JwtService;
 
 @Configuration
 @EnableWebSecurity
