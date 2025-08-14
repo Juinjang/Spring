@@ -36,7 +36,8 @@ public class SecurityConfig {
 		"/api/auth/v2/apple/**",
 		"/api/auth/v2/kakao/**",
 		"/api/members/nickname/exists",
-		"/api/app/version/ios"
+		"/api/app/version/ios",
+		"/api/apple/notifications/v2"
 	};
 	// 개발 환경에서만 추가로 허용되는 URL 패턴
 	private static final String[] DEV_WHITELIST_URLS = {
@@ -94,6 +95,7 @@ public class SecurityConfig {
 					.requestMatchers(
 						AntPathRequestMatcher.antMatcher("/api/members/nickname/exists"),
 						AntPathRequestMatcher.antMatcher("/api/app/version/ios"),
+						AntPathRequestMatcher.antMatcher("/api/apple/notifications/v2"),
 						AntPathRequestMatcher.antMatcher("/h2-console/**")
 					).permitAll()
 					.requestMatchers(
