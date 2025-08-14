@@ -34,6 +34,7 @@ public class AppleController {
 	public ResponseEntity<Void> handleNotificationV2(@RequestBody ResponseBodyV2 requestBody) {
 		ResponseBodyV2DecodedPayload payload = appleService.getNotificationPayload(requestBody);
 		NotificationTypeV2 type = payload.getNotificationType();
+		log.info("### Notification Type: {}", type);
 
 		Data data = payload.getData();
 		JWSTransactionDecodedPayload transactionPayload =
