@@ -1,5 +1,5 @@
 # .github/workflows/prod-cd.yml
-name: CD for Prod
+name: CD For Prod
 
 on:
   push:
@@ -52,7 +52,22 @@ jobs:
 
       - name: Create IAP .p8 Key
         run: |
-          echo "${{ secrets.APPLE_IAP_KEY }}" > ./src/main/resources/keys/${{ secrets.APPLE_IAP_KEY_NAME }}
+          echo "${{ secrets.APPLE_IAP_KEY_PROD }}" > ./src/main/resources/keys/SubscriptionKey_62QGYSCKW2.p8
+
+          # 키 파일 크기 확인 (내용은 로그에 출력하지 않음)
+          if [ -s "./src/main/resources/keys/SubscriptionKey_62QGYSCKW2.p8" ]; then
+            echo "✅ IAP key file created: $(wc -c < ./src/main/resources/keys/SubscriptionKey_62QGYSCKW2.p8) bytes"
+          else
+            echo "❌ IAP key file is empty!"
+            exit 1
+          fi
+
+          # PEM 형식 확인
+          if grep -q "BEGIN PRIVATE KEY" ./src/main/resources/keys/SubscriptionKey_62QGYSCKW2.p8; then
+            echo "✅ IAP key file appears to be in PEM format"
+          else
+            echo "⚠️ IAP key file may not be in PEM format"
+          fi
         shell: bash
       # APPLE IN_APP 결제 관련 프로세스 끝
 
@@ -71,7 +86,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO_PROD }}
 
-      - name: Deploy to Prod
+      - name: Deploy to Prod!
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.EC2_HOST_PROD }}
@@ -79,9 +94,9 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY_PROD }}
           script: |
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO_PROD }}
-            chmod 777 ./deploy.sh
+            sudo chmod 777 ./deploy.sh
             ./deploy.sh
-            docker image prune -f
+            sudo docker image prune -f
 
   create-release:
     needs: build
