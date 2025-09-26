@@ -54,6 +54,20 @@ public class NoteCommandServiceV2 {
 		note.updateNote(request.nickname(), request.priceType(), request.floor(), request.pyong());
 	}
 
+	@Transactional
+	public void updateNoteV2(Long noteId, NotePatchRequest request) {
+		Limjang note = noteFinder.getNoteByIdWhereDeletedIsFalse(noteId);
+
+		validatePriceType(note.getPurpose(), request.priceType());
+
+		LimjangPrice newPrice = request.toUpdatedPrice(note.getPurpose());
+		Address newAddress = request.toUpdatedAddress();
+
+		note.getAddressEntity().update(newAddress);
+		note.getLimjangPrice().updateLimjangPrice(newPrice);
+		note.updateNote(request.nickname(), request.priceType(), request.floor(), request.pyong());
+	}
+
 	private void validatePriceType(LimjangPurpose purposeType, LimjangPriceType priceType) {
 		if (
 			(purposeType == LimjangPurpose.RESIDENTIAL_PURPOSE && priceType == LimjangPriceType.MARKET_PRICE) ||

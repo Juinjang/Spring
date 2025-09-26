@@ -68,6 +68,15 @@ public class NoteControllerV2 {
 		return ApiResponse.onSuccess(null);
 	}
 
+	@Operation(summary = "임장 수정 API V2 - UI/UX 리팩토링")
+	@PatchMapping("/notes/init/{noteId}")
+	public ApiResponse<Void> updateNoteV2(@PathVariable(name = "noteId") Long noteId,
+		@RequestBody @Valid NotePatchRequest request,
+		@AuthenticationPrincipal Member member) {
+		noteCommandService.updateNoteV2(noteId, request);
+		return ApiResponse.onSuccess(null);
+	}
+
 	@Operation(summary = "임장 노트 출력 - 공유하기 선택 화면 API")
 	@GetMapping("/notes/shareable")
 	public ApiResponse<UserNotesShareableGetResponse> findNotesShareable(@AuthenticationPrincipal Member member) {
