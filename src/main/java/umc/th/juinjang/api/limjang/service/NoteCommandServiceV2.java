@@ -3,10 +3,12 @@ package umc.th.juinjang.api.limjang.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import umc.th.juinjang.api.address.service.AddressUpdater;
+import umc.th.juinjang.api.limjang.controller.request.NoteInitRequest;
 import umc.th.juinjang.api.limjang.controller.request.NotePatchRequest;
 import umc.th.juinjang.api.limjang.controller.request.NotePostRequest;
-import umc.th.juinjang.api.address.service.AddressUpdater;
 import umc.th.juinjang.api.limjang.service.response.NotePostResponse;
 import umc.th.juinjang.common.code.status.ErrorStatus;
 import umc.th.juinjang.common.exception.handler.LimjangHandler;
@@ -59,5 +61,15 @@ public class NoteCommandServiceV2 {
 		) {
 			throw new LimjangHandler(ErrorStatus.LIMJANG_POST_TYPE_ERROR);
 		}
+	}
+
+	public NotePostResponse initNote(@Valid NoteInitRequest request, Member member) {
+		Limjang note = request.toEntity(member);
+		validatePriceType(request.purposeType(), request.priceType());
+
+		notePriceUpdater.save(note.getLimjangPrice());
+		Limjang savedNote = noteUpdater.save(note);
+
+		return NotePostResponse.of(savedNote.getLimjangId());
 	}
 }

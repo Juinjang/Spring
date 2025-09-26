@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import umc.th.juinjang.api.dto.ApiResponse;
 import umc.th.juinjang.api.limjang.controller.parameter.LimjangSortOptions;
+import umc.th.juinjang.api.limjang.controller.request.NoteInitRequest;
 import umc.th.juinjang.api.limjang.controller.request.NotePatchRequest;
 import umc.th.juinjang.api.limjang.controller.request.NotePostRequest;
 import umc.th.juinjang.api.limjang.service.NoteCommandServiceV2;
@@ -40,6 +41,13 @@ public class NoteControllerV2 {
 	public ApiResponse<NotePostResponse> createNote(@RequestBody @Valid NotePostRequest request,
 		@AuthenticationPrincipal Member member) {
 		return ApiResponse.of(SuccessStatus._CREATED, noteCommandService.createNote(request, member));
+	}
+
+	@Operation(summary = "임장 생성 API INIT V2 - 간편한 임장 생성")
+	@PostMapping("/notes/init")
+	public ApiResponse<NotePostResponse> initNote(@RequestBody @Valid NoteInitRequest request,
+		@AuthenticationPrincipal Member member) {
+		return ApiResponse.of(SuccessStatus._CREATED, noteCommandService.initNote(request, member));
 	}
 
 	@Operation(summary = "마이 노트 조회 API V2")

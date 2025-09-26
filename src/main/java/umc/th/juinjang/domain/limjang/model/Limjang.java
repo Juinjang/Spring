@@ -1,5 +1,7 @@
 package umc.th.juinjang.domain.limjang.model;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -177,6 +179,21 @@ public class Limjang extends BaseEntity {
 			.addressEntity(addressEntity)
 			.pyong(pyong)
 			.floor(floor)
+			.build();
+	}
+
+	public static Limjang initNote(Member member, LimjangPrice price, LimjangPurpose purpose,
+		LimjangPropertyType propertyType, LimjangPriceType priceType) {
+		String nickname = LocalDateTime.now()
+			.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")) + " 매물노트";
+
+		return Limjang.builder()
+			.memberId(member)
+			.limjangPrice(price)
+			.priceType(priceType)
+			.purpose(purpose)
+			.propertyType(propertyType)
+			.nickname(nickname)
 			.build();
 	}
 
