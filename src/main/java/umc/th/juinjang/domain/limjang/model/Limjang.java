@@ -26,6 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import umc.th.juinjang.domain.checklist.model.ChecklistAnswer;
 import umc.th.juinjang.domain.common.BaseEntity;
 import umc.th.juinjang.domain.image.model.Image;
@@ -35,6 +36,7 @@ import umc.th.juinjang.domain.report.model.Report;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -203,4 +205,5 @@ public class Limjang extends BaseEntity {
 		this.floor = floor;
 		this.pyong = pyong;
 	}
+
 }

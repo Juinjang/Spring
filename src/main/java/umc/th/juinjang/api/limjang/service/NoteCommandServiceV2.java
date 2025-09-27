@@ -63,7 +63,13 @@ public class NoteCommandServiceV2 {
 		LimjangPrice newPrice = request.toUpdatedPrice(note.getPurpose());
 		Address newAddress = request.toUpdatedAddress();
 
-		note.getAddressEntity().update(newAddress);
+		if (note.getAddressEntity() != null) {
+			note.getAddressEntity().update(newAddress);
+		} else {
+			addressUpdater.save(newAddress);
+			note.setAddressEntity(newAddress);
+		}
+
 		note.getLimjangPrice().updateLimjangPrice(newPrice);
 		note.updateNote(request.nickname(), request.priceType(), request.floor(), request.pyong());
 	}
