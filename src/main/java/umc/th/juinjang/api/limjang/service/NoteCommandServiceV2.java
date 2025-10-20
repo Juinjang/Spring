@@ -87,7 +87,6 @@ public class NoteCommandServiceV2 {
 		Limjang note = request.toEntity(member);
 		validatePriceType(request.purposeType(), request.priceType());
 
-		notePriceUpdater.save(note.getLimjangPrice());
 		Limjang savedNote = noteUpdater.save(note);
 
 		return NotePostResponse.of(savedNote.getLimjangId());

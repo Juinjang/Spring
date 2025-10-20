@@ -12,7 +12,7 @@ import umc.th.juinjang.domain.limjang.model.LimjangPurpose;
 public record UserNotesGetResponse(
 	List<UserNoteResponse> notes
 ) {
-	record UserNoteResponse(
+	public record UserNoteResponse(
 		long noteId,
 		LimjangPurpose purposeType,
 		LimjangPropertyType propertyType,
@@ -30,18 +30,22 @@ public record UserNotesGetResponse(
 	) {
 		static UserNoteResponse of(Limjang limjang, boolean isScraped) {
 			return new UserNoteResponse(
-				limjang.getLimjangId(), limjang.getPurpose(), limjang.getPropertyType(), limjang.getPriceType(),
+				limjang.getLimjangId(),
+				limjang.getPurpose(),
+				limjang.getPropertyType(),
+				limjang.getPriceType(),
 				limjang.getNickname(),
 				limjang.getImageList().stream().map(Image::getImageUrl).limit(3).toList(),
 				isScraped,
 				limjang.getReport() == null ? null : limjang.getReport().getTotalRate().toString(),
 				limjang.getLimjangPrice().getPrice(limjang.getPriceType(), limjang.getPurpose()),
-				limjang.getPriceType() == LimjangPriceType.MONTHLY_RENT ? limjang.getLimjangPrice().getMonthlyRent() :
-					null,
+				limjang.getPriceType() == LimjangPriceType.MONTHLY_RENT ?
+					limjang.getLimjangPrice().getMonthlyRent() : null,
 				limjang.getPyong(),
 				limjang.getFloor(),
-				limjang.getAddressEntity().getRoadAddress(),
-				limjang.getAddressEntity().getShortAddress());
+				limjang.getAddressEntity() != null ? limjang.getAddressEntity().getRoadAddress() : null,
+				limjang.getAddressEntity() != null ? limjang.getAddressEntity().getShortAddress() : null
+			);
 		}
 	}
 
