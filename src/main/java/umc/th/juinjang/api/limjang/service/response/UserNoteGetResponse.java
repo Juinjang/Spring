@@ -38,18 +38,18 @@ public record UserNoteGetResponse(
 			note.getPriceType(),
 			note.getNickname(),
 			note.getImageList().stream().map(Image::getImageUrl).limit(3).toList(),
-			address.getRoadAddress(),
-			address.getAddressDetail(),
+			address != null ? address.getRoadAddress() : null,
+			address != null ? address.getAddressDetail() : null,
 			note.getLimjangPrice().getPrice(note.getPriceType(), note.getPurpose()),
 			note.getPriceType() == LimjangPriceType.MONTHLY_RENT ? note.getLimjangPrice().getMonthlyRent() : null,
 			note.getUpdatedAt().format(DateTimeFormatter.ofPattern("yy.MM.dd")),
 			note.getFloor(),
 			note.getPyong(),
-			address.getBcode(),
-			address.getSido(),
-			address.getSigungo(),
-			address.getBname1(),
-			address.getBname2()
+			address != null ? address.getBcode() : null,
+			address != null ? address.getSido() : null,
+			address != null ? address.getSigungo() : null,
+			address != null ? address.getBname1() : null,
+			address != null ? address.getBname2() : null
 		);
 	}
 }

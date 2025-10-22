@@ -117,18 +117,7 @@ public class InitNoteTest extends IntegrationTestSupport {
 
 		UserNoteGetResponse response = noteQueryService.findNote(createdNoteId);
 		log.info("### response : {} ", response);
-		assertInitNoteBasicFields(response, createdNoteId);
-	}
-
-	// 헬퍼 메서드들
-	private NoteInitRequest createInitRequest() {
-		return new NoteInitRequest(
-			LimjangPurpose.RESIDENTIAL_PURPOSE,
-			LimjangPropertyType.APARTMENT,
-			LimjangPriceType.MONTHLY_RENT,
-			"50000",
-			"4000"
-		);
+		
 	}
 
 	private void assertInitNoteBasicFields(UserNotesGetResponse.UserNoteResponse note, Long expectedId) {
