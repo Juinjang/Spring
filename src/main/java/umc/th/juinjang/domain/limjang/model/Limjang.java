@@ -187,7 +187,7 @@ public class Limjang extends BaseEntity {
 	public static Limjang initNote(Member member, LimjangPrice price, LimjangPurpose purpose,
 		LimjangPropertyType propertyType, LimjangPriceType priceType) {
 		String nickname = LocalDateTime.now()
-			.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")) + " 매물노트";
+			.format(DateTimeFormatter.ofPattern("yy.MM.dd HH:mm")) + " 매물노트";
 
 		return Limjang.builder()
 			.memberId(member)
