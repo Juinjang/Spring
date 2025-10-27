@@ -64,7 +64,7 @@ public class NoteControllerV2 {
 	public ApiResponse<Void> updateNote(@PathVariable(name = "noteId") Long noteId,
 		@RequestBody @Valid NotePatchRequest request,
 		@AuthenticationPrincipal Member member) {
-		noteCommandService.updateNote(noteId, request);
+		noteCommandService.updateNoteV2(noteId, request);
 		return ApiResponse.onSuccess(null);
 	}
 
