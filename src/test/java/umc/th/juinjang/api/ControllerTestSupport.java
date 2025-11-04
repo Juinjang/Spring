@@ -7,6 +7,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import umc.th.juinjang.api.limjang.controller.NoteControllerV2;
+import umc.th.juinjang.api.limjang.service.NoteCommandServiceV2;
+import umc.th.juinjang.api.limjang.service.NoteQueryServiceV2;
 import umc.th.juinjang.api.pencil.controller.PencilController;
 import umc.th.juinjang.api.pencil.service.PencilCommandService;
 import umc.th.juinjang.api.pencil.service.PencilQueryService;
@@ -15,7 +18,8 @@ import umc.th.juinjang.api.pencilAccount.service.PencilAccountService;
 
 @WebMvcTest(controllers = {
 	PencilController.class,
-	PencilAccountController.class
+	PencilAccountController.class,
+	NoteControllerV2.class
 })
 public abstract class ControllerTestSupport {
 
@@ -33,4 +37,10 @@ public abstract class ControllerTestSupport {
 
 	@MockBean
 	protected PencilCommandService pencilCommandService;
+
+	@MockBean
+	protected NoteCommandServiceV2 noteCommandServiceV2;
+
+	@MockBean
+	protected NoteQueryServiceV2 noteQueryServiceV2;
 }

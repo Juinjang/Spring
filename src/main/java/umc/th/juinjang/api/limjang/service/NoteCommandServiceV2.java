@@ -3,10 +3,12 @@ package umc.th.juinjang.api.limjang.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import umc.th.juinjang.api.address.service.AddressUpdater;
+import umc.th.juinjang.api.limjang.controller.request.NoteInitRequest;
 import umc.th.juinjang.api.limjang.controller.request.NotePatchRequest;
 import umc.th.juinjang.api.limjang.controller.request.NotePostRequest;
-import umc.th.juinjang.api.address.service.AddressUpdater;
 import umc.th.juinjang.api.limjang.service.response.NotePostResponse;
 import umc.th.juinjang.common.code.status.ErrorStatus;
 import umc.th.juinjang.common.exception.handler.LimjangHandler;
@@ -52,6 +54,26 @@ public class NoteCommandServiceV2 {
 		note.updateNote(request.nickname(), request.priceType(), request.floor(), request.pyong());
 	}
 
+	@Transactional
+	public void updateNoteV2(Long noteId, NotePatchRequest request) {
+		Limjang note = noteFinder.getNoteByIdWhereDeletedIsFalse(noteId);
+
+		validatePriceType(note.getPurpose(), request.priceType());
+
+		LimjangPrice newPrice = request.toUpdatedPrice(note.getPurpose());
+		Address newAddress = request.toUpdatedAddress();
+
+		if (note.getAddressEntity() != null) {
+			note.getAddressEntity().update(newAddress);
+		} else {
+			addressUpdater.save(newAddress);
+			note.setAddressEntity(newAddress);
+		}
+
+		note.getLimjangPrice().updateLimjangPrice(newPrice);
+		note.updateNote(request.nickname(), request.priceType(), request.floor(), request.pyong());
+	}
+
 	private void validatePriceType(LimjangPurpose purposeType, LimjangPriceType priceType) {
 		if (
 			(purposeType == LimjangPurpose.RESIDENTIAL_PURPOSE && priceType == LimjangPriceType.MARKET_PRICE) ||
@@ -59,5 +81,14 @@ public class NoteCommandServiceV2 {
 		) {
 			throw new LimjangHandler(ErrorStatus.LIMJANG_POST_TYPE_ERROR);
 		}
+	}
+
+	public NotePostResponse initNote(@Valid NoteInitRequest request, Member member) {
+		Limjang note = request.toEntity(member);
+		validatePriceType(request.purposeType(), request.priceType());
+
+		Limjang savedNote = noteUpdater.save(note);
+
+		return NotePostResponse.of(savedNote.getLimjangId());
 	}
 }

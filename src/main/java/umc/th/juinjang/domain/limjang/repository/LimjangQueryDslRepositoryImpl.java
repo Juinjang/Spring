@@ -1,11 +1,14 @@
 package umc.th.juinjang.domain.limjang.repository;
 
-import static com.querydsl.core.types.Order.DESC;
-import static umc.th.juinjang.domain.image.model.QImage.image;
-import static umc.th.juinjang.domain.limjang.model.QLimjang.limjang;
-import static umc.th.juinjang.domain.limjang.model.QLimjangPrice.limjangPrice;
-import static umc.th.juinjang.domain.report.model.QReport.report;
-import static umc.th.juinjang.domain.limjang.model.QAddress.address;
+import static com.querydsl.core.types.Order.*;
+import static umc.th.juinjang.domain.image.model.QImage.*;
+import static umc.th.juinjang.domain.limjang.model.QAddress.*;
+import static umc.th.juinjang.domain.limjang.model.QLimjang.*;
+import static umc.th.juinjang.domain.limjang.model.QLimjangPrice.*;
+import static umc.th.juinjang.domain.report.model.QReport.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -15,10 +18,6 @@ import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import umc.th.juinjang.api.limjang.controller.parameter.LimjangSortOptions;
 import umc.th.juinjang.domain.limjang.model.Limjang;
 import umc.th.juinjang.domain.member.model.Member;
@@ -70,7 +69,7 @@ public class LimjangQueryDslRepositoryImpl implements LimjangQueryDslRepository 
 		return queryFactory
 			.selectFrom(limjang)
 			.join(limjang.limjangPrice, limjangPrice).fetchJoin()
-			.join(limjang.addressEntity, address).fetchJoin()
+			.leftJoin(limjang.addressEntity, address).fetchJoin()
 			.leftJoin(limjang.report, report).fetchJoin()
 			.where(limjang.memberId.eq(member))
 			.where(limjang.deleted.isFalse())

@@ -1,5 +1,7 @@
 package umc.th.juinjang.domain.limjang.model;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import umc.th.juinjang.domain.checklist.model.ChecklistAnswer;
 import umc.th.juinjang.domain.common.BaseEntity;
 import umc.th.juinjang.domain.image.model.Image;
@@ -33,6 +36,7 @@ import umc.th.juinjang.domain.report.model.Report;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -180,10 +184,26 @@ public class Limjang extends BaseEntity {
 			.build();
 	}
 
+	public static Limjang initNote(Member member, LimjangPrice price, LimjangPurpose purpose,
+		LimjangPropertyType propertyType, LimjangPriceType priceType) {
+		String nickname = LocalDateTime.now()
+			.format(DateTimeFormatter.ofPattern("yy.MM.dd HH:mm")) + " 매물노트";
+
+		return Limjang.builder()
+			.memberId(member)
+			.limjangPrice(price)
+			.priceType(priceType)
+			.purpose(purpose)
+			.propertyType(propertyType)
+			.nickname(nickname)
+			.build();
+	}
+
 	public void updateNote(String nickname, LimjangPriceType limjangPriceType, String floor, int pyong) {
 		this.nickname = nickname;
 		this.priceType = limjangPriceType;
 		this.floor = floor;
 		this.pyong = pyong;
 	}
+
 }
