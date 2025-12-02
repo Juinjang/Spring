@@ -38,4 +38,20 @@ public record LimjangDetailGetResponse(
         .updatedAt(limjang.getUpdatedAt())
         .build();
   }
+
+  public static LimjangDetailGetResponse mock() {
+    return LimjangDetailGetResponse.builder()
+        .limjangId(1L)
+        .checkListVersion(LimjangCheckListVersion.LIMJANG)
+        .images(List.of("https://example.com/image1.jpg", "https://example.com/image2.jpg"))
+        .purposeCode(1)
+        .nickname("우성 아파트")
+        .priceType(0)
+        .priceList(List.of("500000000"))
+        .address("서울특별시 강남구 테헤란로 123")
+        .addressDetail("101동 1001호")
+        .createdAt(LocalDateTime.of(2024, 11, 15, 10, 30))
+        .updatedAt(LocalDateTime.of(2024, 11, 20, 14, 20))
+        .build();
+  }
 }

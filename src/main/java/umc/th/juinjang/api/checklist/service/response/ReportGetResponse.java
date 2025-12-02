@@ -24,4 +24,17 @@ public record ReportGetResponse(
 			report.getTotalRate()
 		);
 	}
+
+	public static ReportGetResponse mock() {
+		return new ReportGetResponse(
+			1L,
+			"상당히 쾌적한 실내",
+			"훌륭한 공용 공간",
+			"좋은 편인 입지 조건",
+			4.6f,
+			4.3f,
+			4.7f,
+			4.5f
+		);
+	}
 }
