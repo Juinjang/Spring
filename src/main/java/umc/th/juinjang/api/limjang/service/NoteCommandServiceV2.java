@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import umc.th.juinjang.api.address.service.AddressUpdater;
 import umc.th.juinjang.api.limjang.controller.request.NoteInitRequest;
 import umc.th.juinjang.api.limjang.controller.request.NotePatchRequest;
+import umc.th.juinjang.api.limjang.controller.request.NotePatchRequestV2;
 import umc.th.juinjang.api.limjang.controller.request.NotePostRequest;
 import umc.th.juinjang.api.limjang.service.response.NotePostResponse;
 import umc.th.juinjang.common.code.status.ErrorStatus;
@@ -72,6 +73,37 @@ public class NoteCommandServiceV2 {
 
 		note.getLimjangPrice().updateLimjangPrice(newPrice);
 		note.updateNote(request.nickname(), request.priceType(), request.floor(), request.pyong());
+	}
+
+	@Transactional
+	public void updateNoteInitV2(Long noteId, NotePatchRequestV2 request) {
+		try {
+			Limjang note = noteFinder.getNoteByIdWhereDeletedIsFalse(noteId);
+
+			validatePriceType(note.getPurpose(), request.priceType());
+
+			LimjangPrice newPrice = request.toUpdatedPrice(note.getPurpose());
+			Address newAddress = request.toUpdatedAddress();
+
+			Address currentAddress = note.getAddressEntity();
+			if (newAddress.isEmpty()) {
+				if (currentAddress != null) {
+					note.setAddressEntity(null);
+				}
+			} else {
+				if (currentAddress != null) {
+					currentAddress.update(newAddress);
+				} else {
+					addressUpdater.save(newAddress);
+					note.setAddressEntity(newAddress);
+				}
+			}
+
+			note.getLimjangPrice().updateLimjangPrice(newPrice);
+			note.updateNote(request.nickname(), request.priceType(), request.floor(), request.pyong());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void validatePriceType(LimjangPurpose purposeType, LimjangPriceType priceType) {

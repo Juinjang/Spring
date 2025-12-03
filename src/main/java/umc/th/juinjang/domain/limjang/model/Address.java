@@ -1,6 +1,5 @@
 package umc.th.juinjang.domain.limjang.model;
 
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -86,5 +85,23 @@ public class Address extends BaseEntity {
 
 	public String getFullAddress() {
 		return this.roadAddress + " " + this.getAddressDetail();
+	}
+
+	public static Address empty() {
+		return Address.builder().build(); // 모든 필드 null
+	}
+
+	public boolean isEmpty() {
+		return isBlank(roadAddress)
+			&& isBlank(addressDetail)
+			&& isBlank(bcode)
+			&& isBlank(sido)
+			&& isBlank(sigungo)
+			&& isBlank(bname1)
+			&& isBlank(bname2);
+	}
+
+	private boolean isBlank(String s) {
+		return s == null || s.isBlank();
 	}
 }

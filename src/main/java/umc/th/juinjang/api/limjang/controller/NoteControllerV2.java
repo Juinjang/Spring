@@ -17,6 +17,7 @@ import umc.th.juinjang.api.dto.ApiResponse;
 import umc.th.juinjang.api.limjang.controller.parameter.LimjangSortOptions;
 import umc.th.juinjang.api.limjang.controller.request.NoteInitRequest;
 import umc.th.juinjang.api.limjang.controller.request.NotePatchRequest;
+import umc.th.juinjang.api.limjang.controller.request.NotePatchRequestV2;
 import umc.th.juinjang.api.limjang.controller.request.NotePostRequest;
 import umc.th.juinjang.api.limjang.service.NoteCommandServiceV2;
 import umc.th.juinjang.api.limjang.service.NoteQueryServiceV2;
@@ -71,9 +72,9 @@ public class NoteControllerV2 {
 	@Operation(summary = "임장 수정 API V2 - UI/UX 리팩토링")
 	@PatchMapping("/notes/init/{noteId}")
 	public ApiResponse<Void> updateNoteV2(@PathVariable(name = "noteId") Long noteId,
-		@RequestBody @Valid NotePatchRequest request,
+		@RequestBody @Valid NotePatchRequestV2 request,
 		@AuthenticationPrincipal Member member) {
-		noteCommandService.updateNoteV2(noteId, request);
+		noteCommandService.updateNoteInitV2(noteId, request);
 		return ApiResponse.onSuccess(null);
 	}
 
