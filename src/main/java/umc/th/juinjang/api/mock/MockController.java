@@ -46,7 +46,7 @@ public class MockController {
 	}
 
 	@Operation(summary = "리포트 조회 Mock API")
-	@GetMapping("/notes/mock/report")
+	@GetMapping("/notes/report")
 	public ApiResponse<ReportWithLimjangResponseDTO> getMockReport() {
 		ReportGetResponse reportMock = ReportGetResponse.mock();
 		LimjangDetailGetResponse limjangMock = LimjangDetailGetResponse.mock();
@@ -55,7 +55,7 @@ public class MockController {
 	}
 
 	@Operation(summary = "녹음 및 메모 조회 Mock API")
-	@GetMapping("/notes/mock/records")
+	@GetMapping("/notes/records")
 	public ApiResponse<RecordResponseDTO.RecordMemoDto> getMockRecordMemo() {
 
 		// Mock 메모 데이터 생성
@@ -71,7 +71,7 @@ public class MockController {
 	}
 
 	@Operation(summary = "체크리스트 조회 Mock API")
-	@GetMapping("/notes/mock/checklists")
+	@GetMapping("/notes/checklists")
 	public ApiResponse<List<ChecklistAnswerResponseDTO.AnswerDto>> getMockChecklistAnswer() {
 		Long limjangId = 1L;
 

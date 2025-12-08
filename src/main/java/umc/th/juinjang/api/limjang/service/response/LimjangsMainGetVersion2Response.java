@@ -39,7 +39,7 @@ public record LimjangsMainGetVersion2Response(List<LimjangMainVersion2Response> 
 		LimjangMainVersion2Response mockNote = LimjangMainVersion2Response.builder()
 			.limjangId(1L)
 			.priceType(0)
-			.image("https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock_png_1.png")
+			.image("https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock-png_1.jpeg")
 			.nickname("우성 아파트")
 			.price("3010000000")
 			.totalAverage("4.5")
