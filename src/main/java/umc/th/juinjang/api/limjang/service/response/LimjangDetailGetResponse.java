@@ -46,7 +46,8 @@ public record LimjangDetailGetResponse(
 			.checkListVersion(LimjangCheckListVersion.LIMJANG)
 			.images(List.of("https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock-png_1.jpeg",
 				"https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock-png_2.jpeg",
-				"https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock-png_3.jpeg"))
+				"https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock-png_3.jpeg",
+				"https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock-png_4.jpeg"))
 			.purposeCode(1)
 			.nickname("우성 아파트")
 			.priceType(0)

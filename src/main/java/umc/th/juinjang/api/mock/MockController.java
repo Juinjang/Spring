@@ -61,7 +61,7 @@ public class MockController {
 		// Mock 메모 데이터 생성
 		RecordResponseDTO.RecordMemoDto response = RecordResponseDTO.RecordMemoDto.builder()
 			.limjangId(1L)
-			.memo("- 베란다 확장 공사 완료. 냉기 차단 잘 됨 - 단지내 어린이집")
+			.memo("- 베란다 확장 공사 완료. 냉기 차단 잘 됨 \n - 단지내 어린이집")
 			.createdAt(LocalDateTime.of(2024, 11, 15, 10, 30))
 			.updatedAt(LocalDateTime.of(2024, 11, 20, 17, 0))
 			.recordDto(List.of())
