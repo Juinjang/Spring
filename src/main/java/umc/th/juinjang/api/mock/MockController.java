@@ -1,6 +1,7 @@
 package umc.th.juinjang.api.mock;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import umc.th.juinjang.api.checklist.service.response.ChecklistAnswerResponseDTO;
 import umc.th.juinjang.api.checklist.service.response.ReportGetResponse;
 import umc.th.juinjang.api.checklist.service.response.ReportWithLimjangResponseDTO;
 import umc.th.juinjang.api.dto.ApiResponse;
@@ -17,6 +19,8 @@ import umc.th.juinjang.api.limjang.service.response.LimjangsMainGetVersion2Respo
 import umc.th.juinjang.api.limjang.service.response.UserNoteGetResponse;
 import umc.th.juinjang.api.limjang.service.response.UserNotesGetResponse;
 import umc.th.juinjang.api.record.service.response.RecordResponseDTO;
+import umc.th.juinjang.domain.checklist.model.ChecklistQuestionCategory;
+import umc.th.juinjang.domain.checklist.model.ChecklistQuestionType;
 
 @RestController
 @RequestMapping("/api/mock")
@@ -64,6 +68,85 @@ public class MockController {
 			.build();
 
 		return ApiResponse.onSuccess(response);
+	}
+
+	@Operation(summary = "체크리스트 조회 Mock API")
+	@GetMapping("/notes/mock/checklists")
+	public ApiResponse<List<ChecklistAnswerResponseDTO.AnswerDto>> getMockChecklistAnswer() {
+		Long limjangId = 1L;
+
+		// 카테고리, 답변, 답변타입 순서로 정의
+		Object[][] mockData = {
+			// 입지여건
+			{ChecklistQuestionCategory.LOCATION_CONDITION, "5", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.LOCATION_CONDITION, "2호선 신당역", ChecklistQuestionType.DROPDOWN},
+			{ChecklistQuestionCategory.LOCATION_CONDITION, "3", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.LOCATION_CONDITION, "4", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.LOCATION_CONDITION, "5", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.LOCATION_CONDITION, "5", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.LOCATION_CONDITION, "5", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.LOCATION_CONDITION, "5", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.LOCATION_CONDITION, "1", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.LOCATION_CONDITION, "아파트 단지", ChecklistQuestionType.DROPDOWN},
+			{ChecklistQuestionCategory.LOCATION_CONDITION, "4", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.LOCATION_CONDITION, "남향", ChecklistQuestionType.DROPDOWN},
+			{ChecklistQuestionCategory.LOCATION_CONDITION, "4", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.LOCATION_CONDITION, "5", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.LOCATION_CONDITION, "5", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.LOCATION_CONDITION, "1", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.LOCATION_CONDITION, "5", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.LOCATION_CONDITION, "2000년도", ChecklistQuestionType.TEXT_FIELD},
+			{ChecklistQuestionCategory.LOCATION_CONDITION, "3", ChecklistQuestionType.SCORE},
+			// 공용공간
+			{ChecklistQuestionCategory.PUBLIC_SPACE, "2대", ChecklistQuestionType.TEXT_FIELD},
+			{ChecklistQuestionCategory.PUBLIC_SPACE, "4", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.PUBLIC_SPACE, "4", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.PUBLIC_SPACE, "1", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.PUBLIC_SPACE, "3", ChecklistQuestionType.SCORE},
+			// 실내
+			{ChecklistQuestionCategory.INDOOR, "설치형에어컨", ChecklistQuestionType.DROPDOWN},
+			{ChecklistQuestionCategory.INDOOR, "2", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "5", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "거실중앙형 구조", ChecklistQuestionType.DROPDOWN},
+			{ChecklistQuestionCategory.INDOOR, "5", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "3", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "4", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "1", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "3", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "4", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "3", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "4", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "3", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "4", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "5", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "5", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "4", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "2", ChecklistQuestionType.TEXT_FIELD},
+			{ChecklistQuestionCategory.INDOOR, "4", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "4", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "5", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "4", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "3", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "3", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "5", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "3", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "5", ChecklistQuestionType.SCORE},
+			{ChecklistQuestionCategory.INDOOR, "5", ChecklistQuestionType.SCORE}
+		};
+
+		List<ChecklistAnswerResponseDTO.AnswerDto> answers = new ArrayList<>();
+		for (int i = 0; i < mockData.length; i++) {
+			answers.add(ChecklistAnswerResponseDTO.AnswerDto.builder()
+				.answerId((long)(i + 1))
+				.questionId((long)(i + 1))
+				.category((ChecklistQuestionCategory)mockData[i][0])
+				.limjangId(limjangId)
+				.answer((String)mockData[i][1])
+				.answerType((ChecklistQuestionType)mockData[i][2])
+				.build());
+		}
+
+		return ApiResponse.onSuccess(answers);
 	}
 
 }

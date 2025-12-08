@@ -65,7 +65,7 @@ public record UserNotesGetResponse(
 				"https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock_png_2.png",
 				"https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock_png_3.png"),
 			true,
-			"4.6",
+			"3.63",
 			"3010000000",
 			null,
 			28,
