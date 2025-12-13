@@ -53,4 +53,28 @@ public record UserNotesGetResponse(
 		return new UserNotesGetResponse(
 			limjangs.stream().map(it -> UserNoteResponse.of(it, isScraped.get(it.getLimjangId()))).toList());
 	}
+
+	public static UserNotesGetResponse mock() {
+		UserNoteResponse mockNote1 = new UserNoteResponse(
+			1L,
+			LimjangPurpose.RESIDENTIAL_PURPOSE,
+			LimjangPropertyType.APARTMENT,
+			LimjangPriceType.SALE,
+			"우성 아파트",
+			List.of("https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock-png_1.jpeg",
+				"https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock_png_2.jpeg",
+				"https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock_png_3.jpeg",
+				"https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock_png_4.jpeg"),
+			true,
+			"3.63",
+			"3010000000",
+			null,
+			28,
+			"10",
+			"서울 송파구 잠실동 101-1",
+			"서울시"
+		);
+
+		return new UserNotesGetResponse(List.of(mockNote1));
+	}
 }

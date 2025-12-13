@@ -52,4 +52,30 @@ public record UserNoteGetResponse(
 			address != null ? address.getBname2() : null
 		);
 	}
+
+	// TODO : 이미지 저장 및 URL 변경 필요
+	public static UserNoteGetResponse mock() {
+		return new UserNoteGetResponse(
+			true,
+			LimjangPurpose.RESIDENTIAL_PURPOSE,
+			LimjangPropertyType.APARTMENT,
+			LimjangPriceType.SALE,
+			"우성 아파트",
+			List.of("https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock-png_1.jpeg",
+				"https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock-png_2.jpeg",
+				"https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock-png_3.jpeg"),
+			"서울 송파구 잠실동",
+			"101-1",
+			"3010000000",
+			null,
+			"23.12.01",
+			"10",
+			28,
+			"1168010100",
+			"서울특별시",
+			"송파구",
+			"잠실동",
+			""
+		);
+	}
 }

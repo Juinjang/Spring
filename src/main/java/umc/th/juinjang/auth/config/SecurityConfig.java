@@ -37,7 +37,8 @@ public class SecurityConfig {
 		"/api/auth/v2/kakao/**",
 		"/api/members/nickname/exists",
 		"/api/app/version/ios",
-		"/api/apple/notifications/v2"
+		"/api/apple/notifications/v2",
+		"/api/mock/**"
 	};
 	// 개발 환경에서만 추가로 허용되는 URL 패턴
 	private static final String[] DEV_WHITELIST_URLS = {
