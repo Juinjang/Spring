@@ -34,13 +34,13 @@ public class MockController {
 	}
 
 	@Operation(summary = "임장 상세 조회 Mock API")
-	@GetMapping("/notes")
+	@GetMapping("/notes/detail")
 	public ApiResponse<UserNoteGetResponse> getMockNoteDetail() {
 		return ApiResponse.onSuccess(UserNoteGetResponse.mock());
 	}
 
 	@Operation(summary = "마이노트 조회 Mock API")
-	@GetMapping("/notes")
+	@GetMapping("/notes/mynotes")
 	public ApiResponse<UserNotesGetResponse> getMockUserNotes() {
 		return ApiResponse.onSuccess(UserNotesGetResponse.mock());
 	}
