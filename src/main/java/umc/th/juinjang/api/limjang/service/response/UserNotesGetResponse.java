@@ -3,6 +3,7 @@ package umc.th.juinjang.api.limjang.service.response;
 import java.util.List;
 import java.util.Map;
 
+import umc.th.juinjang.common.constant.MockConstant;
 import umc.th.juinjang.domain.image.model.Image;
 import umc.th.juinjang.domain.limjang.model.Limjang;
 import umc.th.juinjang.domain.limjang.model.LimjangPriceType;
@@ -61,10 +62,8 @@ public record UserNotesGetResponse(
 			LimjangPropertyType.APARTMENT,
 			LimjangPriceType.SALE,
 			"우성 아파트",
-			List.of("https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock-png_1.jpeg",
-				"https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock_png_2.jpeg",
-				"https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock_png_3.jpeg",
-				"https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock_png_4.jpeg"),
+			List.of(MockConstant.Image.IMAGE_1, MockConstant.Image.IMAGE_2,
+				MockConstant.Image.IMAGE_3, MockConstant.Image.IMAGE_4),
 			true,
 			"3.63",
 			"3010000000",

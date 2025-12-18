@@ -5,6 +5,7 @@ import static umc.th.juinjang.api.limjang.service.LimjangPriceBridge.*;
 import java.util.List;
 
 import lombok.Builder;
+import umc.th.juinjang.common.constant.MockConstant;
 import umc.th.juinjang.domain.limjang.model.Limjang;
 
 public record LimjangsMainGetVersion2Response(List<LimjangMainVersion2Response> recentUpdatedList) {
@@ -39,10 +40,10 @@ public record LimjangsMainGetVersion2Response(List<LimjangMainVersion2Response> 
 		LimjangMainVersion2Response mockNote = LimjangMainVersion2Response.builder()
 			.limjangId(1L)
 			.priceType(0)
-			.image("https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock-png_1.jpeg")
+			.image(MockConstant.Image.IMAGE_1)
 			.nickname("우성 아파트")
 			.price("3010000000")
-			.totalAverage("4.5")
+			.totalAverage("3.63")
 			.address("")
 			.build();
 

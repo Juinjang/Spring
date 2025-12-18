@@ -3,6 +3,7 @@ package umc.th.juinjang.api.limjang.service.response;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import umc.th.juinjang.common.constant.MockConstant;
 import umc.th.juinjang.domain.image.model.Image;
 import umc.th.juinjang.domain.limjang.model.Address;
 import umc.th.juinjang.domain.limjang.model.Limjang;
@@ -53,7 +54,6 @@ public record UserNoteGetResponse(
 		);
 	}
 
-	// TODO : 이미지 저장 및 URL 변경 필요
 	public static UserNoteGetResponse mock() {
 		return new UserNoteGetResponse(
 			true,
@@ -61,9 +61,8 @@ public record UserNoteGetResponse(
 			LimjangPropertyType.APARTMENT,
 			LimjangPriceType.SALE,
 			"우성 아파트",
-			List.of("https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock-png_1.jpeg",
-				"https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock-png_2.jpeg",
-				"https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock-png_3.jpeg"),
+			List.of(MockConstant.Image.IMAGE_1, MockConstant.Image.IMAGE_2,
+				MockConstant.Image.IMAGE_3, MockConstant.Image.IMAGE_4),
 			"서울 송파구 잠실동",
 			"101-1",
 			"3010000000",

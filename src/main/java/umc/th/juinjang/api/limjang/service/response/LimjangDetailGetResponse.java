@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.Builder;
+import umc.th.juinjang.common.constant.MockConstant;
 import umc.th.juinjang.domain.checklist.model.LimjangCheckListVersion;
 import umc.th.juinjang.domain.image.model.Image;
 import umc.th.juinjang.domain.limjang.model.Limjang;
@@ -44,10 +45,8 @@ public record LimjangDetailGetResponse(
 		return LimjangDetailGetResponse.builder()
 			.limjangId(1L)
 			.checkListVersion(LimjangCheckListVersion.LIMJANG)
-			.images(List.of("https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock-png_1.jpeg",
-				"https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock-png_2.jpeg",
-				"https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock-png_3.jpeg",
-				"https://juinjang-bucket.s3.ap-northeast-2.amazonaws.com/mock/mock-png_4.jpeg"))
+			.images(List.of(MockConstant.Image.IMAGE_1, MockConstant.Image.IMAGE_2,
+				MockConstant.Image.IMAGE_3, MockConstant.Image.IMAGE_4))
 			.purposeCode(1)
 			.nickname("우성 아파트")
 			.priceType(0)
