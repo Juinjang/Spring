@@ -3,6 +3,7 @@ package umc.th.juinjang.api.limjang.service.response;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import umc.th.juinjang.common.constant.MockConstant;
 import umc.th.juinjang.domain.image.model.Image;
 import umc.th.juinjang.domain.limjang.model.Address;
 import umc.th.juinjang.domain.limjang.model.Limjang;
@@ -50,6 +51,30 @@ public record UserNoteGetResponse(
 			address != null ? address.getSigungo() : null,
 			address != null ? address.getBname1() : null,
 			address != null ? address.getBname2() : null
+		);
+	}
+
+	public static UserNoteGetResponse mock() {
+		return new UserNoteGetResponse(
+			true,
+			LimjangPurpose.RESIDENTIAL_PURPOSE,
+			LimjangPropertyType.APARTMENT,
+			LimjangPriceType.SALE,
+			"우성 아파트",
+			List.of(MockConstant.Image.IMAGE_1, MockConstant.Image.IMAGE_2,
+				MockConstant.Image.IMAGE_3, MockConstant.Image.IMAGE_4),
+			"서울 송파구 잠실동",
+			"101-1",
+			"3010000000",
+			null,
+			"23.12.01",
+			"10",
+			28,
+			"1168010100",
+			"서울특별시",
+			"송파구",
+			"잠실동",
+			""
 		);
 	}
 }

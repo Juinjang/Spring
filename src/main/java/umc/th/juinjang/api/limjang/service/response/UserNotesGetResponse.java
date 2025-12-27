@@ -3,6 +3,7 @@ package umc.th.juinjang.api.limjang.service.response;
 import java.util.List;
 import java.util.Map;
 
+import umc.th.juinjang.common.constant.MockConstant;
 import umc.th.juinjang.domain.image.model.Image;
 import umc.th.juinjang.domain.limjang.model.Limjang;
 import umc.th.juinjang.domain.limjang.model.LimjangPriceType;
@@ -52,5 +53,27 @@ public record UserNotesGetResponse(
 	public static UserNotesGetResponse of(List<Limjang> limjangs, Map<Long, Boolean> isScraped) {
 		return new UserNotesGetResponse(
 			limjangs.stream().map(it -> UserNoteResponse.of(it, isScraped.get(it.getLimjangId()))).toList());
+	}
+
+	public static UserNotesGetResponse mock() {
+		UserNoteResponse mockNote1 = new UserNoteResponse(
+			1L,
+			LimjangPurpose.RESIDENTIAL_PURPOSE,
+			LimjangPropertyType.APARTMENT,
+			LimjangPriceType.SALE,
+			"우성 아파트",
+			List.of(MockConstant.Image.IMAGE_1, MockConstant.Image.IMAGE_2,
+				MockConstant.Image.IMAGE_3, MockConstant.Image.IMAGE_4),
+			true,
+			"3.63",
+			"3010000000",
+			null,
+			28,
+			"10",
+			"서울 송파구 잠실동 101-1",
+			"서울시"
+		);
+
+		return new UserNotesGetResponse(List.of(mockNote1));
 	}
 }
