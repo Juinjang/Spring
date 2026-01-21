@@ -39,24 +39,30 @@ public record NotePatchRequestV2(
 		return NotePriceFactory.create(purpose, priceType, price, monthlyRent);
 	}
 
-	public Address toUpdatedAddress() {
-		if (isAddressAllEmpty()) {
-			return Address.empty();
-		}
-		return Address.create(roadAddress, addressDetail, bcode, sido, sigungu, bname1, bname2);
-	}
+    public Address toUpdatedAddress() {
+        // 둘 다 없음 -> 삭제(주소 null 처리 유도)
+        if (isDeleteAddressIntent()) {
+            return Address.empty();
+        }
 
-	private boolean isAddressAllEmpty() {
-		return isBlank(roadAddress)
-			&& isBlank(addressDetail)
-			&& isBlank(bcode)
-			&& isBlank(sido)
-			&& isBlank(sigungu)
-			&& isBlank(bname1)
-			&& isBlank(bname2);
-	}
+        // 상세주소만 -> 정책상 금지
+        if (isDetailOnly()) {
+            throw new IllegalArgumentException("본주소 없이 상세주소만 입력할 수 없습니다.");
+        }
+
+        // 본주소가 있으면 생성
+        return Address.create(roadAddress, addressDetail, bcode, sido, sigungu, bname1, bname2);
+    }
 
 	private boolean isBlank(String s) {
 		return s == null || s.isBlank();
 	}
+
+    private boolean isDeleteAddressIntent() { // 4번
+        return isBlank(roadAddress) && isBlank(addressDetail);
+    }
+
+    private boolean isDetailOnly() { // 3번
+        return isBlank(roadAddress) && !isBlank(addressDetail);
+    }
 }
