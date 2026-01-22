@@ -1,9 +1,12 @@
 package umc.th.juinjang.domain.limjang.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,5 +59,9 @@ public class LimjangPrice extends BaseEntity {
 			};
 		}
 		return null;
+	}
+
+	public static LimjangPrice empty() {
+		return LimjangPrice.builder().build(); // 모든 price 필드 null
 	}
 }

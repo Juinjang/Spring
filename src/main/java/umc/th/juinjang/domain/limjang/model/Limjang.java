@@ -199,8 +199,10 @@ public class Limjang extends BaseEntity {
 			.build();
 	}
 
-	public void updateNote(String nickname, LimjangPriceType limjangPriceType, String floor, int pyong) {
-		this.nickname = nickname;
+	public void updateNote(String nickname, LimjangPriceType limjangPriceType, String floor, Integer pyong) {
+		if (nickname != null) {
+			this.nickname = nickname;
+		}
 		this.priceType = limjangPriceType;
 		this.floor = floor;
 		this.pyong = pyong;
