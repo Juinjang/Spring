@@ -1,4 +1,4 @@
-# About 주인장 버전 v1.2.0
+# About 주인장 버전 v1.2.1
 
 ![주인장기획서이미지](https://github.com/user-attachments/assets/b2e72c8f-0425-4571-946e-866cf56704ac)
 
