@@ -36,34 +36,34 @@ jobs:
 
       - name: Create application-dev.yml
         run: |
-          mkdir -p ./src/main/resources
-          echo "${{ secrets.PROPERTIES_DEV }}" > ./src/main/resources/application-dev.yml
+          mkdir -p ./apps/juinjang-api/src/main/resources
+          echo "${{ secrets.PROPERTIES_DEV }}" > ./apps/juinjang-api/src/main/resources/application-dev.yml
         shell: bash
 
       - name: Create .p8
         run: |
-          echo "${{ secrets.APPLE_AUTH }}" > ./src/main/resources/AUTHKEY_JUINJAG.p8
+          echo "${{ secrets.APPLE_AUTH }}" > ./apps/juinjang-api/src/main/resources/AUTHKEY_JUINJAG.p8
         shell: bash
 
       # APPLE IN_APP 결제 관련 프로세스 시작
       - name: Create certs and keys directories
         run: |
-          mkdir -p ./src/main/resources/keys
+          mkdir -p ./apps/juinjang-api/src/main/resources/keys
 
       - name: Create IAP .p8 Key
         run: |
-          echo "${{ secrets.APPLE_IAP_KEY }}" > ./src/main/resources/keys/SubscriptionKey_Q5646J7W54.p8
-          
+          echo "${{ secrets.APPLE_IAP_KEY }}" > ./apps/juinjang-api/src/main/resources/keys/SubscriptionKey_Q5646J7W54.p8
+
           # 키 파일 크기 확인 (내용은 로그에 출력하지 않음)
-          if [ -s "./src/main/resources/keys/SubscriptionKey_Q5646J7W54.p8" ]; then
-            echo "✅ IAP key file created: $(wc -c < ./src/main/resources/keys/SubscriptionKey_Q5646J7W54.p8) bytes"
+          if [ -s "./apps/juinjang-api/src/main/resources/keys/SubscriptionKey_Q5646J7W54.p8" ]; then
+            echo "✅ IAP key file created: $(wc -c < ./apps/juinjang-api/src/main/resources/keys/SubscriptionKey_Q5646J7W54.p8) bytes"
           else
             echo "❌ IAP key file is empty!"
             exit 1
           fi
-          
+
           # PEM 형식 확인
-          if grep -q "BEGIN PRIVATE KEY" ./src/main/resources/keys/SubscriptionKey_Q5646J7W54.p8; then
+          if grep -q "BEGIN PRIVATE KEY" ./apps/juinjang-api/src/main/resources/keys/SubscriptionKey_Q5646J7W54.p8; then
             echo "✅ IAP key file appears to be in PEM format"
           else
             echo "⚠️ IAP key file may not be in PEM format"
@@ -72,7 +72,7 @@ jobs:
       # APPLE IN_APP 결제 관련 프로세스 끝
 
       - name: Build With Gradle
-        run: ./gradlew build -x test
+        run: ./gradlew :apps:juinjang-api:build -x test
 
       - name: Login to Docker Hub
         run: |
