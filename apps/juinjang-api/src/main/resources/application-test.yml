@@ -1,0 +1,135 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # 테스트마다 스키마 재생성
+      dialect: org.hibernate.dialect.H2Dialect  # H2 데이터베이스 사용
+      use_sql_comments: false
+      default_batch_fetch_size: 100
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: false
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+  sql:
+    init:
+      mode: never
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+# AWS 설정 - 테스트용 더미 값
+cloud:
+  aws:
+    credentials:
+      access-key: test-access-key
+      secret-key: test-secret-key
+    s3:
+      bucket: test-bucket
+      uploadPath: https://test-bucket.s3.ap-northeast-2.amazonaws.com
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
+
+# JWT 설정 - 테스트용
+jwt:
+  secret: test-secret-key-for-junit-test-environment-minimum-256-bits
+  access-token-expiration: 3600000  # 1시간
+  refresh-token-expiration: 86400000  # 24시간
+
+# OAuth2 설정 - 테스트용 더미 값
+security:
+  oauth2:
+    client:
+      provider:
+        kakao:
+          authorization-uri: https://kauth.kakao.com/oauth/authorize
+          token-uri: https://kauth.kakao.com/oauth/token
+          user-info-uri: https://kapi.kakao.com/v2/user/me
+          user-name-attribute: id
+      registration:
+        kakao:
+          client-id: test-client-id
+          client-secret: test-client-secret
+          client-authentication-method: client_secret_post
+          redirect-uri: http://localhost:8080/api/auth/kakao/callback
+          authorization-grant-type: authorization_code
+          admin-key: test-admin-key
+          client-name: kakao
+          scope:
+            - profile_nickname
+            - account_email
+
+# 앱 버전
+app:
+  version:
+    ios: 1.0.0
+
+# Apple 설정 - 테스트용
+apple:
+  iap:
+    enabled: false
+    environment: Sandbox
+    bundle-id: com.juinjangteam.juinjang.test
+    issuer-id: test-issuer-id
+    key-id: test-key-id
+    apple-id: 0000000000
+    enable-online-checks: false
+    certificate-names:
+    private-key-path:
+  auth:
+    token-uri: https://appleid.apple.com/auth/token
+    public-key-url: https://appleid.apple.com/auth/keys
+  redirect-uri: null
+  iss: https://appleid.apple.com
+  aud: test.juinjangteam.com
+  client-id: com.juinjangteam.juinjang.test
+  team-id: test-team-id
+  key:
+    id: test-key-id
+    path:
+
+# Discord webhook - 테스트 환경에서는 비활성화
+discord:
+  name: discord-feign-client
+  webhook-url: https://discord.com/test
+  report-shared-note: https://discord.com/test
+  member-create: https://discord.com/test
+  execute-payment: https://discord.com/test
+
+# Management endpoints
+management:
+  endpoints:
+    prometheus:
+      enabled: false
+    web:
+      exposure:
+        include: health,info
+
+# 로깅 설정
+logging:
+  file:
+    path: ./test-log
+  api:
+    excluded-paths: /actuator/**,/swagger-ui/**,/h2-console/**
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.springframework.test: INFO
+    umc.th.juinjang: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
