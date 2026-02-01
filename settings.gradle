@@ -1,1 +1,3 @@
 rootProject.name = 'juinjang'
+
+include 'apps:juinjang-api'
