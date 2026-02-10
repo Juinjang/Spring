@@ -1,34 +1,28 @@
 plugins {
-    id("org.springframework.boot")
-    kotlin("jvm")
-    kotlin("plugin.spring")
-    kotlin("plugin.jpa")
-    id("org.jlleitschuh.gradle.ktlint")
-}
-
-tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
-    archiveBaseName.set("juinjang-api")
-}
-
-tasks.named<Jar>("jar") { enabled = false }
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "17"
-    }
+    id("org.jetbrains.kotlin.plugin.jpa")
 }
 
 dependencies {
-    // Kotlin
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    // Modules
+    implementation(project(":supports:monitoring"))
+    implementation(project(":supports:logging"))
+    implementation(project(":modules:jpa"))
+    implementation(project(":modules:redis"))
+    testImplementation(testFixtures(project(":modules:jpa")))
+
+    // Lombok (코드 마이그레이션 전까지 유지)
+    compileOnly("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok")
+    testCompileOnly("org.projectlombok:lombok")
+    testAnnotationProcessor("org.projectlombok:lombok")
 
     // Spring Boot
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-aop")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
 
     // Spring Cloud
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
@@ -36,20 +30,29 @@ dependencies {
     // Spring Retry
     implementation("org.springframework.retry:spring-retry")
 
-    // Redis
-    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    // QueryDSL (이 모듈 자체 엔티티용 APT)
+    kapt("com.querydsl:querydsl-apt:${project.properties["queryDslVersion"]}:jakarta")
+
+    // JWT
+    implementation("io.jsonwebtoken:jjwt-api:${project.properties["jjwtVersion"]}")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:${project.properties["jjwtVersion"]}")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:${project.properties["jjwtVersion"]}")
+
+    // AWS S3
+    implementation("org.springframework.cloud:spring-cloud-starter-aws:${project.properties["springCloudAwsVersion"]}")
+
+    // Google Cloud Vision
+    implementation("com.google.cloud:google-cloud-vision:${project.properties["googleCloudVisionVersion"]}")
+
+    // Apple StoreKit
+    implementation("com.apple.itunes.storekit:app-store-server-library:${project.properties["appleStoreKitVersion"]}")
 
     // Documentation
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${project.properties["springDocOpenApiVersion"]}")
 
     // Database
-    runtimeOnly("com.mysql:mysql-connector-j")
     runtimeOnly("com.h2database:h2")
 
     // Test
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("com.ninja-squad:springmockk:4.0.2")
-    testImplementation("org.mockito:mockito-core:5.14.0")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
-    testImplementation("org.instancio:instancio-junit:5.0.2")
+    testImplementation("org.springframework.security:spring-security-test")
 }
