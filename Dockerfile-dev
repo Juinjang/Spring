@@ -2,6 +2,7 @@ FROM eclipse-temurin:17-jdk
 
 ARG JAR_FILE=./apps/juinjang-api/build/libs/juinjang-api-0.0.1-SNAPSHOT.jar
 ENV GOOGLE_APPLICATION_CREDENTIALS=/app/config/service-account-key.json
+ENV TZ=Asia/Seoul
 COPY ${JAR_FILE} app.jar
 
-ENTRYPOINT ["java", "-XX:+HeapDumpOnOutOfMemoryError", "-XX:HeapDumpPath=/var/heapdumps/juinjang", "-Dspring.profiles.active=dev", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-XX:+HeapDumpOnOutOfMemoryError", "-XX:HeapDumpPath=/var/heapdumps/juinjang", "-Duser.timezone=Asia/Seoul", "-Dspring.profiles.active=dev", "-jar", "/app.jar"]
