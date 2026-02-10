@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <springProperty scope="context" name="LOG_PATH" source="logging.file.path"/>
+
+    <!-- 환경별 SERVER_INFO -->
+    <springProfile name="local">
+        <property name="SERVER_INFO" value="local"/>
+    </springProfile>
+    <springProfile name="dev">
+        <property name="SERVER_INFO" value="dev"/>
+    </springProfile>
+    <springProfile name="prod">
+        <property name="SERVER_INFO" value="prod"/>
+    </springProfile>
+
+    <include resource="logback/logback-appender.xml"/>
+
+    <!-- 모든 환경: 콘솔 출력 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <!-- dev/prod: 파일 로깅 추가 -->
+    <springProfile name="dev | prod">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE_FILE"/>
+        </root>
+        <logger name="umc.th.juinjang.monitoring.ApiLogPrinter" level="INFO" additivity="false">
+            <appender-ref ref="API_FILE"/>
+            <appender-ref ref="API_CONSOLE"/>
+        </logger>
+        <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
+            <appender-ref ref="SQL_FILE"/>
+        </logger>
+        <logger name="org.hibernate.orm.jdbc.bind" level="TRACE" additivity="false">
+            <appender-ref ref="SQL_FILE"/>
+        </logger>
+    </springProfile>
+
+    <!-- local/test: 콘솔만 -->
+    <springProfile name="local | test">
+        <logger name="umc.th.juinjang.monitoring.ApiLogPrinter" level="INFO" additivity="false">
+            <appender-ref ref="API_CONSOLE"/>
+        </logger>
+        <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+        </logger>
+        <logger name="org.hibernate.orm.jdbc.bind" level="TRACE" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+        </logger>
+    </springProfile>
+
+    <logger name="org.hibernate" level="ERROR"/>
+    <logger name="org.springframework.web" level="INFO"/>
+
+    <!-- dev/local에서만 적용 -->
+    <springProfile name="dev | local">
+        <logger name="org.springframework.boot.start.endpoint.web" level="ERROR" additivity="false"/>
+    </springProfile>
+</configuration>
