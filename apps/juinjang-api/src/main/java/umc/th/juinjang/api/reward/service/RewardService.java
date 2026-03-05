@@ -10,8 +10,8 @@ import umc.th.juinjang.api.pencil.service.AcquiredPencilUpdater;
 import umc.th.juinjang.api.pencilAccount.service.PencilAccountFinder;
 import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.note.shared.model.ViewCountPolicy;
-import umc.th.juinjang.domain.pencil.acquired.model.AcquiredPencil;
-import umc.th.juinjang.domain.pencil.acquired.model.AcquiredType;
+import umc.th.juinjang.domain.pencil.acquired.AcquiredPencil;
+import umc.th.juinjang.domain.pencil.acquired.AcquiredType;
 import umc.th.juinjang.domain.pencilaccount.model.PencilAccount;
 import umc.th.juinjang.domain.reward.model.Reward;
 import umc.th.juinjang.domain.reward.model.RewardType;
@@ -46,8 +46,8 @@ public class RewardService {
 	}
 
 	private AcquiredPencil createAcquiredPencil(Member member, Long sharedNoteId, Long milestone, Long rewardPencil) {
-		return AcquiredPencil.create(member, viewCountPolicy.getMessageForMilestone(milestone), sharedNoteId,
-			rewardPencil, false, AcquiredType.VIEWCOUNT);
+		return AcquiredPencil.create(member.getMemberId(), viewCountPolicy.getMessageForMilestone(milestone), sharedNoteId,
+			rewardPencil, AcquiredType.VIEWCOUNT);
 	}
 
 	private Reward createReward(Member member, Long sharedNoteId, Long milestone, Long rewardPencil) {

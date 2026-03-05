@@ -3,8 +3,8 @@ package umc.th.juinjang.api.pencil.service;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
-import umc.th.juinjang.domain.pencil.acquired.model.AcquiredPencil;
-import umc.th.juinjang.domain.pencil.acquired.repository.AcquiredPencilRepository;
+import umc.th.juinjang.domain.pencil.acquired.AcquiredPencil;
+import umc.th.juinjang.domain.pencil.acquired.AcquiredPencilRepository;
 
 @Component
 @RequiredArgsConstructor

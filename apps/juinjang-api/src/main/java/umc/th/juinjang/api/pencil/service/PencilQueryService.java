@@ -19,7 +19,6 @@ import com.apple.itunes.storekit.model.RefundPreference;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import umc.th.juinjang.api.pencil.service.response.AcquiredPencilResponse;
 import umc.th.juinjang.api.pencil.service.response.PurchasedPencilResponse;
 import umc.th.juinjang.api.pencil.service.response.UsedPencilResponse;
 import umc.th.juinjang.api.pencilAccount.service.PencilAccountFinder;
@@ -40,10 +39,6 @@ public class PencilQueryService {
 	private final UsedPencilFinder usedPencilFinder;
 	private final PencilAccountFinder pencilAccountFinder;
 
-	public List<AcquiredPencilResponse> getAcquiredPencils(Member member) {
-		return acquiredPencilFinder.findAllByMemberOrderByCreatedAtDesc(member);
-	}
-
 	public List<PurchasedPencilResponse> getPurchasedPencils(Member member) {
 		List<PurchasedPencil> purchasedPencils = purchasedPencilFinder.findAllByMemberWhereDeliverySuccessOrderByCreatedAtDesc(
 			member);
@@ -57,11 +52,6 @@ public class PencilQueryService {
 		return usedPencils.stream()
 			.map(UsedPencilResponse::from)
 			.toList();
-	}
-
-	public boolean isAcquiredPencilReadStatus(Member member) {
-		// false 인 것이 존재하면 안됨.
-		return !acquiredPencilFinder.existsByMemberAndIsReadFalse(member);
 	}
 
 	public ConsumptionRequest getConsumptionRequest(String transactionId) {
@@ -158,7 +148,7 @@ public class PencilQueryService {
 	}
 
 	private boolean getSampleContentProvided(Member member) {
-		return acquiredPencilFinder.existsByMember(member);
+		return acquiredPencilFinder.existsByMemberId(member.getMemberId());
 	}
 
 	private ConsumptionStatus converterToConsumptionStatus(Long purchaseQuantity, Long remainQuantity) {

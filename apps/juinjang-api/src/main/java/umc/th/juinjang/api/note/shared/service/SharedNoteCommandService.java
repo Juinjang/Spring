@@ -28,8 +28,8 @@ import umc.th.juinjang.common.exception.handler.SharedNoteHandler;
 import umc.th.juinjang.domain.limjang.model.Limjang;
 import umc.th.juinjang.domain.member.model.Member;
 import umc.th.juinjang.domain.note.shared.model.SharedNote;
-import umc.th.juinjang.domain.pencil.acquired.model.AcquiredPencil;
-import umc.th.juinjang.domain.pencil.acquired.model.AcquiredType;
+import umc.th.juinjang.domain.pencil.acquired.AcquiredPencil;
+import umc.th.juinjang.domain.pencil.acquired.AcquiredType;
 import umc.th.juinjang.domain.pencil.purchased.model.PurchasedPencil;
 import umc.th.juinjang.domain.pencil.used.model.UsedPencil;
 import umc.th.juinjang.domain.pencil.used.model.Usedtype;
@@ -97,7 +97,7 @@ public class SharedNoteCommandService {
 
 	private AcquiredPencil createAcquiredPencil(Long sharedNoteId, Member seller, Long price, AcquiredType type) {
 		String content = "노트 공유 완료!";
-		return AcquiredPencil.create(seller, content, sharedNoteId, price, false, type);
+		return AcquiredPencil.create(seller.getMemberId(), content, sharedNoteId, price, type);
 	}
 
 	private void consumePurchasedPencils(Member buyer, long unpaidPencil) {

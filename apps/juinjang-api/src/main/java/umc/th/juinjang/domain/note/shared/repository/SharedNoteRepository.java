@@ -1,8 +1,10 @@
 package umc.th.juinjang.domain.note.shared.repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -52,4 +54,16 @@ public interface SharedNoteRepository extends JpaRepository<SharedNote, Long>, S
 
 	@Query("SELECT s.limjang.limjangId FROM SharedNote s WHERE s.limjang in :limjangs AND s.deletedAt is not null")
 	Set<Long> findLimjangIdsByDeletedAtIsNotNullAndLimjang(@Param("limjangs") List<Limjang> limjangs);
+
+	@Query("SELECT s.sharedNoteId, s.buildingName FROM SharedNote s WHERE s.sharedNoteId IN :ids")
+	List<Object[]> findAllBuildingNameById(@Param("ids") List<Long> ids);
+
+	default Map<Long, String> findBuildingNameMapByIds(List<Long> ids) {
+		return findAllBuildingNameById(ids).stream()
+			.collect(Collectors.toMap(
+				row -> (Long) row[0],
+				row -> (String) row[1],
+				(a, b) -> a
+			));
+	}
 }
