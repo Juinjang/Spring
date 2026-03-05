@@ -34,9 +34,9 @@ jobs:
 
       - name: Create application-dev.yml
         run: |
-          mkdir -p ./src/main/resources
-          echo "${{ secrets.PROPERTIES_DEV }}" > ./src/main/resources/application-dev.yml
+          mkdir -p ./apps/juinjang-api/src/main/resources
+          echo "${{ secrets.PROPERTIES_DEV }}" > ./apps/juinjang-api/src/main/resources/application-dev.yml
         shell: bash
 
       - name: Build With Gradle
-        run: ./gradlew build -x test
+        run: ./gradlew :apps:juinjang-api:build -x test

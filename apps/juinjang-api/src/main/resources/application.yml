@@ -1,0 +1,115 @@
+# ===== 공통 설정 (모든 프로필에 적용) =====
+server:
+  port: 8080
+  shutdown: graceful
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 10
+    connection-timeout: 1m
+    max-connections: 8192
+    accept-count: 100
+    keep-alive-timeout: 60s
+  max-http-request-header-size: 8KB
+
+spring:
+  application:
+    name: juinjang-api
+  config:
+    import:
+      - monitoring.yml
+      - jpa.yml
+      - redis.yml
+      - logging.yml
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+logging:
+  api:
+    excluded-paths: /actuator/**,/swagger-ui/**
+
+---
+# ===== local, test 프로필 공통 (더미 값) =====
+spring:
+  config:
+    activate:
+      on-profile: local, test
+
+cloud:
+  aws:
+    credentials:
+      access-key: test-access-key
+      secret-key: test-secret-key
+    s3:
+      bucket: test-bucket
+      uploadPath: https://test-bucket.s3.ap-northeast-2.amazonaws.com
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
+
+jwt:
+  secret: test-secret-key-for-junit-test-environment-minimum-256-bits
+  access-token-expiration: 3600000
+  refresh-token-expiration: 86400000
+
+security:
+  oauth2:
+    client:
+      provider:
+        kakao:
+          authorization-uri: https://kauth.kakao.com/oauth/authorize
+          token-uri: https://kauth.kakao.com/oauth/token
+          user-info-uri: https://kapi.kakao.com/v2/user/me
+          user-name-attribute: id
+      registration:
+        kakao:
+          client-id: test-client-id
+          client-secret: test-client-secret
+          client-authentication-method: client_secret_post
+          redirect-uri: http://localhost:8080/api/auth/kakao/callback
+          authorization-grant-type: authorization_code
+          admin-key: test-admin-key
+          client-name: kakao
+          scope:
+            - profile_nickname
+            - account_email
+
+app:
+  version:
+    ios: 1.0.0
+
+apple:
+  iap:
+    enabled: false
+    environment: Sandbox
+    bundle-id: com.juinjangteam.juinjang.test
+    issuer-id: test-issuer-id
+    key-id: test-key-id
+    apple-id: 0000000000
+    enable-online-checks: false
+    certificate-names:
+    private-key-path:
+  auth:
+    token-uri: https://appleid.apple.com/auth/token
+    public-key-url: https://appleid.apple.com/auth/keys
+  redirect-uri: null
+  iss: https://appleid.apple.com
+  aud: test.juinjangteam.com
+  client-id: com.juinjangteam.juinjang.test
+  team-id: test-team-id
+  key:
+    id: test-key-id
+    path:
+
+discord:
+  name: discord-feign-client
+  webhook-url: https://discord.com/test
+  report-shared-note: https://discord.com/test
+  member-create: https://discord.com/test
+  execute-payment: https://discord.com/test
+

@@ -1,0 +1,85 @@
+spring:
+  jpa:
+    open-in-view: false
+    generate-ddl: false
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+      dialect: org.hibernate.dialect.MySQL8Dialect
+      use_sql_comments: true
+    properties:
+      hibernate:
+        default_batch_fetch_size: 1000
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 40
+      minimum-idle: 10
+      connection-timeout: 3000
+      validation-timeout: 5000
+      max-lifetime: 1800000
+
+---
+# ===== test 프로필 =====
+# datasource는 Testcontainers(MySqlTestContainersConfig)가 동적으로 주입
+spring:
+  config:
+    activate:
+      on-profile: test
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: false
+  datasource:
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+
+---
+# ===== local 프로필 =====
+# Docker infra-compose.yml의 MySQL에 연결
+spring:
+  config:
+    activate:
+      on-profile: local
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+  datasource:
+    url: jdbc:mysql://localhost:3306/juinjang
+    username: application
+    password: application
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+
+---
+# ===== dev 프로필 =====
+spring:
+  config:
+    activate:
+      on-profile: dev
+  jpa:
+    show-sql: true
+  datasource:
+    url: jdbc:mysql://${DEV_MYSQL_HOST}:${DEV_MYSQL_PORT}/juinjang
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PWD}
+
+---
+# ===== prod 프로필 =====
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:mysql://${PROD_MYSQL_HOST}:${PROD_MYSQL_PORT}/juinjang
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PWD}
+    hikari:
+      maximum-pool-size: 40
+      minimum-idle: 30
