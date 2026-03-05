@@ -74,6 +74,7 @@ subprojects {
         testImplementation("org.mockito:mockito-core:${project.properties["mockitoVersion"]}")
         testImplementation("org.mockito.kotlin:mockito-kotlin:${project.properties["mockitoKotlinVersion"]}")
         testImplementation("org.instancio:instancio-junit:${project.properties["instancioJUnitVersion"]}")
+        testImplementation("com.tngtech.archunit:archunit-junit5:${project.properties["archunitVersion"]}")
     }
 
     tasks.withType(Jar::class) { enabled = true }
